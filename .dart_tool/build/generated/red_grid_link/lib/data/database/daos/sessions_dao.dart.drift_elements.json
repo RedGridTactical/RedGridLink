@@ -1,1 +1,0 @@
-{"valid_import":true,"imports":[{"uri":"package:drift/drift.dart","transitive":false},{"uri":"package:red_grid_link/data/database/app_database.dart","transitive":false},{"uri":"package:red_grid_link/data/database/tables/sessions_table.dart","transitive":false}],"elements":[{"kind":"databaseAccessor","name":"SessionsDao","dart_name":"SessionsDao"}]}

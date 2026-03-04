@@ -1,4 +1,0 @@
-// ignore_for_file: type=lint
-mixin _$TracksDaoMixin on DatabaseAccessor<AppDatabase> {
-  $TracksTable get tracks => attachedDatabase.tracks;
-}

@@ -1,1 +1,0 @@
-{"valid_import":true,"imports":[{"uri":"package:in_app_purchase/in_app_purchase.dart","transitive":false},{"uri":"package:red_grid_link/data/models/entitlement.dart","transitive":false},{"uri":"package:red_grid_link/services/iap/purchase_handler.dart","transitive":false}],"elements":[]}

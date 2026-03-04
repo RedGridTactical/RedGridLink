@@ -1,1 +1,0 @@
-{"valid_import":true,"imports":[{"uri":"package:drift/drift.dart","transitive":false},{"uri":"package:uuid/uuid.dart","transitive":false}],"elements":[{"kind":"table","name":"map_regions","dart_name":"MapRegions"}]}

@@ -1,0 +1,46 @@
+# Flutter/Dart
+.dart_tool/
+.packages
+build/
+.flutter-plugins
+.flutter-plugins-dependencies
+
+# Generated code
+*.g.dart
+*.drift.g.part
+*.drift_module.json
+
+# IDE
+*.iml
+.idea/
+.vscode/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Secrets
+*.jks
+*.keystore
+key.properties
+**/android/key.properties
+google-services.json
+
+# Build artifacts
+*.apk
+*.aab
+*.ipa
+*.dSYM.zip
+*.dSYM
+
+# Coverage
+coverage/
+.test_coverage.dart
+
+# Pub
+.pub-cache/
+.pub/
+pubspec.lock
+
+# Claude
+.claude/settings.local.json
