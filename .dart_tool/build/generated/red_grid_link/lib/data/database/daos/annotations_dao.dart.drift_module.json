@@ -1,0 +1,52 @@
+{
+  "elements": {
+    "AnnotationsDao": {
+      "id": {
+        "library_uri": "package:red_grid_link/data/database/daos/annotations_dao.dart",
+        "name": "AnnotationsDao"
+      },
+      "declaration": {
+        "source_uri": "package:red_grid_link/data/database/daos/annotations_dao.dart",
+        "offset": 311,
+        "name": "AnnotationsDao"
+      },
+      "references": [
+        {
+          "library_uri": "package:red_grid_link/data/database/tables/annotations_table.dart",
+          "name": "annotations"
+        }
+      ],
+      "type": "dao",
+      "tables": [
+        {
+          "library_uri": "package:red_grid_link/data/database/tables/annotations_table.dart",
+          "name": "annotations"
+        }
+      ],
+      "views": [],
+      "includes": [],
+      "queries": [],
+      "dart_type": {
+        "elements": [
+          {
+            "lexeme": "AnnotationsDao",
+            "import_uri": "package:red_grid_link/data/database/daos/annotations_dao.dart"
+          }
+        ]
+      },
+      "database": {
+        "elements": [
+          {
+            "lexeme": "AppDatabase",
+            "import_uri": "package:red_grid_link/data/database/app_database.dart"
+          }
+        ]
+      }
+    }
+  },
+  "imports": [
+    "package:drift/drift.dart",
+    "package:red_grid_link/data/database/app_database.dart",
+    "package:red_grid_link/data/database/tables/annotations_table.dart"
+  ]
+}

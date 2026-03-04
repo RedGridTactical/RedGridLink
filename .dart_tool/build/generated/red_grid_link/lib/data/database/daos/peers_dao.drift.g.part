@@ -1,0 +1,4 @@
+// ignore_for_file: type=lint
+mixin _$PeersDaoMixin on DatabaseAccessor<AppDatabase> {
+  $PeersTable get peers => attachedDatabase.peers;
+}

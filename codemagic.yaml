@@ -1,0 +1,202 @@
+# =============================================================================
+# Codemagic CI/CD Configuration — Red Grid Link
+# =============================================================================
+#
+# Environment Variables (set in Codemagic UI under App Settings > Environment):
+#
+# --- Android Code Signing ---
+# CM_KEYSTORE              : Base64-encoded .jks/.keystore file.
+#                            Generate with: base64 -i release.keystore | pbcopy
+#                            Create keystore with: keytool -genkeypair -v
+#                              -keystore release.keystore -keyalg RSA
+#                              -keysize 2048 -validity 10000
+#                              -alias <your-alias>
+# CM_KEY_ALIAS             : Alias used when creating the keystore (e.g., "redgridlink")
+# CM_KEY_PASSWORD          : Password for the key within the keystore
+# CM_KEYSTORE_PASSWORD     : Password for the keystore file itself
+#
+# --- Google Play Publishing ---
+# GOOGLE_PLAY_SERVICE_ACCOUNT_JSON : Contents of the Google Play service account
+#                            JSON key file. Create at Google Cloud Console >
+#                            Service Accounts > Keys > Add Key > JSON.
+#                            The service account must have "Release Manager"
+#                            or equivalent permissions in Google Play Console >
+#                            Settings > API access.
+#
+# --- App Store Connect Publishing ---
+# APP_STORE_CONNECT_ISSUER_ID      : Issuer ID from App Store Connect >
+#                            Users and Access > Integrations > App Store
+#                            Connect API > Issuer ID (UUID format).
+# APP_STORE_CONNECT_KEY_IDENTIFIER : Key ID from App Store Connect >
+#                            Users and Access > Integrations > App Store
+#                            Connect API > Active Keys (10-char alphanumeric).
+# APP_STORE_CONNECT_PRIVATE_KEY    : Contents of the .p8 private key file
+#                            downloaded when creating the API key. Starts with
+#                            -----BEGIN PRIVATE KEY-----. Can only be
+#                            downloaded once; regenerate if lost.
+#
+# =============================================================================
+
+definitions:
+  environment: &flutter_env
+    flutter: stable
+    java: 17
+  scripts:
+    - &pub_get
+      name: Install dependencies
+      script: flutter pub get
+    - &code_gen
+      name: Run Drift code generation
+      script: dart run build_runner build --delete-conflicting-outputs
+    - &run_tests
+      name: Run tests
+      script: flutter test
+
+workflows:
+  # ===========================================================================
+  # Android Release — Build AAB and publish to Google Play (internal track)
+  # ===========================================================================
+  android-release:
+    name: Android Release
+    max_build_duration: 30
+    instance_type: linux_x2
+    triggering:
+      events:
+        - push
+        - tag
+      branch_patterns:
+        - pattern: main
+          include: true
+      tag_patterns:
+        - pattern: v*
+          include: true
+      cancel_previous_builds: true
+    environment:
+      <<: *flutter_env
+      groups:
+        - android_credentials    # CM_KEYSTORE, CM_KEY_ALIAS, CM_KEY_PASSWORD, CM_KEYSTORE_PASSWORD
+        - google_play            # GOOGLE_PLAY_SERVICE_ACCOUNT_JSON
+      android_signing:
+        - red_grid_link_keystore # Reference name for the keystore in Codemagic UI
+    scripts:
+      - *pub_get
+      - *code_gen
+      - *run_tests
+      - name: Set up Android keystore
+        script: |
+          # Decode the base64-encoded keystore into a file
+          echo $CM_KEYSTORE | base64 --decode > $CM_BUILD_DIR/release.keystore
+
+          # Create key.properties for Gradle to consume
+          cat > $CM_BUILD_DIR/android/key.properties <<EOF
+          storePassword=$CM_KEYSTORE_PASSWORD
+          keyPassword=$CM_KEY_PASSWORD
+          keyAlias=$CM_KEY_ALIAS
+          storeFile=$CM_BUILD_DIR/release.keystore
+          EOF
+      - name: Build Android App Bundle
+        script: |
+          flutter build appbundle \
+            --release \
+            --build-number=$PROJECT_BUILD_NUMBER
+    artifacts:
+      - build/app/outputs/bundle/release/*.aab
+      - build/app/outputs/mapping/release/mapping.txt
+      - flutter_drive.log
+    publishing:
+      google_play:
+        credentials: $GOOGLE_PLAY_SERVICE_ACCOUNT_JSON
+        track: internal
+        submit_as_draft: true
+
+  # ===========================================================================
+  # iOS Release — Build IPA and publish to TestFlight
+  # ===========================================================================
+  ios-release:
+    name: iOS Release
+    max_build_duration: 60
+    instance_type: mac_mini_m2
+    integrations:
+      app_store_connect: Red Grid Link ASC  # Name of the ASC integration in Codemagic UI
+    triggering:
+      events:
+        - push
+        - tag
+      branch_patterns:
+        - pattern: main
+          include: true
+      tag_patterns:
+        - pattern: v*
+          include: true
+      cancel_previous_builds: true
+    environment:
+      <<: *flutter_env
+      ios_signing:
+        distribution_type: app_store
+        bundle_identifier: com.redgrid.redGridLink
+      groups:
+        - app_store_connect     # APP_STORE_CONNECT_ISSUER_ID, APP_STORE_CONNECT_KEY_IDENTIFIER, APP_STORE_CONNECT_PRIVATE_KEY
+      vars:
+        # Encryption declaration for App Store submission
+        # Set to YES because the app uses AES-256-GCM encryption
+        ITSAPPUSESNONEXEMPTENCRYPTION: "true"
+    scripts:
+      - *pub_get
+      - *code_gen
+      - *run_tests
+      - name: Install CocoaPods
+        script: |
+          cd ios
+          pod install
+      - name: Set up iOS code signing
+        script: |
+          # Codemagic handles code signing automatically when
+          # ios_signing is configured and App Store Connect
+          # integration is set up. This step uses the integration
+          # to fetch provisioning profiles and certificates.
+          keychain initialize
+          app-store-connect fetch-signing-files "com.redgrid.redGridLink" \
+            --type IOS_APP_STORE \
+            --create
+          keychain add-certificates
+          xcode-project use-profiles
+      - name: Build IPA
+        script: |
+          flutter build ipa \
+            --release \
+            --build-number=$PROJECT_BUILD_NUMBER \
+            --export-options-plist=/Users/builder/export_options.plist
+    artifacts:
+      - build/ios/ipa/*.ipa
+      - /tmp/xcodebuild_logs/*.log
+      - flutter_drive.log
+    publishing:
+      app_store_connect:
+        auth: integration
+        submit_to_testflight: true
+        beta_groups:
+          - Internal Testers
+        submit_to_app_store: false
+
+  # ===========================================================================
+  # Test — Run analysis and tests on pull requests
+  # ===========================================================================
+  test:
+    name: Test & Analyze
+    max_build_duration: 15
+    instance_type: linux_x2
+    triggering:
+      events:
+        - pull_request
+      branch_patterns:
+        - pattern: main
+          include: true
+      cancel_previous_builds: true
+    environment:
+      <<: *flutter_env
+    scripts:
+      - *pub_get
+      - *code_gen
+      - name: Run Flutter analyze
+        script: flutter analyze --no-fatal-infos
+      - *run_tests

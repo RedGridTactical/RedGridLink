@@ -1,0 +1,288 @@
+{
+  "elements": {
+    "annotations": {
+      "id": {
+        "library_uri": "package:red_grid_link/data/database/tables/annotations_table.dart",
+        "name": "annotations"
+      },
+      "declaration": {
+        "source_uri": "package:red_grid_link/data/database/tables/annotations_table.dart",
+        "offset": 137,
+        "name": "Annotations"
+      },
+      "references": [],
+      "type": "table",
+      "columns": [
+        {
+          "sqlType": {
+            "builtin": "string"
+          },
+          "nullable": false,
+          "nameInSql": "id",
+          "nameInDart": "id",
+          "declaration": {
+            "source_uri": "package:red_grid_link/data/database/tables/annotations_table.dart",
+            "offset": 220,
+            "name": "id"
+          },
+          "typeConverter": null,
+          "clientDefaultCode": {
+            "elements": [
+              "() => const ",
+              {
+                "lexeme": "Uuid",
+                "import_uri": "package:uuid/uuid.dart"
+              },
+              "().v4()"
+            ]
+          },
+          "defaultArgument": null,
+          "overriddenJsonName": null,
+          "referenceName": null,
+          "documentationComment": "/// Unique annotation ID (UUID v4).",
+          "constraints": [],
+          "customConstraints": null
+        },
+        {
+          "sqlType": {
+            "builtin": "string"
+          },
+          "nullable": true,
+          "nameInSql": "session_id",
+          "nameInDart": "sessionId",
+          "declaration": {
+            "source_uri": "package:red_grid_link/data/database/tables/annotations_table.dart",
+            "offset": 368,
+            "name": "sessionId"
+          },
+          "typeConverter": null,
+          "clientDefaultCode": null,
+          "defaultArgument": null,
+          "overriddenJsonName": null,
+          "referenceName": null,
+          "documentationComment": "/// Foreign key to sessions table (nullable for standalone annotations).",
+          "constraints": [],
+          "customConstraints": null
+        },
+        {
+          "sqlType": {
+            "builtin": "string"
+          },
+          "nullable": false,
+          "nameInSql": "type",
+          "nameInDart": "type",
+          "declaration": {
+            "source_uri": "package:red_grid_link/data/database/tables/annotations_table.dart",
+            "offset": 462,
+            "name": "type"
+          },
+          "typeConverter": null,
+          "clientDefaultCode": null,
+          "defaultArgument": null,
+          "overriddenJsonName": null,
+          "referenceName": null,
+          "documentationComment": "/// Geometry type: polyline or polygon.",
+          "constraints": [],
+          "customConstraints": null
+        },
+        {
+          "sqlType": {
+            "builtin": "string"
+          },
+          "nullable": false,
+          "nameInSql": "points_json",
+          "nameInDart": "pointsJson",
+          "declaration": {
+            "source_uri": "package:red_grid_link/data/database/tables/annotations_table.dart",
+            "offset": 545,
+            "name": "pointsJson"
+          },
+          "typeConverter": null,
+          "clientDefaultCode": null,
+          "defaultArgument": null,
+          "overriddenJsonName": null,
+          "referenceName": null,
+          "documentationComment": "/// JSON-encoded array of {lat, lon} points.",
+          "constraints": [],
+          "customConstraints": null
+        },
+        {
+          "sqlType": {
+            "builtin": "int"
+          },
+          "nullable": false,
+          "nameInSql": "color",
+          "nameInDart": "color",
+          "declaration": {
+            "source_uri": "package:red_grid_link/data/database/tables/annotations_table.dart",
+            "offset": 618,
+            "name": "color"
+          },
+          "typeConverter": null,
+          "clientDefaultCode": null,
+          "defaultArgument": {
+            "elements": [
+              "const ",
+              {
+                "lexeme": "Constant",
+                "import_uri": "package:drift/src/runtime/query_builder/query_builder.dart"
+              },
+              "(0xFFFF0000)"
+            ]
+          },
+          "overriddenJsonName": null,
+          "referenceName": null,
+          "documentationComment": "/// Color as an ARGB integer.",
+          "constraints": [],
+          "customConstraints": null
+        },
+        {
+          "sqlType": {
+            "builtin": "double"
+          },
+          "nullable": false,
+          "nameInSql": "stroke_width",
+          "nameInDart": "strokeWidth",
+          "declaration": {
+            "source_uri": "package:red_grid_link/data/database/tables/annotations_table.dart",
+            "offset": 723,
+            "name": "strokeWidth"
+          },
+          "typeConverter": null,
+          "clientDefaultCode": null,
+          "defaultArgument": {
+            "elements": [
+              "const ",
+              {
+                "lexeme": "Constant",
+                "import_uri": "package:drift/src/runtime/query_builder/query_builder.dart"
+              },
+              "(2.0)"
+            ]
+          },
+          "overriddenJsonName": null,
+          "referenceName": null,
+          "documentationComment": "/// Line stroke width.",
+          "constraints": [],
+          "customConstraints": null
+        },
+        {
+          "sqlType": {
+            "builtin": "string"
+          },
+          "nullable": true,
+          "nameInSql": "label",
+          "nameInDart": "label",
+          "declaration": {
+            "source_uri": "package:red_grid_link/data/database/tables/annotations_table.dart",
+            "offset": 821,
+            "name": "label"
+          },
+          "typeConverter": null,
+          "clientDefaultCode": null,
+          "defaultArgument": null,
+          "overriddenJsonName": null,
+          "referenceName": null,
+          "documentationComment": "/// Optional label.",
+          "constraints": [],
+          "customConstraints": null
+        },
+        {
+          "sqlType": {
+            "builtin": "string"
+          },
+          "nullable": false,
+          "nameInSql": "created_by",
+          "nameInDart": "createdBy",
+          "declaration": {
+            "source_uri": "package:red_grid_link/data/database/tables/annotations_table.dart",
+            "offset": 920,
+            "name": "createdBy"
+          },
+          "typeConverter": null,
+          "clientDefaultCode": null,
+          "defaultArgument": null,
+          "overriddenJsonName": null,
+          "referenceName": null,
+          "documentationComment": "/// ID of the peer that created this annotation.",
+          "constraints": [],
+          "customConstraints": null
+        },
+        {
+          "sqlType": {
+            "builtin": "dateTime"
+          },
+          "nullable": false,
+          "nameInSql": "created_at",
+          "nameInDart": "createdAt",
+          "declaration": {
+            "source_uri": "package:red_grid_link/data/database/tables/annotations_table.dart",
+            "offset": 1004,
+            "name": "createdAt"
+          },
+          "typeConverter": null,
+          "clientDefaultCode": null,
+          "defaultArgument": null,
+          "overriddenJsonName": null,
+          "referenceName": null,
+          "documentationComment": "/// When the annotation was created.",
+          "constraints": [],
+          "customConstraints": null
+        },
+        {
+          "sqlType": {
+            "builtin": "bool"
+          },
+          "nullable": false,
+          "nameInSql": "is_synced",
+          "nameInDart": "isSynced",
+          "declaration": {
+            "source_uri": "package:red_grid_link/data/database/tables/annotations_table.dart",
+            "offset": 1105,
+            "name": "isSynced"
+          },
+          "typeConverter": null,
+          "clientDefaultCode": null,
+          "defaultArgument": {
+            "elements": [
+              "const ",
+              {
+                "lexeme": "Constant",
+                "import_uri": "package:drift/src/runtime/query_builder/query_builder.dart"
+              },
+              "(false)"
+            ]
+          },
+          "overriddenJsonName": null,
+          "referenceName": null,
+          "documentationComment": "/// Whether this annotation has been synced to peers.",
+          "constraints": [],
+          "customConstraints": null
+        }
+      ],
+      "existing_data_class": null,
+      "table_constraints": [
+        {
+          "type": "primary_key",
+          "columns": [
+            "id"
+          ]
+        }
+      ],
+      "custom_parent_class": null,
+      "fixed_entity_info_name": null,
+      "base_dart_name": "Annotations",
+      "row_class_name": "Annotation",
+      "companion_class_name": null,
+      "without_rowid": false,
+      "strict": false,
+      "write_default_constraints": true,
+      "custom_constraints": [],
+      "attached_indices": []
+    }
+  },
+  "imports": [
+    "package:drift/drift.dart",
+    "package:uuid/uuid.dart"
+  ]
+}

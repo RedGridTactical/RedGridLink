@@ -1,0 +1,122 @@
+{
+  "configVersion": 1,
+  "apple": {
+    "info": {
+      "en-US": {
+        "title": "Red Grid Link",
+        "subtitle": "Offline MGRS Nav & Team Sync",
+        "description": "Your team. Your grid. No cell towers required.\n\nRed Grid Link is an offline-first, MGRS-native coordination platform for small teams (2-8 people) operating beyond reliable cell service. It combines precision land navigation with Field Link -- zero-config proximity sync over Bluetooth and WiFi Direct. No accounts. No servers. No complexity.\n\nFIELD LINK -- TEAM SYNC WITHOUT INFRASTRUCTURE:\nField Link is what sets Red Grid Link apart. Devices within proximity automatically discover each other and share encrypted position and marker data -- no internet, no configuration, no pairing codes. Just turn it on and your team appears on the map.\n- BLE + WiFi Direct/AWDL proximity transport (cross-platform)\n- AES-256-GCM encrypted sync with ECDH ephemeral session keys\n- Compact delta payloads (<200 bytes per position update)\n- Tiered session security: Open (auto-join), PIN (4-digit), or QR code\n- Ghost markers: see last-known positions when teammates move out of range\n- Time-decay visualization: full opacity fades to outline over 30 minutes\n- Velocity vectors project teammate movement direction at disconnect\n- Snap-to-live animation on reconnect\n- Expedition Mode: <4% battery per 8-hour session (BLE-only, 30-second updates)\n\nMGRS-NATIVE NAVIGATION:\nBuilt on the proven MGRS engine from Red Grid Tactical -- the same coordinate system used by NATO forces worldwide.\n- Live MGRS coordinates (4/6/8/10-digit precision)\n- MGRS grid overlay on offline maps (GZD to 100m resolution)\n- Bearing, distance, and dead reckoning tools\n- Magnetic declination (WMM model)\n- NATO phonetic voice readout for hands-free grid calls\n\n8 TACTICAL TOOLS:\n- Dead Reckoning plotter\n- Two-point Resection\n- Pace Count tracker\n- Bearing calculator with back azimuth\n- Coordinate Converter (MGRS, lat/lon, UTM)\n- Range Estimation\n- Slope Calculator\n- ETA / Speed Calculator\n\nOFFLINE MAP SYSTEM:\n- Downloadable map packs from USGS Topo and OpenTopoMap\n- Full offline operation -- maps cached locally as MBTiles\n- MGRS grid lines rendered as a dynamic overlay at all zoom levels\n\n4 OPERATIONAL MODES:\nOne engine, four presentation layers. Terminology, icons, and quick actions adapt to your mission:\n- Search & Rescue -- sector assignments, clue markers, search patterns\n- Backcountry -- camp, waypoint, and trail navigation\n- Hunting -- stand locations, game sightings, property boundaries\n- Training -- exercise objectives, rally points, phase lines\n\nAFTER-ACTION REPORTS:\nOne-tap PDF export containing map snapshot, mission timeline, track data, timestamps, team roster, markers, and session log.\n\n4 TACTICAL DISPLAY THEMES:\n- Red Light: preserve night-adapted vision (free)\n- NVG Green: night observation device compatibility (Pro)\n- Day White: high-contrast for daylight (Pro)\n- Blue Force: tactical blue display (Pro)\n\nBUILT FOR THE FIELD:\n- Glove-friendly UI with 44px+ minimum touch targets\n- 3-tap maximum to any primary action\n- Haptic feedback on key interactions\n\nZERO FOOTPRINT PRIVACY:\n- No accounts. No sign-up. No login.\n- No cloud sync. No analytics. No tracking.\n- No ads. No third-party data SDKs.\n- Location data stays on your device.\n- Field Link data is ephemeral -- nothing persists after the session ends.\n- All Field Link communication encrypted with AES-256-GCM.\n- In-app purchases processed by Apple/Google only.",
+        "keywords": ["mgrs", "tactical", "navigation", "offline", "team", "sync", "BLE", "military", "grid", "SAR"],
+        "releaseNotes": "Red Grid Link v1.0 -- initial release:\n- Live MGRS navigation with 1-meter precision\n- Field Link proximity sync (BLE + WiFi Direct/AWDL)\n- AES-256-GCM encrypted sync with ECDH key exchange\n- Offline map downloads (USGS Topo + OpenTopoMap)\n- Ghost markers with time-decay visualization\n- 4 operational modes (SAR, Backcountry, Hunting, Training)\n- 4 tactical display themes\n- 8 tactical land navigation tools\n- After-Action Report PDF export\n- NATO phonetic voice readout",
+        "privacyPolicyUrl": "https://github.com/redgrid/red-grid-link/blob/main/PRIVACY.md",
+        "supportUrl": "https://github.com/redgrid/red-grid-link/issues"
+      }
+    },
+    "categories": ["NAVIGATION"],
+    "secondaryCategory": "UTILITIES",
+    "copyright": "2026 Red Grid",
+    "ageRating": "4+",
+    "pricing": {
+      "basePlan": "free",
+      "inAppPurchases": [
+        {
+          "id": "pro_monthly",
+          "name": "Pro Monthly",
+          "price": 3.99,
+          "type": "auto_renewable_subscription",
+          "description": "All themes, unlimited map downloads, AAR export (2 devices)"
+        },
+        {
+          "id": "pro_yearly",
+          "name": "Pro Yearly",
+          "price": 29.99,
+          "type": "auto_renewable_subscription",
+          "description": "All themes, unlimited map downloads, AAR export (2 devices)"
+        },
+        {
+          "id": "pro_link_monthly",
+          "name": "Pro+Link Monthly",
+          "price": 5.99,
+          "type": "auto_renewable_subscription",
+          "description": "Pro features + full 8-device Field Link"
+        },
+        {
+          "id": "pro_link_yearly",
+          "name": "Pro+Link Yearly",
+          "price": 44.99,
+          "type": "auto_renewable_subscription",
+          "description": "Pro features + full 8-device Field Link"
+        },
+        {
+          "id": "team_yearly",
+          "name": "Team Yearly",
+          "price": 199.99,
+          "type": "auto_renewable_subscription",
+          "description": "Pro+Link for 8 seats"
+        },
+        {
+          "id": "lifetime",
+          "name": "Lifetime Pro+Link",
+          "price": 99.99,
+          "type": "non_consumable",
+          "description": "Pro+Link forever, one-time purchase"
+        }
+      ]
+    }
+  },
+  "google": {
+    "title": "Red Grid Link",
+    "shortDescription": "Offline MGRS navigation with proximity team sync -- no cell service needed.",
+    "fullDescription": "Your team. Your grid. No cell towers required.\n\nRed Grid Link is an offline-first, MGRS-native coordination platform for small teams (2-8 people) operating beyond reliable cell service. It combines precision land navigation with Field Link -- zero-config proximity sync over Bluetooth and WiFi Direct. No accounts. No servers. No complexity.\n\nFIELD LINK -- TEAM SYNC WITHOUT INFRASTRUCTURE:\nField Link is what sets Red Grid Link apart. Devices within proximity automatically discover each other and share encrypted position and marker data -- no internet, no configuration, no pairing codes. Just turn it on and your team appears on the map.\n- BLE + WiFi Direct/AWDL proximity transport (cross-platform)\n- AES-256-GCM encrypted sync with ECDH ephemeral session keys\n- Compact delta payloads (<200 bytes per position update)\n- Tiered session security: Open (auto-join), PIN (4-digit), or QR code\n- Ghost markers: see last-known positions when teammates move out of range\n- Time-decay visualization: full opacity fades to outline over 30 minutes\n- Velocity vectors project teammate movement direction at disconnect\n- Snap-to-live animation on reconnect\n- Expedition Mode: <4% battery per 8-hour session (BLE-only, 30-second updates)\n\nMGRS-NATIVE NAVIGATION:\nBuilt on the proven MGRS engine from Red Grid Tactical -- the same coordinate system used by NATO forces worldwide.\n- Live MGRS coordinates (4/6/8/10-digit precision)\n- MGRS grid overlay on offline maps (GZD to 100m resolution)\n- Bearing, distance, and dead reckoning tools\n- Magnetic declination (WMM model)\n- NATO phonetic voice readout for hands-free grid calls\n\n8 TACTICAL TOOLS:\n- Dead Reckoning plotter\n- Two-point Resection\n- Pace Count tracker\n- Bearing calculator with back azimuth\n- Coordinate Converter (MGRS, lat/lon, UTM)\n- Range Estimation\n- Slope Calculator\n- ETA / Speed Calculator\n\nOFFLINE MAP SYSTEM:\n- Downloadable map packs from USGS Topo and OpenTopoMap\n- Full offline operation -- maps cached locally as MBTiles\n- MGRS grid lines rendered as a dynamic overlay at all zoom levels\n\n4 OPERATIONAL MODES:\nOne engine, four presentation layers. Terminology, icons, and quick actions adapt to your mission:\n- Search & Rescue -- sector assignments, clue markers, search patterns\n- Backcountry -- camp, waypoint, and trail navigation\n- Hunting -- stand locations, game sightings, property boundaries\n- Training -- exercise objectives, rally points, phase lines\n\nAFTER-ACTION REPORTS:\nOne-tap PDF export containing map snapshot, mission timeline, track data, timestamps, team roster, markers, and session log.\n\n4 TACTICAL DISPLAY THEMES:\n- Red Light: preserve night-adapted vision (free)\n- NVG Green: night observation device compatibility (Pro)\n- Day White: high-contrast for daylight (Pro)\n- Blue Force: tactical blue display (Pro)\n\nBUILT FOR THE FIELD:\n- Glove-friendly UI with 44px+ minimum touch targets\n- 3-tap maximum to any primary action\n- Haptic feedback on key interactions\n\nZERO FOOTPRINT PRIVACY:\n- No accounts. No sign-up. No login.\n- No cloud sync. No analytics. No tracking.\n- No ads. No third-party data SDKs.\n- Location data stays on your device.\n- Field Link data is ephemeral -- nothing persists after the session ends.\n- All Field Link communication encrypted with AES-256-GCM.\n- In-app purchases processed by Apple/Google only.",
+    "category": "NAVIGATION",
+    "contentRating": "Everyone",
+    "privacyPolicyUrl": "https://github.com/redgrid/red-grid-link/blob/main/PRIVACY.md",
+    "pricing": {
+      "basePlan": "free",
+      "inAppPurchases": [
+        {
+          "id": "pro_monthly",
+          "name": "Pro Monthly",
+          "price": 3.99,
+          "type": "subscription",
+          "description": "All themes, unlimited map downloads, AAR export (2 devices)"
+        },
+        {
+          "id": "pro_yearly",
+          "name": "Pro Yearly",
+          "price": 29.99,
+          "type": "subscription",
+          "description": "All themes, unlimited map downloads, AAR export (2 devices)"
+        },
+        {
+          "id": "pro_link_monthly",
+          "name": "Pro+Link Monthly",
+          "price": 5.99,
+          "type": "subscription",
+          "description": "Pro features + full 8-device Field Link"
+        },
+        {
+          "id": "pro_link_yearly",
+          "name": "Pro+Link Yearly",
+          "price": 44.99,
+          "type": "subscription",
+          "description": "Pro features + full 8-device Field Link"
+        },
+        {
+          "id": "team_yearly",
+          "name": "Team Yearly",
+          "price": 199.99,
+          "type": "subscription",
+          "description": "Pro+Link for 8 seats"
+        },
+        {
+          "id": "lifetime",
+          "name": "Lifetime Pro+Link",
+          "price": 99.99,
+          "type": "in_app_product",
+          "description": "Pro+Link forever, one-time purchase"
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,52 @@
+{
+  "elements": {
+    "PeersDao": {
+      "id": {
+        "library_uri": "package:red_grid_link/data/database/daos/peers_dao.dart",
+        "name": "PeersDao"
+      },
+      "declaration": {
+        "source_uri": "package:red_grid_link/data/database/daos/peers_dao.dart",
+        "offset": 287,
+        "name": "PeersDao"
+      },
+      "references": [
+        {
+          "library_uri": "package:red_grid_link/data/database/tables/peers_table.dart",
+          "name": "peers"
+        }
+      ],
+      "type": "dao",
+      "tables": [
+        {
+          "library_uri": "package:red_grid_link/data/database/tables/peers_table.dart",
+          "name": "peers"
+        }
+      ],
+      "views": [],
+      "includes": [],
+      "queries": [],
+      "dart_type": {
+        "elements": [
+          {
+            "lexeme": "PeersDao",
+            "import_uri": "package:red_grid_link/data/database/daos/peers_dao.dart"
+          }
+        ]
+      },
+      "database": {
+        "elements": [
+          {
+            "lexeme": "AppDatabase",
+            "import_uri": "package:red_grid_link/data/database/app_database.dart"
+          }
+        ]
+      }
+    }
+  },
+  "imports": [
+    "package:drift/drift.dart",
+    "package:red_grid_link/data/database/app_database.dart",
+    "package:red_grid_link/data/database/tables/peers_table.dart"
+  ]
+}

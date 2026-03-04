@@ -1,0 +1,246 @@
+{
+  "elements": {
+    "sessions": {
+      "id": {
+        "library_uri": "package:red_grid_link/data/database/tables/sessions_table.dart",
+        "name": "sessions"
+      },
+      "declaration": {
+        "source_uri": "package:red_grid_link/data/database/tables/sessions_table.dart",
+        "offset": 116,
+        "name": "Sessions"
+      },
+      "references": [],
+      "type": "table",
+      "columns": [
+        {
+          "sqlType": {
+            "builtin": "string"
+          },
+          "nullable": false,
+          "nameInSql": "id",
+          "nameInDart": "id",
+          "declaration": {
+            "source_uri": "package:red_grid_link/data/database/tables/sessions_table.dart",
+            "offset": 193,
+            "name": "id"
+          },
+          "typeConverter": null,
+          "clientDefaultCode": {
+            "elements": [
+              "() => const ",
+              {
+                "lexeme": "Uuid",
+                "import_uri": "package:uuid/uuid.dart"
+              },
+              "().v4()"
+            ]
+          },
+          "defaultArgument": null,
+          "overriddenJsonName": null,
+          "referenceName": null,
+          "documentationComment": "/// Unique session ID (UUID v4).",
+          "constraints": [],
+          "customConstraints": null
+        },
+        {
+          "sqlType": {
+            "builtin": "string"
+          },
+          "nullable": false,
+          "nameInSql": "name",
+          "nameInDart": "name",
+          "declaration": {
+            "source_uri": "package:red_grid_link/data/database/tables/sessions_table.dart",
+            "offset": 301,
+            "name": "name"
+          },
+          "typeConverter": null,
+          "clientDefaultCode": null,
+          "defaultArgument": null,
+          "overriddenJsonName": null,
+          "referenceName": null,
+          "documentationComment": "/// Human-readable session name.",
+          "constraints": [],
+          "customConstraints": null
+        },
+        {
+          "sqlType": {
+            "builtin": "string"
+          },
+          "nullable": false,
+          "nameInSql": "security_mode",
+          "nameInDart": "securityMode",
+          "declaration": {
+            "source_uri": "package:red_grid_link/data/database/tables/sessions_table.dart",
+            "offset": 376,
+            "name": "securityMode"
+          },
+          "typeConverter": null,
+          "clientDefaultCode": null,
+          "defaultArgument": {
+            "elements": [
+              "const ",
+              {
+                "lexeme": "Constant",
+                "import_uri": "package:drift/src/runtime/query_builder/query_builder.dart"
+              },
+              "('open')"
+            ]
+          },
+          "overriddenJsonName": null,
+          "referenceName": null,
+          "documentationComment": "/// Security mode: open, pin, or qr.",
+          "constraints": [],
+          "customConstraints": null
+        },
+        {
+          "sqlType": {
+            "builtin": "string"
+          },
+          "nullable": true,
+          "nameInSql": "pin",
+          "nameInDart": "pin",
+          "declaration": {
+            "source_uri": "package:red_grid_link/data/database/tables/sessions_table.dart",
+            "offset": 508,
+            "name": "pin"
+          },
+          "typeConverter": null,
+          "clientDefaultCode": null,
+          "defaultArgument": null,
+          "overriddenJsonName": null,
+          "referenceName": null,
+          "documentationComment": "/// Optional 4-digit PIN (for pin security mode).",
+          "constraints": [],
+          "customConstraints": null
+        },
+        {
+          "sqlType": {
+            "builtin": "string"
+          },
+          "nullable": true,
+          "nameInSql": "session_key",
+          "nameInDart": "sessionKey",
+          "declaration": {
+            "source_uri": "package:red_grid_link/data/database/tables/sessions_table.dart",
+            "offset": 616,
+            "name": "sessionKey"
+          },
+          "typeConverter": null,
+          "clientDefaultCode": null,
+          "defaultArgument": null,
+          "overriddenJsonName": null,
+          "referenceName": null,
+          "documentationComment": "/// Optional session encryption key (for qr security mode).",
+          "constraints": [],
+          "customConstraints": null
+        },
+        {
+          "sqlType": {
+            "builtin": "dateTime"
+          },
+          "nullable": false,
+          "nameInSql": "created_at",
+          "nameInDart": "createdAt",
+          "declaration": {
+            "source_uri": "package:red_grid_link/data/database/tables/sessions_table.dart",
+            "offset": 709,
+            "name": "createdAt"
+          },
+          "typeConverter": null,
+          "clientDefaultCode": null,
+          "defaultArgument": null,
+          "overriddenJsonName": null,
+          "referenceName": null,
+          "documentationComment": "/// When the session was created.",
+          "constraints": [],
+          "customConstraints": null
+        },
+        {
+          "sqlType": {
+            "builtin": "string"
+          },
+          "nullable": false,
+          "nameInSql": "operational_mode",
+          "nameInDart": "operationalMode",
+          "declaration": {
+            "source_uri": "package:red_grid_link/data/database/tables/sessions_table.dart",
+            "offset": 818,
+            "name": "operationalMode"
+          },
+          "typeConverter": null,
+          "clientDefaultCode": null,
+          "defaultArgument": {
+            "elements": [
+              "const ",
+              {
+                "lexeme": "Constant",
+                "import_uri": "package:drift/src/runtime/query_builder/query_builder.dart"
+              },
+              "('sar')"
+            ]
+          },
+          "overriddenJsonName": null,
+          "referenceName": null,
+          "documentationComment": "/// Operational mode: sar, backcountry, hunting, or training.",
+          "constraints": [],
+          "customConstraints": null
+        },
+        {
+          "sqlType": {
+            "builtin": "bool"
+          },
+          "nullable": false,
+          "nameInSql": "is_active",
+          "nameInDart": "isActive",
+          "declaration": {
+            "source_uri": "package:red_grid_link/data/database/tables/sessions_table.dart",
+            "offset": 948,
+            "name": "isActive"
+          },
+          "typeConverter": null,
+          "clientDefaultCode": null,
+          "defaultArgument": {
+            "elements": [
+              "const ",
+              {
+                "lexeme": "Constant",
+                "import_uri": "package:drift/src/runtime/query_builder/query_builder.dart"
+              },
+              "(false)"
+            ]
+          },
+          "overriddenJsonName": null,
+          "referenceName": null,
+          "documentationComment": "/// Whether this session is currently active.",
+          "constraints": [],
+          "customConstraints": null
+        }
+      ],
+      "existing_data_class": null,
+      "table_constraints": [
+        {
+          "type": "primary_key",
+          "columns": [
+            "id"
+          ]
+        }
+      ],
+      "custom_parent_class": null,
+      "fixed_entity_info_name": null,
+      "base_dart_name": "Sessions",
+      "row_class_name": "Session",
+      "companion_class_name": null,
+      "without_rowid": false,
+      "strict": false,
+      "write_default_constraints": true,
+      "custom_constraints": [],
+      "attached_indices": []
+    }
+  },
+  "imports": [
+    "package:drift/drift.dart",
+    "package:uuid/uuid.dart"
+  ]
+}

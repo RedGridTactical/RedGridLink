@@ -1,0 +1,1 @@
+{"valid_import":true,"imports":[{"uri":"package:drift/drift.dart","transitive":false},{"uri":"package:uuid/uuid.dart","transitive":false}],"elements":[{"kind":"table","name":"sessions","dart_name":"Sessions"}]}

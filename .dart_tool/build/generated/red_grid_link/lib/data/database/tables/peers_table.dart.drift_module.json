@@ -1,0 +1,393 @@
+{
+  "elements": {
+    "peers": {
+      "id": {
+        "library_uri": "package:red_grid_link/data/database/tables/peers_table.dart",
+        "name": "peers"
+      },
+      "declaration": {
+        "source_uri": "package:red_grid_link/data/database/tables/peers_table.dart",
+        "offset": 136,
+        "name": "Peers"
+      },
+      "references": [],
+      "type": "table",
+      "columns": [
+        {
+          "sqlType": {
+            "builtin": "string"
+          },
+          "nullable": false,
+          "nameInSql": "id",
+          "nameInDart": "id",
+          "declaration": {
+            "source_uri": "package:red_grid_link/data/database/tables/peers_table.dart",
+            "offset": 207,
+            "name": "id"
+          },
+          "typeConverter": null,
+          "clientDefaultCode": {
+            "elements": [
+              "() => const ",
+              {
+                "lexeme": "Uuid",
+                "import_uri": "package:uuid/uuid.dart"
+              },
+              "().v4()"
+            ]
+          },
+          "defaultArgument": null,
+          "overriddenJsonName": null,
+          "referenceName": null,
+          "documentationComment": "/// Unique peer ID (UUID v4).",
+          "constraints": [],
+          "customConstraints": null
+        },
+        {
+          "sqlType": {
+            "builtin": "string"
+          },
+          "nullable": false,
+          "nameInSql": "session_id",
+          "nameInDart": "sessionId",
+          "declaration": {
+            "source_uri": "package:red_grid_link/data/database/tables/peers_table.dart",
+            "offset": 317,
+            "name": "sessionId"
+          },
+          "typeConverter": null,
+          "clientDefaultCode": null,
+          "defaultArgument": null,
+          "overriddenJsonName": null,
+          "referenceName": null,
+          "documentationComment": "/// Foreign key to sessions table.",
+          "constraints": [],
+          "customConstraints": null
+        },
+        {
+          "sqlType": {
+            "builtin": "string"
+          },
+          "nullable": false,
+          "nameInSql": "display_name",
+          "nameInDart": "displayName",
+          "declaration": {
+            "source_uri": "package:red_grid_link/data/database/tables/peers_table.dart",
+            "offset": 394,
+            "name": "displayName"
+          },
+          "typeConverter": null,
+          "clientDefaultCode": null,
+          "defaultArgument": null,
+          "overriddenJsonName": null,
+          "referenceName": null,
+          "documentationComment": "/// User-configured display name.",
+          "constraints": [],
+          "customConstraints": null
+        },
+        {
+          "sqlType": {
+            "builtin": "string"
+          },
+          "nullable": false,
+          "nameInSql": "device_type",
+          "nameInDart": "deviceType",
+          "declaration": {
+            "source_uri": "package:red_grid_link/data/database/tables/peers_table.dart",
+            "offset": 486,
+            "name": "deviceType"
+          },
+          "typeConverter": null,
+          "clientDefaultCode": null,
+          "defaultArgument": {
+            "elements": [
+              "const ",
+              {
+                "lexeme": "Constant",
+                "import_uri": "package:drift/src/runtime/query_builder/query_builder.dart"
+              },
+              "('unknown')"
+            ]
+          },
+          "overriddenJsonName": null,
+          "referenceName": null,
+          "documentationComment": "/// Device platform: android, ios, or unknown.",
+          "constraints": [],
+          "customConstraints": null
+        },
+        {
+          "sqlType": {
+            "builtin": "double"
+          },
+          "nullable": true,
+          "nameInSql": "lat",
+          "nameInDart": "lat",
+          "declaration": {
+            "source_uri": "package:red_grid_link/data/database/tables/peers_table.dart",
+            "offset": 587,
+            "name": "lat"
+          },
+          "typeConverter": null,
+          "clientDefaultCode": null,
+          "defaultArgument": null,
+          "overriddenJsonName": null,
+          "referenceName": null,
+          "documentationComment": "/// GPS latitude.",
+          "constraints": [],
+          "customConstraints": null
+        },
+        {
+          "sqlType": {
+            "builtin": "double"
+          },
+          "nullable": true,
+          "nameInSql": "lon",
+          "nameInDart": "lon",
+          "declaration": {
+            "source_uri": "package:red_grid_link/data/database/tables/peers_table.dart",
+            "offset": 654,
+            "name": "lon"
+          },
+          "typeConverter": null,
+          "clientDefaultCode": null,
+          "defaultArgument": null,
+          "overriddenJsonName": null,
+          "referenceName": null,
+          "documentationComment": "/// GPS longitude.",
+          "constraints": [],
+          "customConstraints": null
+        },
+        {
+          "sqlType": {
+            "builtin": "double"
+          },
+          "nullable": true,
+          "nameInSql": "altitude",
+          "nameInDart": "altitude",
+          "declaration": {
+            "source_uri": "package:red_grid_link/data/database/tables/peers_table.dart",
+            "offset": 730,
+            "name": "altitude"
+          },
+          "typeConverter": null,
+          "clientDefaultCode": null,
+          "defaultArgument": null,
+          "overriddenJsonName": null,
+          "referenceName": null,
+          "documentationComment": "/// GPS altitude in meters.",
+          "constraints": [],
+          "customConstraints": null
+        },
+        {
+          "sqlType": {
+            "builtin": "double"
+          },
+          "nullable": true,
+          "nameInSql": "speed",
+          "nameInDart": "speed",
+          "declaration": {
+            "source_uri": "package:red_grid_link/data/database/tables/peers_table.dart",
+            "offset": 801,
+            "name": "speed"
+          },
+          "typeConverter": null,
+          "clientDefaultCode": null,
+          "defaultArgument": null,
+          "overriddenJsonName": null,
+          "referenceName": null,
+          "documentationComment": "/// Speed in m/s.",
+          "constraints": [],
+          "customConstraints": null
+        },
+        {
+          "sqlType": {
+            "builtin": "double"
+          },
+          "nullable": true,
+          "nameInSql": "heading",
+          "nameInDart": "heading",
+          "declaration": {
+            "source_uri": "package:red_grid_link/data/database/tables/peers_table.dart",
+            "offset": 883,
+            "name": "heading"
+          },
+          "typeConverter": null,
+          "clientDefaultCode": null,
+          "defaultArgument": null,
+          "overriddenJsonName": null,
+          "referenceName": null,
+          "documentationComment": "/// Compass heading in degrees.",
+          "constraints": [],
+          "customConstraints": null
+        },
+        {
+          "sqlType": {
+            "builtin": "double"
+          },
+          "nullable": true,
+          "nameInSql": "accuracy",
+          "nameInDart": "accuracy",
+          "declaration": {
+            "source_uri": "package:red_grid_link/data/database/tables/peers_table.dart",
+            "offset": 963,
+            "name": "accuracy"
+          },
+          "typeConverter": null,
+          "clientDefaultCode": null,
+          "defaultArgument": null,
+          "overriddenJsonName": null,
+          "referenceName": null,
+          "documentationComment": "/// GPS accuracy in meters.",
+          "constraints": [],
+          "customConstraints": null
+        },
+        {
+          "sqlType": {
+            "builtin": "string"
+          },
+          "nullable": true,
+          "nameInSql": "mgrs_raw",
+          "nameInDart": "mgrsRaw",
+          "declaration": {
+            "source_uri": "package:red_grid_link/data/database/tables/peers_table.dart",
+            "offset": 1048,
+            "name": "mgrsRaw"
+          },
+          "typeConverter": null,
+          "clientDefaultCode": null,
+          "defaultArgument": null,
+          "overriddenJsonName": null,
+          "referenceName": null,
+          "documentationComment": "/// Raw MGRS coordinate string.",
+          "constraints": [],
+          "customConstraints": null
+        },
+        {
+          "sqlType": {
+            "builtin": "dateTime"
+          },
+          "nullable": false,
+          "nameInSql": "last_seen",
+          "nameInDart": "lastSeen",
+          "declaration": {
+            "source_uri": "package:red_grid_link/data/database/tables/peers_table.dart",
+            "offset": 1150,
+            "name": "lastSeen"
+          },
+          "typeConverter": null,
+          "clientDefaultCode": null,
+          "defaultArgument": null,
+          "overriddenJsonName": null,
+          "referenceName": null,
+          "documentationComment": "/// Last time a position update was received.",
+          "constraints": [],
+          "customConstraints": null
+        },
+        {
+          "sqlType": {
+            "builtin": "bool"
+          },
+          "nullable": false,
+          "nameInSql": "is_connected",
+          "nameInDart": "isConnected",
+          "declaration": {
+            "source_uri": "package:red_grid_link/data/database/tables/peers_table.dart",
+            "offset": 1241,
+            "name": "isConnected"
+          },
+          "typeConverter": null,
+          "clientDefaultCode": null,
+          "defaultArgument": {
+            "elements": [
+              "const ",
+              {
+                "lexeme": "Constant",
+                "import_uri": "package:drift/src/runtime/query_builder/query_builder.dart"
+              },
+              "(true)"
+            ]
+          },
+          "overriddenJsonName": null,
+          "referenceName": null,
+          "documentationComment": "/// Whether the peer is currently connected.",
+          "constraints": [],
+          "customConstraints": null
+        },
+        {
+          "sqlType": {
+            "builtin": "int"
+          },
+          "nullable": true,
+          "nameInSql": "battery_level",
+          "nameInDart": "batteryLevel",
+          "declaration": {
+            "source_uri": "package:red_grid_link/data/database/tables/peers_table.dart",
+            "offset": 1347,
+            "name": "batteryLevel"
+          },
+          "typeConverter": null,
+          "clientDefaultCode": null,
+          "defaultArgument": null,
+          "overriddenJsonName": null,
+          "referenceName": null,
+          "documentationComment": "/// Battery level 0-100.",
+          "constraints": [],
+          "customConstraints": null
+        },
+        {
+          "sqlType": {
+            "builtin": "string"
+          },
+          "nullable": false,
+          "nameInSql": "sync_mode",
+          "nameInDart": "syncMode",
+          "declaration": {
+            "source_uri": "package:red_grid_link/data/database/tables/peers_table.dart",
+            "offset": 1444,
+            "name": "syncMode"
+          },
+          "typeConverter": null,
+          "clientDefaultCode": null,
+          "defaultArgument": {
+            "elements": [
+              "const ",
+              {
+                "lexeme": "Constant",
+                "import_uri": "package:drift/src/runtime/query_builder/query_builder.dart"
+              },
+              "('expedition')"
+            ]
+          },
+          "overriddenJsonName": null,
+          "referenceName": null,
+          "documentationComment": "/// Sync mode: expedition or active.",
+          "constraints": [],
+          "customConstraints": null
+        }
+      ],
+      "existing_data_class": null,
+      "table_constraints": [
+        {
+          "type": "primary_key",
+          "columns": [
+            "id"
+          ]
+        }
+      ],
+      "custom_parent_class": null,
+      "fixed_entity_info_name": null,
+      "base_dart_name": "Peers",
+      "row_class_name": "Peer",
+      "companion_class_name": null,
+      "without_rowid": false,
+      "strict": false,
+      "write_default_constraints": true,
+      "custom_constraints": [],
+      "attached_indices": []
+    }
+  },
+  "imports": [
+    "package:drift/drift.dart",
+    "package:uuid/uuid.dart"
+  ]
+}

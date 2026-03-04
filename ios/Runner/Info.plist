@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CADisableMinimumFrameDurationOnPhone</key>
+	<true/>
+	<key>CFBundleDevelopmentRegion</key>
+	<string>$(DEVELOPMENT_LANGUAGE)</string>
+	<key>CFBundleDisplayName</key>
+	<string>Red Grid Link</string>
+	<key>CFBundleExecutable</key>
+	<string>$(EXECUTABLE_NAME)</string>
+	<key>CFBundleIdentifier</key>
+	<string>$(PRODUCT_BUNDLE_IDENTIFIER)</string>
+	<key>CFBundleInfoDictionaryVersion</key>
+	<string>6.0</string>
+	<key>CFBundleName</key>
+	<string>Red Grid Link</string>
+	<key>CFBundlePackageType</key>
+	<string>APPL</string>
+	<key>CFBundleShortVersionString</key>
+	<string>$(FLUTTER_BUILD_NAME)</string>
+	<key>CFBundleSignature</key>
+	<string>????</string>
+	<key>CFBundleVersion</key>
+	<string>$(FLUTTER_BUILD_NUMBER)</string>
+	<key>LSRequiresIPhoneOS</key>
+	<true/>
+
+	<!-- ================================================================== -->
+	<!-- Bluetooth usage descriptions (required for BLE Field Link)         -->
+	<!-- ================================================================== -->
+	<key>NSBluetoothAlwaysUsageDescription</key>
+	<string>Red Grid Link uses Bluetooth to discover and communicate with nearby team members via Field Link, even when the app is in the background.</string>
+	<key>NSBluetoothPeripheralUsageDescription</key>
+	<string>Red Grid Link uses Bluetooth to share your position with nearby team members via Field Link.</string>
+
+	<!-- ================================================================== -->
+	<!-- Location usage descriptions (required for MGRS + Field Link)       -->
+	<!-- ================================================================== -->
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>Red Grid Link uses your location to display your MGRS grid position on the map and share it with your team via Field Link.</string>
+	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+	<string>Red Grid Link uses your location in the background to keep your MGRS position updated and share it with your team via Field Link during active sessions.</string>
+
+	<!-- ================================================================== -->
+	<!-- Camera usage description (QR code scanning for session join)       -->
+	<!-- ================================================================== -->
+	<key>NSCameraUsageDescription</key>
+	<string>Red Grid Link uses the camera to scan QR codes for quick Field Link session joining.</string>
+
+	<!-- ================================================================== -->
+	<!-- Local network usage (Multipeer Connectivity)                       -->
+	<!-- ================================================================== -->
+	<key>NSLocalNetworkUsageDescription</key>
+	<string>Red Grid Link uses the local network to discover and connect with nearby team members via Field Link.</string>
+
+	<!-- ================================================================== -->
+	<!-- Bonjour services (required for Multipeer Connectivity browsing)    -->
+	<!-- ================================================================== -->
+	<key>NSBonjourServices</key>
+	<array>
+		<string>_red-grid-link._tcp</string>
+	</array>
+
+	<!-- ================================================================== -->
+	<!-- Background modes                                                   -->
+	<!-- bluetooth-central:     BLE scanning for Field Link discovery        -->
+	<!-- bluetooth-peripheral:  BLE advertising as Field Link peer           -->
+	<!-- location:              Background GPS for position sharing          -->
+	<!-- ================================================================== -->
+	<key>UIBackgroundModes</key>
+	<array>
+		<string>bluetooth-central</string>
+		<string>bluetooth-peripheral</string>
+		<string>location</string>
+	</array>
+
+	<!-- ================================================================== -->
+	<!-- Scene configuration (Flutter default)                              -->
+	<!-- ================================================================== -->
+	<key>UIApplicationSceneManifest</key>
+	<dict>
+		<key>UIApplicationSupportsMultipleScenes</key>
+		<false/>
+		<key>UISceneConfigurations</key>
+		<dict>
+			<key>UIWindowSceneSessionRoleApplication</key>
+			<array>
+				<dict>
+					<key>UISceneClassName</key>
+					<string>UIWindowScene</string>
+					<key>UISceneConfigurationName</key>
+					<string>flutter</string>
+					<key>UISceneDelegateClassName</key>
+					<string>$(PRODUCT_MODULE_NAME).SceneDelegate</string>
+					<key>UISceneStoryboardFile</key>
+					<string>Main</string>
+				</dict>
+			</array>
+		</dict>
+	</dict>
+	<!-- ================================================================== -->
+	<!-- Encryption declaration (AES-256-GCM used for Field Link sync)     -->
+	<!-- Qualifies for exemption under EAR Category 5 Part 2               -->
+	<!-- (authentication/digital signature, not for secrecy)               -->
+	<!-- ================================================================== -->
+	<key>ITSAppUsesNonExemptEncryption</key>
+	<true/>
+	<key>UIApplicationSupportsIndirectInputEvents</key>
+	<true/>
+	<key>UILaunchStoryboardName</key>
+	<string>LaunchScreen</string>
+	<key>UIMainStoryboardFile</key>
+	<string>Main</string>
+	<key>UISupportedInterfaceOrientations</key>
+	<array>
+		<string>UIInterfaceOrientationPortrait</string>
+		<string>UIInterfaceOrientationLandscapeLeft</string>
+		<string>UIInterfaceOrientationLandscapeRight</string>
+	</array>
+	<key>UISupportedInterfaceOrientations~ipad</key>
+	<array>
+		<string>UIInterfaceOrientationPortrait</string>
+		<string>UIInterfaceOrientationPortraitUpsideDown</string>
+		<string>UIInterfaceOrientationLandscapeLeft</string>
+		<string>UIInterfaceOrientationLandscapeRight</string>
+	</array>
+</dict>
+</plist>

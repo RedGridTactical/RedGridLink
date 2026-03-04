@@ -1,0 +1,52 @@
+{
+  "elements": {
+    "MarkersDao": {
+      "id": {
+        "library_uri": "package:red_grid_link/data/database/daos/markers_dao.dart",
+        "name": "MarkersDao"
+      },
+      "declaration": {
+        "source_uri": "package:red_grid_link/data/database/daos/markers_dao.dart",
+        "offset": 295,
+        "name": "MarkersDao"
+      },
+      "references": [
+        {
+          "library_uri": "package:red_grid_link/data/database/tables/markers_table.dart",
+          "name": "markers"
+        }
+      ],
+      "type": "dao",
+      "tables": [
+        {
+          "library_uri": "package:red_grid_link/data/database/tables/markers_table.dart",
+          "name": "markers"
+        }
+      ],
+      "views": [],
+      "includes": [],
+      "queries": [],
+      "dart_type": {
+        "elements": [
+          {
+            "lexeme": "MarkersDao",
+            "import_uri": "package:red_grid_link/data/database/daos/markers_dao.dart"
+          }
+        ]
+      },
+      "database": {
+        "elements": [
+          {
+            "lexeme": "AppDatabase",
+            "import_uri": "package:red_grid_link/data/database/app_database.dart"
+          }
+        ]
+      }
+    }
+  },
+  "imports": [
+    "package:drift/drift.dart",
+    "package:red_grid_link/data/database/app_database.dart",
+    "package:red_grid_link/data/database/tables/markers_table.dart"
+  ]
+}
