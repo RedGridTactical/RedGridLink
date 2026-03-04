@@ -137,6 +137,31 @@ Requires Flutter SDK. All free features work from source. Pro features require a
 
 ---
 
+## Roadmap
+
+Full roadmap with feature checklists: [ROADMAP.md](ROADMAP.md)
+
+| Version | Target | Theme | Highlights |
+|---------|--------|-------|------------|
+| **V1.0** | **Now** | Foundation | MGRS nav, Field Link (BLE+WiFi Direct), 8 tools, AAR PDF, offline maps, 4 themes, IAP |
+| **V1.1** | Q2 2026 | Field Hardening | Connection stability, battery optimization, GPS filtering, haptics, localization |
+| **V1.2** | Q3 2026 | Team Features | Team roles, waypoint sharing, route planning, boundary alerts, shared annotations |
+| **V2.0** | Q4 2026 | Intelligence | Elevation profiles, line-of-sight, weather overlay, terrain analysis, contour lines |
+| **V2.1** | Q1 2027 | Advanced Nav | Track recording, GPX import/export, navigate-to-waypoint, coordinate formats |
+| **V3.0** | Q2 2027 | Connected Ops | Cloud relay, web dashboard, mesh networking, session scheduling, API |
+| **V3.1** | Q3 2027 | Sensors | Garmin inReach, ATAK interop, external GPS, drone overlay |
+| **V4.0** | Q4 2027 | Training | Scenario builder, instructor mode, scoring, AR compass, certification tracking |
+
+### Ongoing
+
+- Security audits and cryptographic library updates
+- Battery performance optimization
+- Map tile source expansion
+- Test coverage expansion (target 90%+)
+- Store listing optimization and A/B testing
+
+---
+
 ## Related Projects
 
 - [Red Grid Tactical](https://github.com/RedGridTactical/RedGridMGRS) -- solo MGRS navigator (React Native / Expo)
