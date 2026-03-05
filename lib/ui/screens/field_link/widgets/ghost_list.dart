@@ -93,10 +93,7 @@ class GhostList extends ConsumerWidget {
 
   void _removeGhost(WidgetRef ref, String peerId) {
     tapMedium();
-    // TODO(Phase 4B): Wire ghost removal through FieldLinkService.
-    // The service facade needs a removeGhost(peerId) method that
-    // delegates to the GhostManager.
-    ref.read(fieldLinkServiceProvider); // Keep ref active
+    ref.read(fieldLinkServiceProvider).removeGhost(peerId);
   }
 
   Future<void> _clearAllGhosts(
@@ -115,8 +112,7 @@ class GhostList extends ConsumerWidget {
 
     if (confirmed) {
       tapHeavy();
-      // TODO(Phase 4B): Expose removeAllGhosts through FieldLinkService.
-      ref.read(fieldLinkServiceProvider); // Keep ref active
+      ref.read(fieldLinkServiceProvider).removeAllGhosts();
     }
   }
 }

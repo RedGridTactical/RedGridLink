@@ -241,6 +241,12 @@ class FieldLinkService {
   /// Stream of ghost markers for disconnected peers.
   Stream<List<Ghost>> get ghostsStream => _ghostManager.ghostStream;
 
+  /// Remove a single ghost marker by peer ID.
+  void removeGhost(String peerId) => _ghostManager.removeGhost(peerId);
+
+  /// Remove all ghost markers.
+  void removeAllGhosts() => _ghostManager.removeAllGhosts();
+
   /// Number of currently connected peers.
   int get connectedPeerCount => _transport.connectedDeviceIds.length;
 

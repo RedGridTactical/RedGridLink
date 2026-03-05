@@ -1,8 +1,8 @@
-/// Cryptographic utility stubs for Red Grid Link.
+/// Cryptographic utilities for Red Grid Link.
 ///
-/// Phase 1: Random key/PIN generation, SHA-256 hashing, UUID device IDs.
-/// Phase 3 (TODO): ECDH key exchange, AES-256-GCM encrypt/decrypt via
-/// pointycastle.
+/// Random key/PIN generation, SHA-256 hashing, UUID device IDs.
+/// For ECDH key exchange see: services/field_link/security/key_exchange.dart
+/// For AES-256-GCM see: services/field_link/security/message_encryptor.dart
 
 import 'dart:convert';
 import 'dart:math';
@@ -146,21 +146,7 @@ String _sha256Hex(List<int> data) {
 }
 
 // ---------------------------------------------------------------------------
-// Phase 3 TODOs
+// Note: Full cryptographic implementations are in:
+//   - lib/services/field_link/security/key_exchange.dart (ECDH P-256)
+//   - lib/services/field_link/security/message_encryptor.dart (AES-256-GCM)
 // ---------------------------------------------------------------------------
-
-// TODO(Phase 3): Implement ECDH key exchange using pointycastle
-// - Generate ephemeral EC key pair (P-256 / secp256r1)
-// - Derive shared secret from peer's public key
-// - Use HKDF to derive symmetric key from shared secret
-//
-// Future<({Uint8List publicKey, Uint8List privateKey})> generateECKeyPair()
-// Future<Uint8List> deriveSharedSecret(Uint8List peerPublicKey, Uint8List privateKey)
-
-// TODO(Phase 3): Implement AES-256-GCM encrypt/decrypt using pointycastle
-// - Encrypt arbitrary payload with session key
-// - 96-bit random IV per message
-// - 128-bit authentication tag
-//
-// Uint8List aesEncrypt(Uint8List plaintext, Uint8List key)
-// Uint8List aesDecrypt(Uint8List ciphertext, Uint8List key)
