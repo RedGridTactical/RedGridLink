@@ -13,6 +13,7 @@
 [![Tests](https://img.shields.io/badge/Tests-646%20Passing-brightgreen)]()
 [![Platform](https://img.shields.io/badge/Platform-iOS%20%7C%20Android-8B0000)]()
 [![PRs Welcome](https://img.shields.io/badge/PRs-Welcome-CC0000)](https://github.com/RedGridTactical/RedGridLink/pulls)
+[![Buy Me a Coffee](https://img.shields.io/badge/Buy%20Me%20a%20Coffee-Support-FFDD00?logo=buymeacoffee&logoColor=black)](https://buymeacoffee.com/redgridtac0)
 
 **Offline MGRS navigation and proximity team coordination for small teams (2-8 people). No cell service needed.**
 
