@@ -2,14 +2,17 @@
 
 # Red Grid Link
 
-[![Download on App Store](https://img.shields.io/badge/App%20Store-Coming%20Soon-8B0000?logo=apple)](https://github.com/redgrid/red-grid-link/releases/latest)
-[![Get it on Google Play](https://img.shields.io/badge/Google%20Play-Coming%20Soon-CC0000?logo=googleplay)](https://github.com/redgrid/red-grid-link/releases/latest)
+[![Download on App Store](https://img.shields.io/badge/App%20Store-Coming%20Soon-8B0000?logo=apple)](https://github.com/RedGridTactical/RedGridLink/releases/latest)
+[![Get it on Google Play](https://img.shields.io/badge/Google%20Play-Coming%20Soon-CC0000?logo=googleplay)](https://github.com/RedGridTactical/RedGridLink/releases/latest)
 [![License](https://img.shields.io/badge/License-MIT%20%2B%20Commons%20Clause-8B0000)](LICENSE)
 [![No Tracking](https://img.shields.io/badge/Tracking-None-CC0000)](PRIVACY.md)
 [![Offline First](https://img.shields.io/badge/Offline-First-8B0000)]()
 [![MGRS Native](https://img.shields.io/badge/MGRS-Native-CC0000)]()
 [![AES-256](https://img.shields.io/badge/Encryption-AES--256--GCM-8B0000)]()
 [![Flutter](https://img.shields.io/badge/Built%20with-Flutter-CC0000?logo=flutter)]()
+[![Tests](https://img.shields.io/badge/Tests-646%20Passing-brightgreen)]()
+[![Platform](https://img.shields.io/badge/Platform-iOS%20%7C%20Android-8B0000)]()
+[![PRs Welcome](https://img.shields.io/badge/PRs-Welcome-CC0000)](https://github.com/RedGridTactical/RedGridLink/pulls)
 
 **Offline MGRS navigation and proximity team coordination for small teams (2-8 people). No cell service needed.**
 
@@ -126,8 +129,8 @@ Full details in [PRIVACY.md](PRIVACY.md).
 ## Build from Source
 
 ```bash
-git clone https://github.com/redgrid/red-grid-link.git
-cd red-grid-link
+git clone https://github.com/RedGridTactical/RedGridLink.git
+cd RedGridLink
 flutter pub get
 flutter pub run build_runner build --delete-conflicting-outputs
 flutter run
@@ -162,6 +165,18 @@ Full roadmap with feature checklists: [ROADMAP.md](ROADMAP.md)
 
 ---
 
+## Contributing
+
+Red Grid Link is built in the open. We welcome bug reports, feature requests, and pull requests.
+
+- **Report a bug:** [Open an issue](https://github.com/RedGridTactical/RedGridLink/issues/new)
+- **Request a feature:** [Start a discussion](https://github.com/RedGridTactical/RedGridLink/discussions)
+- **Submit a PR:** Fork, branch, and open a pull request
+
+See the [Roadmap](ROADMAP.md) for planned features and where help is needed.
+
+---
+
 ## Related Projects
 
 - [Red Grid Tactical](https://github.com/RedGridTactical/RedGridMGRS) -- solo MGRS navigator (React Native / Expo)
@@ -177,3 +192,5 @@ Contact: redgridtactical@gmail.com
 ---
 
 *Your team. Your grid. No cell towers required.*
+
+If Red Grid Link helps you stay coordinated in the field, give it a star and share it with your team.

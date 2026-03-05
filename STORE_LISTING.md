@@ -119,10 +119,10 @@ Red Grid Link v1.0 -- initial release:
 - No server communication required for any feature
 
 ## Privacy URL
-https://github.com/redgrid/red-grid-link/blob/main/PRIVACY.md
+https://github.com/RedGridTactical/RedGridLink/blob/master/PRIVACY.md
 
 ## Support URL
-https://github.com/redgrid/red-grid-link/issues
+https://github.com/RedGridTactical/RedGridLink/issues
 
 ## Age Rating
 4+ / Everyone
