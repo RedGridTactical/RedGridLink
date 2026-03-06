@@ -131,6 +131,8 @@ workflows:
       cancel_previous_builds: true
     environment:
       <<: *flutter_env
+      groups:
+        - ios_signing    # CERTIFICATE_PRIVATE_KEY (RSA 2048 PEM)
     scripts:
       - *pub_get
       - *code_gen
@@ -141,13 +143,11 @@ workflows:
           pod install
       - name: Set up iOS code signing
         script: |
-          # Generate a fresh RSA private key for certificate signing.
-          # This is needed because existing certs in the Apple account
-          # were created elsewhere and their private keys are not available.
-          # The --create flag uses this key to create a new distribution
-          # certificate and provisioning profile via the ASC API.
+          # CERTIFICATE_PRIVATE_KEY is stored as a Codemagic env var
+          # (ios_signing group) so the same key is reused across builds.
+          # This ensures fetch-signing-files finds the matching cert
+          # instead of trying to create a new one each time.
           keychain initialize
-          export CERTIFICATE_PRIVATE_KEY="$(openssl genrsa 2048 2>/dev/null)"
           app-store-connect fetch-signing-files "com.redgrid.redGridLink" \
             --type IOS_APP_STORE \
             --create
