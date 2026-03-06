@@ -65,7 +65,7 @@ workflows:
         - push
         - tag
       branch_patterns:
-        - pattern: main
+        - pattern: master
           include: true
       tag_patterns:
         - pattern: v*
@@ -123,7 +123,7 @@ workflows:
         - push
         - tag
       branch_patterns:
-        - pattern: main
+        - pattern: master
           include: true
       tag_patterns:
         - pattern: v*
@@ -186,7 +186,7 @@ workflows:
       events:
         - pull_request
       branch_patterns:
-        - pattern: main
+        - pattern: master
           include: true
       cancel_previous_builds: true
     environment:
