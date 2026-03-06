@@ -131,9 +131,6 @@ workflows:
       cancel_previous_builds: true
     environment:
       <<: *flutter_env
-      ios_signing:
-        distribution_type: app_store
-        bundle_identifier: com.redgrid.redGridLink
       vars:
         # Encryption declaration for App Store submission
         # Set to YES because the app uses AES-256-GCM encryption
