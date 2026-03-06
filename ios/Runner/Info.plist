@@ -102,11 +102,11 @@
 	</dict>
 	<!-- ================================================================== -->
 	<!-- Encryption declaration (AES-256-GCM used for Field Link sync)     -->
-	<!-- Qualifies for exemption under EAR Category 5 Part 2               -->
-	<!-- (authentication/digital signature, not for secrecy)               -->
+	<!-- Qualifies for mass market exemption under EAR 740.17              -->
+	<!-- (peer-to-peer auth/communication, not content protection/DRM)     -->
 	<!-- ================================================================== -->
 	<key>ITSAppUsesNonExemptEncryption</key>
-	<true/>
+	<false/>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
 	<key>UILaunchStoryboardName</key>

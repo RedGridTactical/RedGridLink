@@ -131,10 +131,6 @@ workflows:
       cancel_previous_builds: true
     environment:
       <<: *flutter_env
-      vars:
-        # Encryption declaration for App Store submission
-        # Set to YES because the app uses AES-256-GCM encryption
-        ITSAPPUSESNONEXEMPTENCRYPTION: "true"
     scripts:
       - *pub_get
       - *code_gen
