@@ -145,11 +145,13 @@ workflows:
           pod install
       - name: Set up iOS code signing
         script: |
-          # Codemagic handles code signing automatically when
-          # ios_signing is configured and App Store Connect
-          # integration is set up. This step uses the integration
-          # to fetch provisioning profiles and certificates.
+          # Generate a fresh RSA private key for certificate signing.
+          # This is needed because existing certs in the Apple account
+          # were created elsewhere and their private keys are not available.
+          # The --create flag uses this key to create a new distribution
+          # certificate and provisioning profile via the ASC API.
           keychain initialize
+          export CERTIFICATE_PRIVATE_KEY="$(openssl genrsa 2048 2>/dev/null)"
           app-store-connect fetch-signing-files "com.redgrid.redGridLink" \
             --type IOS_APP_STORE \
             --create
