@@ -134,8 +134,6 @@ workflows:
       ios_signing:
         distribution_type: app_store
         bundle_identifier: com.redgrid.redGridLink
-      groups:
-        - app_store_connect     # APP_STORE_CONNECT_ISSUER_ID, APP_STORE_CONNECT_KEY_IDENTIFIER, APP_STORE_CONNECT_PRIVATE_KEY
       vars:
         # Encryption declaration for App Store submission
         # Set to YES because the app uses AES-256-GCM encryption
