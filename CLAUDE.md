@@ -16,7 +16,7 @@ flutter pub get
 # Run code generation (Drift)
 flutter pub run build_runner build --delete-conflicting-outputs
 
-# Run tests (646 tests)
+# Run tests (667 tests)
 flutter test
 
 # Run app
@@ -51,6 +51,7 @@ lib/
 │   └── repositories/         # 7 repositories (settings, session, peer, etc.)
 ├── services/
 │   ├── location/             # GPS stream + permission handling
+│   ├── step_detector/        # Accelerometer-based step detection (sensors_plus)
 │   ├── field_link/
 │   │   ├── transport/        # BLE + Android P2P + iOS P2P + manager
 │   │   ├── discovery/        # BLE scan/advertise, session join
@@ -126,7 +127,7 @@ ios/Runner/
 ## Testing
 
 ```bash
-# All tests (646 tests)
+# All tests (667 tests)
 flutter test
 
 # Specific test file
@@ -149,6 +150,7 @@ Test coverage areas:
 - IAP service: Purchase flow, entitlement handling (56 tests)
 - Repositories: Settings CRUD (21 tests)
 - Providers: All settings notifiers (28 tests)
+- Step detector: Accelerometer step detection, debounce, orientation (21 tests)
 - Widgets: TacticalButton, HomeScreen, OnboardingScreen (27 tests)
 - App widget: Root app rendering (1 test)
 

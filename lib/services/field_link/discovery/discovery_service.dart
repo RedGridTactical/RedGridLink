@@ -166,8 +166,8 @@ class DiscoveryService {
       );
     }
 
-    // Check session capacity.
-    if (_transportManager.connectedDeviceIds.length >=
+    // Check session capacity (connected peers + local device).
+    if (_transportManager.connectedDeviceIds.length + 1 >=
         SyncConstants.maxSessionDevices) {
       throw const FieldLinkException(
         'Session is full (max ${SyncConstants.maxSessionDevices} devices)',

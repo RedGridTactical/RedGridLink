@@ -46,8 +46,14 @@ class GhostManager {
   // ---------------------------------------------------------------------------
 
   /// Start the periodic ghost state update timer.
+  ///
+  /// Clears any ghosts from a previous session to prevent carry-over.
   Future<void> start() async {
     _updateTimer?.cancel();
+    if (_ghosts.isNotEmpty) {
+      _ghosts.clear();
+      _emit();
+    }
     _updateTimer = Timer.periodic(_updateInterval, (_) {
       _updateGhostStates();
     });

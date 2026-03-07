@@ -57,6 +57,9 @@ class BleTransport implements TransportService {
 
   StreamSubscription<List<ScanResult>>? _scanSubscription;
 
+  /// Subscription for the isScanning stream (auto-restart logic).
+  StreamSubscription<bool>? _isScanningSubscription;
+
   /// Session ID embedded in manufacturer-specific advertising data so that
   /// only peers in the same session respond.
   ///
@@ -76,6 +79,14 @@ class BleTransport implements TransportService {
   /// Characteristic subscriptions per device.
   final Map<String, List<StreamSubscription<List<int>>>> _charSubscriptions =
       {};
+
+  /// Connection state subscriptions per device (for reconnect handling).
+  final Map<String, StreamSubscription<BluetoothConnectionState>>
+      _connectionStateSubs = {};
+
+  /// Cached writable characteristics per device (avoids re-discovering
+  /// services on every send).
+  final Map<String, BluetoothCharacteristic> _writableCharCache = {};
 
   /// Reconnection attempt counts (for exponential back-off).
   final Map<String, int> _reconnectAttempts = {};
@@ -145,6 +156,7 @@ class BleTransport implements TransportService {
     _disposed = true;
     await stopDiscovery();
     await disconnectAll();
+    _writableCharCache.clear();
     await _stateController.close();
     await _discoveryController.close();
     await _messageController.close();
@@ -181,7 +193,9 @@ class BleTransport implements TransportService {
 
     // When the scan completes (timeout), restart it automatically
     // to maintain continuous discovery.
-    FlutterBluePlus.isScanning.listen((scanning) {
+    // Cancel any prior isScanning subscription to avoid leaking listeners.
+    await _isScanningSubscription?.cancel();
+    _isScanningSubscription = FlutterBluePlus.isScanning.listen((scanning) {
       if (!scanning && _state == TransportState.discovering && !_disposed) {
         // Restart scan after a short pause to avoid hammering the adapter.
         Future.delayed(const Duration(milliseconds: 500), () {
@@ -201,6 +215,9 @@ class BleTransport implements TransportService {
   Future<void> stopDiscovery() async {
     await _scanSubscription?.cancel();
     _scanSubscription = null;
+
+    await _isScanningSubscription?.cancel();
+    _isScanningSubscription = null;
 
     if (await FlutterBluePlus.isScanning.first) {
       await FlutterBluePlus.stopScan();
@@ -269,15 +286,19 @@ class BleTransport implements TransportService {
       }
       _negotiatedMtu[deviceId] = mtu;
 
-      // Discover services and subscribe to characteristics.
+      // Discover services, cache writable characteristic, and subscribe.
       final services = await device.discoverServices();
       await _subscribeToCharacteristics(deviceId, device, services);
+      _cacheWritableCharacteristic(deviceId, services);
 
       _connectedDevices[deviceId] = device;
       _reconnectAttempts[deviceId] = 0;
 
       // Listen for disconnection events to trigger reconnection.
-      device.connectionState.listen((state) {
+      // Cancel any prior subscription for this device first.
+      await _connectionStateSubs[deviceId]?.cancel();
+      _connectionStateSubs[deviceId] =
+          device.connectionState.listen((state) {
         if (state == BluetoothConnectionState.disconnected) {
           _onDeviceDisconnected(deviceId);
         }
@@ -303,6 +324,10 @@ class BleTransport implements TransportService {
     _negotiatedMtu.remove(deviceId);
     _reconnectAttempts.remove(deviceId);
     _chunkBuffers.remove(deviceId);
+    _writableCharCache.remove(deviceId);
+
+    // Cancel connection state subscription.
+    await _connectionStateSubs.remove(deviceId)?.cancel();
 
     // Cancel characteristic subscriptions.
     final subs = _charSubscriptions.remove(deviceId);
@@ -340,6 +365,10 @@ class BleTransport implements TransportService {
   void _onDeviceDisconnected(String deviceId) {
     _connectedDevices.remove(deviceId);
     _negotiatedMtu.remove(deviceId);
+    _writableCharCache.remove(deviceId);
+
+    // Cancel connection state subscription (avoid re-entrant calls).
+    _connectionStateSubs.remove(deviceId)?.cancel();
 
     final subs = _charSubscriptions.remove(deviceId);
     if (subs != null) {
@@ -455,8 +484,13 @@ class BleTransport implements TransportService {
     final buffer = _chunkBuffers.putIfAbsent(deviceId, _ChunkBuffer.new);
 
     if (flag == 0x01) {
-      // First chunk — reset buffer.
+      // First chunk — reset buffer and mark as started.
       buffer.reset();
+      buffer.hasFirstChunk = true;
+    } else if (!buffer.hasFirstChunk) {
+      // Mid/last chunk without a first chunk — discard to avoid corruption.
+      buffer.reset();
+      return;
     }
 
     if (value.length > 2) {
@@ -588,19 +622,18 @@ class BleTransport implements TransportService {
     }
   }
 
-  /// Find a writable characteristic on the Field Link service.
-  Future<BluetoothCharacteristic?> _getWritableCharacteristic(
-    BluetoothDevice device,
-  ) async {
-    final services = await device.discoverServices();
+  /// Cache the writable characteristic for a device after initial
+  /// service discovery (avoids re-discovering on every send).
+  void _cacheWritableCharacteristic(
+    String deviceId,
+    List<BluetoothService> services,
+  ) {
     for (final service in services) {
       if (service.uuid.str.toLowerCase() !=
           BleConstants.fieldLinkServiceUuid.toLowerCase()) {
         continue;
       }
 
-      // Prefer the control characteristic for generic writes; fall back
-      // to any writable characteristic.
       BluetoothCharacteristic? fallback;
       for (final char in service.characteristics) {
         if (!char.properties.write && !char.properties.writeWithoutResponse) {
@@ -608,13 +641,31 @@ class BleTransport implements TransportService {
         }
         if (char.uuid.str.toLowerCase() ==
             BleConstants.controlCharUuid.toLowerCase()) {
-          return char;
+          _writableCharCache[deviceId] = char;
+          return;
         }
         fallback ??= char;
       }
-      return fallback;
+      if (fallback != null) {
+        _writableCharCache[deviceId] = fallback;
+      }
     }
-    return null;
+  }
+
+  /// Find a writable characteristic on the Field Link service.
+  ///
+  /// Returns the cached characteristic if available; otherwise falls back
+  /// to a fresh service discovery (should only happen if cache was cleared).
+  Future<BluetoothCharacteristic?> _getWritableCharacteristic(
+    BluetoothDevice device,
+  ) async {
+    final cached = _writableCharCache[device.remoteId.str];
+    if (cached != null) return cached;
+
+    // Fallback: re-discover (e.g., after reconnection cleared cache).
+    final services = await device.discoverServices();
+    _cacheWritableCharacteristic(device.remoteId.str, services);
+    return _writableCharCache[device.remoteId.str];
   }
 
   // ---------------------------------------------------------------------------
@@ -688,9 +739,16 @@ class BleTransport implements TransportService {
 class _ChunkBuffer {
   final List<Uint8List> _chunks = [];
 
+  /// Whether a first-chunk (flag 0x01) has been received for the current
+  /// message. Mid/last chunks are discarded if this is false.
+  bool hasFirstChunk = false;
+
   void append(Uint8List chunk) => _chunks.add(chunk);
 
-  void reset() => _chunks.clear();
+  void reset() {
+    _chunks.clear();
+    hasFirstChunk = false;
+  }
 
   Uint8List assemble() {
     if (_chunks.isEmpty) return Uint8List(0);

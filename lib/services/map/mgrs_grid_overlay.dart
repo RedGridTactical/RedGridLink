@@ -267,6 +267,10 @@ class MgrsGridOverlay extends StatelessWidget {
     );
     final strokeWidth = metersPerCell == 1000 ? 0.6 : 0.4;
 
+    // lonStep is computed at the viewport center latitude. At zoom 12+
+    // the viewport spans <1° latitude, so the approximation is accurate.
+    // For wider viewports, vertical line spacing varies slightly with
+    // latitude — acceptable for a visual overlay.
     final midLat = (bounds.south + bounds.north) / 2;
     final latStep = _metersToLatDeg(metersPerCell.toDouble());
     final lonStep = _metersToLonDeg(metersPerCell.toDouble(), midLat);

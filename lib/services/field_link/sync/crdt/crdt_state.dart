@@ -76,7 +76,9 @@ class CrdtState {
         );
 
       case SyncPayloadType.marker:
-        final markerId = delta.data['id'] as String;
+        final rawMarkerId = delta.data['id'];
+        if (rawMarkerId is! String) return this; // Malformed — skip
+        final markerId = rawMarkerId;
         final isDelete = delta.data['_deleted'] == true;
         final LwwRegister<Marker?> register;
 
@@ -106,7 +108,9 @@ class CrdtState {
         );
 
       case SyncPayloadType.annotation:
-        final annotationId = delta.data['id'] as String;
+        final rawAnnotationId = delta.data['id'];
+        if (rawAnnotationId is! String) return this; // Malformed — skip
+        final annotationId = rawAnnotationId;
         final isDelete = delta.data['_deleted'] == true;
         final LwwRegister<Annotation?> register;
 

@@ -24,7 +24,7 @@ enum BatteryMode {
 class BatteryManager {
   /// Platform channel for native battery level queries.
   static const MethodChannel _batteryChannel =
-      MethodChannel('red_grid_link/battery');
+      MethodChannel('com.redgrid.link/battery');
 
   BatteryMode _currentMode;
 
@@ -105,10 +105,19 @@ class BatteryManager {
   /// Human-readable projected remaining battery time.
   ///
   /// Returns a string like "8hr 12min remaining" based on the current
-  /// drain rate. Returns "Unknown" if insufficient data.
+  /// drain rate. Returns "Charging" if battery level is rising, or
+  /// "Calculating..." if insufficient data is available.
   String get projectedRemainingTime {
+    if (currentBatteryLevel == null) return 'Calculating...';
     final rate = drainRatePerHour;
-    if (rate <= 0 || currentBatteryLevel == null) return 'Unknown';
+    if (rate <= 0) {
+      // Battery is stable or charging — not draining.
+      if (_batteryHistory.length >= 2 &&
+          _batteryHistory.last.level >= _batteryHistory.first.level) {
+        return 'Charging';
+      }
+      return 'Calculating...';
+    }
 
     final hoursRemaining = currentBatteryLevel! / rate;
     final hours = hoursRemaining.floor();

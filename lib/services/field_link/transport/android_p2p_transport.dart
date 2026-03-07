@@ -29,6 +29,9 @@ class AndroidP2pTransport implements TransportService {
   static const EventChannel _eventChannel =
       EventChannel('com.redgrid.link/nearby_connections/events');
 
+  /// The session ID we are currently advertising for.
+  String? _activeSessionId;
+
   // ---------------------------------------------------------------------------
   // Transport metadata
   // ---------------------------------------------------------------------------
@@ -126,6 +129,7 @@ class AndroidP2pTransport implements TransportService {
   @override
   Future<void> startDiscovery(String sessionId) async {
     _ensureNotDisposed();
+    _activeSessionId = sessionId;
     _setState(TransportState.discovering);
 
     try {
@@ -344,8 +348,19 @@ class AndroidP2pTransport implements TransportService {
     final endpointId = data['endpointId'] as String?;
     if (endpointId == null) return;
 
-    // Auto-accept incoming connections.
-    // TODO(Phase 7): Add authentication check before accepting.
+    // Verify the session ID matches before accepting.
+    final peerSessionId = data['sessionId'] as String?;
+    if (_activeSessionId != null &&
+        peerSessionId != null &&
+        peerSessionId != _activeSessionId) {
+      // Reject connections from different sessions.
+      _channel.invokeMethod<void>('rejectConnection', {
+        'endpointId': endpointId,
+      }).catchError((_) {});
+      return;
+    }
+
+    // Accept connection for matching or unknown session.
     _channel.invokeMethod<void>('acceptConnection', {
       'endpointId': endpointId,
     }).catchError((_) {

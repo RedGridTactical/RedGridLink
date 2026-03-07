@@ -51,6 +51,9 @@ class TileManager {
   /// Active download completer for cancellation support.
   Completer<void>? _cancelCompleter;
 
+  /// Whether a download is currently in progress.
+  bool _isDownloading = false;
+
   TileManager({MapRepository? mapRepository, Dio? dio})
       : _mapRepository = mapRepository,
         _dio = dio ??
@@ -98,15 +101,20 @@ class TileManager {
 
   /// Attempt to load an MBTiles tile provider from a local file.
   ///
-  /// Returns `null` if the file does not exist.
+  /// Returns `null` if the file does not exist or is corrupt.
   Future<TileProvider?> loadMBTilesProvider(String filePath) async {
     final file = File(filePath);
     if (!await file.exists()) return null;
 
-    return MbTilesTileProvider.fromPath(
-      path: filePath,
-      silenceTileNotFound: true,
-    );
+    try {
+      return MbTilesTileProvider.fromPath(
+        path: filePath,
+        silenceTileNotFound: true,
+      );
+    } catch (_) {
+      // Corrupt or incompatible MBTiles file — treat as unavailable.
+      return null;
+    }
   }
 
   // ---------------------------------------------------------------------------
@@ -136,6 +144,11 @@ class TileManager {
   /// 3. Writes tiles into a local MBTiles (SQLite) file via the mbtiles package.
   /// 4. Updates [MapRepository] with the file path and actual size.
   Stream<double> downloadRegion(MapRegion region) async* {
+    // Prevent concurrent downloads from corrupting MBTiles.
+    if (_isDownloading) {
+      throw StateError('A download is already in progress');
+    }
+    _isDownloading = true;
     _cancelCompleter = Completer<void>();
 
     // Calculate all tile coordinates
@@ -147,6 +160,7 @@ class TileManager {
 
     if (tiles.isEmpty) {
       _cancelCompleter = null;
+      _isDownloading = false;
       return;
     }
 
@@ -180,7 +194,7 @@ class TileManager {
         minZoom: region.minZoom.toDouble(),
         maxZoom: region.maxZoom.toDouble(),
         attributionHtml: MapConstants.osmAttribution,
-        description: 'RedGrid Tac offline region: ${region.name}',
+        description: 'Red Grid Link offline region: ${region.name}',
         type: TileLayerType.baseLayer,
         version: 1.0,
       ),
@@ -235,6 +249,7 @@ class TileManager {
         await partialFile.delete();
       }
       _cancelCompleter = null;
+      _isDownloading = false;
       return;
     }
 
@@ -252,6 +267,7 @@ class TileManager {
     }
 
     _cancelCompleter = null;
+    _isDownloading = false;
   }
 
   /// Cancel an in-progress download.

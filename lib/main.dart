@@ -4,8 +4,29 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:red_grid_link/app.dart';
+import 'package:red_grid_link/core/utils/crypto_utils.dart';
+import 'package:red_grid_link/data/database/app_database.dart';
+import 'package:red_grid_link/data/repositories/annotation_repository.dart';
+import 'package:red_grid_link/data/repositories/map_repository.dart';
+import 'package:red_grid_link/data/repositories/marker_repository.dart';
+import 'package:red_grid_link/data/repositories/peer_repository.dart';
+import 'package:red_grid_link/data/repositories/session_repository.dart';
 import 'package:red_grid_link/data/repositories/settings_repository.dart';
+import 'package:red_grid_link/data/repositories/track_repository.dart';
+import 'package:red_grid_link/providers/aar_provider.dart';
+import 'package:red_grid_link/providers/field_link_provider.dart';
+import 'package:red_grid_link/providers/location_provider.dart';
+import 'package:red_grid_link/providers/map_provider.dart';
 import 'package:red_grid_link/providers/settings_provider.dart';
+import 'package:red_grid_link/services/field_link/battery/battery_manager.dart';
+import 'package:red_grid_link/services/field_link/field_link_service.dart';
+import 'package:red_grid_link/services/field_link/ghost/ghost_manager.dart';
+import 'package:red_grid_link/services/field_link/sync/sync_engine.dart';
+import 'package:red_grid_link/services/field_link/transport/ble_transport.dart';
+import 'package:red_grid_link/services/map/tile_manager.dart';
+
+/// Key used to persist the local device ID across launches.
+const _deviceIdKey = 'red_grid_link_device_id';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -29,10 +50,65 @@ void main() async {
   final prefs = await SharedPreferences.getInstance();
   final settingsRepo = SettingsRepository(prefs);
 
+  // ---------------------------------------------------------------------------
+  // Database & repositories
+  // ---------------------------------------------------------------------------
+  final db = constructDb();
+  final trackRepo = TrackRepository(db);
+  final sessionRepo = SessionRepository(db);
+  final peerRepo = PeerRepository(db);
+  final markerRepo = MarkerRepository(db);
+  final annotationRepo = AnnotationRepository(db);
+  final mapRepo = MapRepository(db);
+
+  // ---------------------------------------------------------------------------
+  // Stable device ID (persisted across launches)
+  // ---------------------------------------------------------------------------
+  var deviceId = prefs.getString(_deviceIdKey);
+  if (deviceId == null) {
+    deviceId = generateDeviceId();
+    await prefs.setString(_deviceIdKey, deviceId);
+  }
+
+  // ---------------------------------------------------------------------------
+  // Field Link sub-services
+  // ---------------------------------------------------------------------------
+  final transport = BleTransport();
+  final ghostManager = GhostManager();
+  final batteryManager = BatteryManager();
+  final syncEngine = SyncEngine(
+    transport: transport,
+    peerRepository: peerRepo,
+    markerRepository: markerRepo,
+    localDeviceId: deviceId,
+  );
+
+  final fieldLinkService = FieldLinkService(
+    transport: transport,
+    syncEngine: syncEngine,
+    ghostManager: ghostManager,
+    batteryManager: batteryManager,
+    sessionRepository: sessionRepo,
+    peerRepository: peerRepo,
+    localDeviceId: deviceId,
+  );
+
+  // ---------------------------------------------------------------------------
+  // Tile manager with database-backed region storage
+  // ---------------------------------------------------------------------------
+  final tileManager = TileManager(mapRepository: mapRepo);
+
   runApp(
     ProviderScope(
       overrides: [
         settingsRepositoryProvider.overrideWithValue(settingsRepo),
+        trackRepositoryProvider.overrideWithValue(trackRepo),
+        sessionRepositoryProvider.overrideWithValue(sessionRepo),
+        peerRepositoryProvider.overrideWithValue(peerRepo),
+        markerRepositoryProvider.overrideWithValue(markerRepo),
+        annotationRepositoryProvider.overrideWithValue(annotationRepo),
+        fieldLinkServiceProvider.overrideWithValue(fieldLinkService),
+        tileManagerProvider.overrideWithValue(tileManager),
       ],
       child: const RedGridLinkApp(),
     ),

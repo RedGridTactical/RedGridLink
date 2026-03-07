@@ -97,14 +97,19 @@ class SyncEngine {
     // Start heartbeat for periodic position broadcasts.
     _startHeartbeat(config.updateIntervalMs);
 
-    // Broadcast a join control message.
-    final joinPayload = _encoder.encodeControl(
-      _localDeviceId,
-      'join',
-      {'sessionId': sessionId},
-      _state.sequenceCounter.countFor(_localDeviceId),
-    );
-    await _transport.broadcast(joinPayload.toBytes());
+    // Broadcast a join control message (best-effort; peers may not be
+    // connected yet — join is implied by first heartbeat position).
+    try {
+      final joinPayload = _encoder.encodeControl(
+        _localDeviceId,
+        'join',
+        {'sessionId': sessionId},
+        _state.sequenceCounter.countFor(_localDeviceId),
+      );
+      await _transport.broadcast(joinPayload.toBytes());
+    } catch (_) {
+      // No peers connected yet; that's expected at session start.
+    }
 
     _emitState();
   }
@@ -261,10 +266,13 @@ class SyncEngine {
 
     switch (payload.type) {
       case SyncPayloadType.position:
+        final lat = payload.data['lat'];
+        final lon = payload.data['lon'];
+        if (lat is! num || lon is! num) break; // Malformed — skip persist
         await _peerRepository.updatePeerPosition(
           payload.senderId,
-          lat: (payload.data['lat'] as num).toDouble(),
-          lon: (payload.data['lon'] as num).toDouble(),
+          lat: lat.toDouble(),
+          lon: lon.toDouble(),
           mgrs: payload.data['mgrs'] as String?,
           lastSeen: payload.timestamp,
           altitude: (payload.data['alt'] as num?)?.toDouble(),

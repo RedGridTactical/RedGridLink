@@ -35,6 +35,7 @@ dependencies:
   dio: ^5.4.3
   connectivity_plus: ^6.0.3
   wakelock_plus: ^1.2.5
+  sensors_plus: ^5.0.1
 
 dev_dependencies:
   flutter_test:

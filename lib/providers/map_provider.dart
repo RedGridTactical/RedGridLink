@@ -65,7 +65,7 @@ final mapZoomProvider = StateProvider<double>((ref) {
 final mapCenterMgrsProvider = Provider<String>((ref) {
   final center = ref.watch(mapCenterProvider);
   if (center.latitude < -80 || center.latitude > 84) return 'OUT OF RANGE';
-  return ref.read(mapControllerServiceProvider).getMGRSAtCenter();
+  return ref.watch(mapControllerServiceProvider).getMGRSAtCenter();
 });
 
 // -----------------------------------------------------------------------------

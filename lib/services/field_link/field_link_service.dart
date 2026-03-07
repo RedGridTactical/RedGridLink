@@ -339,8 +339,13 @@ class FieldLinkService {
   /// Initialize the Field Link service.
   ///
   /// Sets up stream subscriptions for transport state and sync engine
-  /// state changes.
+  /// state changes. Safe to call multiple times — cancels prior
+  /// subscriptions first.
   Future<void> initialize() async {
+    // Cancel existing subscriptions to avoid leaking listeners.
+    await _transportStateSub?.cancel();
+    await _syncStateSub?.cancel();
+
     // Listen for transport state changes.
     _transportStateSub = _transport.stateStream.listen(_onTransportState);
 
@@ -408,9 +413,13 @@ class FieldLinkService {
       if (entry.key == _localDeviceId) continue;
 
       final isConnected = connectedIds.contains(entry.key);
+      final shortId = entry.key.length > 8
+          ? entry.key.substring(0, 8)
+          : entry.key;
+
       peers.add(Peer(
         id: entry.key,
-        displayName: entry.key.substring(0, 8), // Shortened ID as fallback
+        displayName: shortId,
         position: entry.value,
         lastSeen: entry.value.timestamp,
         isConnected: isConnected,
@@ -422,7 +431,7 @@ class FieldLinkService {
         if (_ghostManager.currentGhosts.every((g) => g.peerId != entry.key)) {
           _ghostManager.onPeerDisconnected(Peer(
             id: entry.key,
-            displayName: entry.key.substring(0, 8),
+            displayName: shortId,
             position: entry.value,
             lastSeen: entry.value.timestamp,
             isConnected: false,

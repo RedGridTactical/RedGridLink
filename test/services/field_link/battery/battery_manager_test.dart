@@ -147,17 +147,17 @@ void main() {
   // projectedRemainingTime
   // -------------------------------------------------------------------------
   group('projectedRemainingTime', () {
-    test('returns Unknown with no data', () {
-      expect(manager.projectedRemainingTime, 'Unknown');
+    test('returns Calculating with no data', () {
+      expect(manager.projectedRemainingTime, 'Calculating...');
     });
 
-    test('returns Unknown when battery level is null', () {
-      expect(manager.projectedRemainingTime, 'Unknown');
+    test('returns Calculating when battery level is null', () {
+      expect(manager.projectedRemainingTime, 'Calculating...');
     });
 
-    test('returns Unknown when drain rate is 0', () {
+    test('returns Calculating when drain rate is 0', () {
       manager.updateBatteryLevel(100);
-      expect(manager.projectedRemainingTime, 'Unknown');
+      expect(manager.projectedRemainingTime, 'Calculating...');
     });
   });
 
