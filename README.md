@@ -10,7 +10,7 @@
 [![MGRS Native](https://img.shields.io/badge/MGRS-Native-CC0000)]()
 [![AES-256](https://img.shields.io/badge/Encryption-AES--256--GCM-8B0000)]()
 [![Flutter](https://img.shields.io/badge/Built%20with-Flutter-CC0000?logo=flutter)]()
-[![Tests](https://img.shields.io/badge/Tests-749%20Passing-brightgreen)]()
+[![Tests](https://img.shields.io/badge/Tests-783%20Passing-brightgreen)]()
 [![Platform](https://img.shields.io/badge/Platform-iOS%20%7C%20Android-8B0000)]()
 [![PRs Welcome](https://img.shields.io/badge/PRs-Welcome-CC0000)](https://github.com/RedGridTactical/RedGridLink/pulls)
 [![Buy Me a Coffee](https://img.shields.io/badge/Buy%20Me%20a%20Coffee-Support-FFDD00?logo=buymeacoffee&logoColor=black)](https://buymeacoffee.com/redgridtac0)
@@ -47,7 +47,9 @@ Zero-config proximity sync over BLE + WiFi Direct (Android) / AWDL (iOS). Device
 - Delta payloads under 200 bytes per position update
 - Ghost markers with time-decay visualization when teammates disconnect
 - Velocity vectors project last-known movement direction
-- Expedition Mode: <4% battery per 8-hour session (BLE-only)
+- Expedition Mode: <3% battery/hr (BLE-only, 30s updates)
+- Ultra Expedition Mode: <2% battery/hr (BLE-only, 60s updates)
+- Auto-reconnect with exponential backoff on disconnect
 
 ### Offline Maps
 Download map packs from USGS Topo (public domain) and OpenTopoMap for full offline operation. Maps are cached locally as MBTiles with MGRS grid lines rendered as a dynamic overlay.
@@ -121,7 +123,7 @@ No accounts. No servers. No cell service. No configuration. It just works.
 | After-Action Reports | User-generated | Local only | Never |
 | Device identifiers | Never | Never | Never |
 
-No accounts. No analytics. No crash reporting. No ad networks. No third-party data SDKs.
+No accounts. No analytics. No ad networks. No third-party data SDKs. Privacy-safe crash reporting (Sentry, release mode only — no location data transmitted).
 In-app purchases processed by Apple/Google -- Red Grid Link never sees your payment details.
 Full details in [PRIVACY.md](PRIVACY.md).
 
@@ -147,8 +149,8 @@ Full roadmap with feature checklists: [ROADMAP.md](ROADMAP.md)
 
 | Version | Target | Theme | Highlights |
 |---------|--------|-------|------------|
-| **V1.0** | **Now** | Foundation | MGRS nav, Field Link (BLE+WiFi Direct), 11 tools, AAR PDF, offline maps, 4 themes, IAP |
-| **V1.1** | Q2 2026 | Field Hardening | Connection stability, battery optimization, GPS filtering, haptics, localization |
+| **V1.0** | **Complete** | Foundation | MGRS nav, Field Link (BLE+WiFi Direct), 11 tools, AAR PDF, offline maps, 4 themes, IAP |
+| **V1.1** | **Complete** | Field Hardening | Kalman filter, Peer HUD, Ultra Expedition, auto-reconnect, Sentry, l10n, Help/About |
 | **V1.2** | Q3 2026 | Team Features | Team roles, waypoint sharing, route planning, boundary alerts, shared annotations |
 | **V2.0** | Q4 2026 | Intelligence | Elevation profiles, line-of-sight, weather overlay, terrain analysis, contour lines |
 | **V2.1** | Q1 2027 | Advanced Nav | Track recording, GPX import/export, navigate-to-waypoint, coordinate formats |

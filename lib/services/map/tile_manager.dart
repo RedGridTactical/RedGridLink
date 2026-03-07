@@ -139,6 +139,12 @@ class TileManager {
     return _mapRepository.getDownloadedRegions();
   }
 
+  /// Create a region entry in the database (before download).
+  Future<void> createRegion(MapRegion region) async {
+    if (_mapRepository == null) return;
+    await _mapRepository.createRegion(region);
+  }
+
   /// Download tiles for a region and package into MBTiles.
   ///
   /// Yields progress from 0.0 to 1.0. Completes when all tiles are saved.

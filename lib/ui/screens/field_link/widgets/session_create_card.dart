@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_blue_plus/flutter_blue_plus.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 
@@ -63,6 +64,22 @@ class _SessionCreateCardState extends ConsumerState<SessionCreateCard> {
     }
 
     setState(() => _isCreating = true);
+
+    // Pre-flight check: verify Bluetooth is on before attempting session creation.
+    try {
+      final adapterState = await FlutterBluePlus.adapterState.first;
+      if (adapterState != BluetoothAdapterState.on) {
+        notifyError();
+        if (mounted) {
+          _showBluetoothDialog();
+        }
+        setState(() => _isCreating = false);
+        return;
+      }
+    } catch (_) {
+      // If we can't check BT state, proceed and let the transport handle it.
+    }
+
     tapHeavy();
 
     try {
@@ -80,21 +97,71 @@ class _SessionCreateCardState extends ConsumerState<SessionCreateCard> {
     } catch (e) {
       notifyError();
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-              'Failed to create session: $e',
-              style: const TextStyle(color: Colors.white),
+        final message = e.toString();
+        if (message.contains('Bluetooth') || message.contains('bluetooth')) {
+          _showBluetoothDialog();
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(
+                'Failed to create session: $message',
+                style: const TextStyle(color: Colors.white),
+              ),
+              backgroundColor: const Color(0xFFCC0000),
             ),
-            backgroundColor: const Color(0xFFCC0000),
-          ),
-        );
+          );
+        }
       }
     } finally {
       if (mounted) {
         setState(() => _isCreating = false);
       }
     }
+  }
+
+  /// Show a user-friendly dialog explaining Bluetooth needs to be enabled.
+  void _showBluetoothDialog() {
+    final colors = ref.read(currentThemeProvider);
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: colors.card,
+        title: Text(
+          'Bluetooth Required',
+          style: TacticalTextStyles.subheading(colors),
+        ),
+        content: Text(
+          'Field Link uses Bluetooth to discover and communicate with '
+          'nearby teammates. Please enable Bluetooth in your device '
+          'settings and try again.',
+          style: TacticalTextStyles.body(colors),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () async {
+              Navigator.of(ctx).pop();
+              // Attempt to open Bluetooth settings on Android.
+              try {
+                await FlutterBluePlus.turnOn();
+              } catch (_) {
+                // turnOn() may not work on iOS or some Android devices.
+              }
+            },
+            child: Text(
+              'TURN ON',
+              style: TextStyle(color: colors.accent),
+            ),
+          ),
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(),
+            child: Text(
+              'CANCEL',
+              style: TextStyle(color: colors.text3),
+            ),
+          ),
+        ],
+      ),
+    );
   }
 
   /// Build the QR payload for session info.

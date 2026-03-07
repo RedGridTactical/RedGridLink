@@ -15,6 +15,11 @@ enum OperationalMode {
     markerLabel: 'Find',
     icon: Icons.search,
     toolsSubtitle: 'Search and rescue navigation tools',
+    gridSubtitle: 'Search area navigation',
+    linkSubtitle: 'Search team coordination',
+    mapSubtitle: 'Search area map',
+    waypointAction: 'Mark Find',
+    quickActions: ['Sector Assign', 'Mark Clue', 'Search Pattern'],
   ),
   backcountry(
     id: 'backcountry',
@@ -25,6 +30,11 @@ enum OperationalMode {
     markerLabel: 'Waypoint',
     icon: Icons.terrain,
     toolsSubtitle: 'Backcountry navigation calculators',
+    gridSubtitle: 'Trail navigation',
+    linkSubtitle: 'Group coordination',
+    mapSubtitle: 'Trail and terrain map',
+    waypointAction: 'Mark Waypoint',
+    quickActions: ['Mark Camp', 'Set Waypoint', 'Trail Nav'],
   ),
   hunting(
     id: 'hunting',
@@ -35,6 +45,11 @@ enum OperationalMode {
     markerLabel: 'Stand',
     icon: Icons.track_changes,
     toolsSubtitle: 'Hunting party field tools',
+    gridSubtitle: 'Stand navigation',
+    linkSubtitle: 'Hunting party coordination',
+    mapSubtitle: 'Hunting area map',
+    waypointAction: 'Mark Stand',
+    quickActions: ['Mark Stand', 'Game Sighting', 'Property Line'],
   ),
   training(
     id: 'training',
@@ -45,6 +60,11 @@ enum OperationalMode {
     markerLabel: 'Checkpoint',
     icon: Icons.flag,
     toolsSubtitle: 'Training exercise navigation tools',
+    gridSubtitle: 'Exercise navigation',
+    linkSubtitle: 'Exercise team coordination',
+    mapSubtitle: 'Exercise area map',
+    waypointAction: 'Mark Checkpoint',
+    quickActions: ['Set Objective', 'Rally Point', 'Phase Line'],
   );
 
   final String id;
@@ -60,6 +80,21 @@ enum OperationalMode {
   /// Mode-specific subtitle for the Tools screen.
   final String toolsSubtitle;
 
+  /// Mode-specific subtitle for the Grid screen.
+  final String gridSubtitle;
+
+  /// Mode-specific subtitle for the Field Link screen.
+  final String linkSubtitle;
+
+  /// Mode-specific subtitle for the Map screen.
+  final String mapSubtitle;
+
+  /// Mode-specific label for the waypoint action button.
+  final String waypointAction;
+
+  /// Mode-specific quick action labels for context menus.
+  final List<String> quickActions;
+
   const OperationalMode({
     required this.id,
     required this.label,
@@ -69,6 +104,11 @@ enum OperationalMode {
     required this.markerLabel,
     required this.icon,
     required this.toolsSubtitle,
+    required this.gridSubtitle,
+    required this.linkSubtitle,
+    required this.mapSubtitle,
+    required this.waypointAction,
+    required this.quickActions,
   });
 
   /// Resolve an [OperationalMode] from its string [id].

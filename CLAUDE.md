@@ -16,7 +16,7 @@ flutter pub get
 # Run code generation (Drift)
 flutter pub run build_runner build --delete-conflicting-outputs
 
-# Run tests (749 tests)
+# Run tests (783 tests)
 flutter test
 
 # Run app
@@ -194,4 +194,4 @@ See the full plan at `.claude/plans/zazzy-zooming-duckling.md`.
 | V1.1-P5: Offline Map Download UI | Complete |
 | V1.1-P6: Field Hardening (Kalman, HUD, Sentry, l10n) | Complete |
 | V1.1-P7: Tester Feedback (Help, About, Terms, Contrast) | Complete |
-| V1.1-P8: QA/QC Pass | In Progress |
+| V1.1-P8: QA/QC Pass | Complete |

@@ -25,7 +25,9 @@ import 'package:red_grid_link/core/constants/map_constants.dart';
 import 'package:red_grid_link/core/theme/tactical_colors.dart';
 import 'package:red_grid_link/data/models/map_region.dart';
 import 'package:red_grid_link/providers/field_link_provider.dart';
+import 'package:red_grid_link/providers/location_provider.dart';
 import 'package:red_grid_link/providers/map_provider.dart';
+import 'package:red_grid_link/providers/mode_provider.dart';
 import 'package:red_grid_link/services/map/mgrs_grid_overlay.dart';
 import 'package:red_grid_link/services/map/tile_manager.dart';
 
@@ -56,6 +58,15 @@ class _MapScreenState extends ConsumerState<MapScreen> {
     final controllerService = ref.read(mapControllerServiceProvider);
     final tileManager = ref.read(tileManagerProvider);
     final isSessionActive = ref.watch(isSessionActiveProvider);
+    final gpsPosition = ref.watch(currentPositionProvider);
+    final opMode = ref.watch(currentModeProvider);
+
+    // Feed GPS position to the map controller for auto-follow and recenter.
+    // This bridges LocationService → MapControllerService reactively.
+    if (gpsPosition != null) {
+      final latLng = LatLng(gpsPosition.lat, gpsPosition.lon);
+      controllerService.followPosition(latLng);
+    }
     final showToolbar = ref.watch(showAnnotationToolbarProvider);
     final isDrawing = ref.watch(isDrawingActiveProvider);
     final drawingMode = ref.watch(drawingModeProvider);
@@ -136,7 +147,11 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                 ),
 
               // Current position marker (always on top)
-              _buildPositionMarker(controllerService.lastGpsPosition),
+              _buildPositionMarker(
+                gpsPosition != null
+                    ? LatLng(gpsPosition.lat, gpsPosition.lon)
+                    : null,
+              ),
             ],
           ),
 
@@ -162,7 +177,11 @@ class _MapScreenState extends ConsumerState<MapScreen> {
               top: MediaQuery.of(context).padding.top + 12,
               left: 12,
               right: 12,
-              child: _DrawingHint(colors: colors, mode: drawingMode),
+              child: _DrawingHint(
+                colors: colors,
+                mode: drawingMode,
+                markerLabel: opMode.markerLabel,
+              ),
             ),
 
           // ── Attribution bar ────────────────────────────────────────────
@@ -445,15 +464,20 @@ class _AnnotationToggleButton extends StatelessWidget {
 class _DrawingHint extends StatelessWidget {
   final TacticalColorScheme colors;
   final DrawingMode mode;
+  final String markerLabel;
 
-  const _DrawingHint({required this.colors, required this.mode});
+  const _DrawingHint({
+    required this.colors,
+    required this.mode,
+    this.markerLabel = 'MARKER',
+  });
 
   @override
   Widget build(BuildContext context) {
     final hint = switch (mode) {
       DrawingMode.polyline => 'TAP MAP TO ADD POINTS. USE TOOLBAR TO FINISH.',
       DrawingMode.polygon => 'TAP MAP TO ADD VERTICES. USE TOOLBAR TO FINISH.',
-      DrawingMode.marker => 'TAP MAP TO PLACE MARKER.',
+      DrawingMode.marker => 'TAP MAP TO PLACE ${markerLabel.toUpperCase()}.',
       DrawingMode.none => '',
     };
 

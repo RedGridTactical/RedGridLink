@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:red_grid_link/data/models/position.dart';
 import 'package:red_grid_link/data/repositories/track_repository.dart';
+import 'package:red_grid_link/services/location/compass_service.dart';
 import 'package:red_grid_link/services/location/location_service.dart';
 import 'package:red_grid_link/services/location/permission_handler_service.dart';
 
@@ -109,4 +110,33 @@ final locationPermissionProvider =
 final isTrackingProvider = Provider<bool>((ref) {
   final service = ref.watch(locationServiceProvider);
   return service.isTracking;
+});
+
+// ---------------------------------------------------------------------------
+// Compass heading (magnetometer-based)
+// ---------------------------------------------------------------------------
+
+/// Singleton [CompassService] provider.
+///
+/// Provides device heading from the magnetometer — works even when
+/// stationary, unlike GPS heading which requires movement.
+final compassServiceProvider = Provider<CompassService>((ref) {
+  final service = CompassService();
+  service.start();
+  ref.onDispose(() => service.dispose());
+  return service;
+});
+
+/// Stream of compass heading in degrees (0-360, 0 = North).
+///
+/// Updates at ~20Hz from the magnetometer with low-pass smoothing.
+final compassHeadingStreamProvider = StreamProvider<double>((ref) {
+  final service = ref.watch(compassServiceProvider);
+  return service.headingStream;
+});
+
+/// The most recent compass heading, or null if magnetometer is unavailable.
+final compassHeadingProvider = Provider<double?>((ref) {
+  final asyncHeading = ref.watch(compassHeadingStreamProvider);
+  return asyncHeading.whenData((h) => h).valueOrNull;
 });

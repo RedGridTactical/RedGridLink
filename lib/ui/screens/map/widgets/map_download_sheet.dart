@@ -533,8 +533,10 @@ class _MapDownloadSheetState extends ConsumerState<_MapDownloadSheet> {
       maxZoom: maxZoom,
     );
 
-    // Create region in database first
+    // Create region in database BEFORE starting download so
+    // markAsDownloaded() has a row to update.
     final tileManager = ref.read(tileManagerProvider);
+    await tileManager.createRegion(region);
 
     setState(() {
       _isDownloading = true;

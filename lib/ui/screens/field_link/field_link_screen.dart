@@ -5,6 +5,7 @@ import '../../../core/theme/tactical_colors.dart';
 import '../../../core/theme/tactical_text_styles.dart';
 import '../../../core/utils/haptics.dart';
 import '../../../providers/field_link_provider.dart';
+import '../../../providers/mode_provider.dart';
 import '../../../providers/theme_provider.dart';
 import '../../common/dialogs/confirm_dialog.dart';
 import '../../common/widgets/tactical_button.dart';
@@ -27,6 +28,7 @@ class FieldLinkScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final colors = ref.watch(currentThemeProvider);
     final isActive = ref.watch(isSessionActiveProvider);
+    final mode = ref.watch(currentModeProvider);
 
     return Scaffold(
       backgroundColor: colors.bg,
@@ -49,13 +51,42 @@ class FieldLinkScreen extends ConsumerWidget {
                     'FIELD LINK',
                     style: TacticalTextStyles.heading(colors),
                   ),
+                  const SizedBox(width: 8),
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 6,
+                      vertical: 2,
+                    ),
+                    decoration: BoxDecoration(
+                      color: colors.accent.withValues(alpha: 0.15),
+                      borderRadius: BorderRadius.circular(4),
+                      border: Border.all(
+                        color: colors.accent.withValues(alpha: 0.3),
+                      ),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(mode.icon, size: 10, color: colors.accent),
+                        const SizedBox(width: 3),
+                        Text(
+                          mode.label,
+                          style: TacticalTextStyles.dim(colors).copyWith(
+                            color: colors.accent,
+                            fontSize: 9,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
                 ],
               ),
             ),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16),
               child: Text(
-                'Proximity coordination with nearby devices',
+                mode.linkSubtitle,
                 style: TacticalTextStyles.caption(colors),
               ),
             ),

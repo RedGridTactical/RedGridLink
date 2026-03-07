@@ -8,6 +8,7 @@ import '../../../core/utils/haptics.dart';
 import '../../../core/utils/mgrs.dart';
 import '../../../core/utils/voice.dart';
 import '../../../providers/location_provider.dart';
+import '../../../providers/mode_provider.dart';
 import '../../../providers/settings_provider.dart';
 import '../../../providers/theme_provider.dart';
 import '../../common/widgets/bearing_arrow.dart';
@@ -36,6 +37,18 @@ class GridScreen extends ConsumerWidget {
     final position = ref.watch(currentPositionProvider);
     final precision = ref.watch(mgrsPrecisionProvider);
     final declination = ref.watch(declinationProvider);
+    final compassHeading = ref.watch(compassHeadingProvider);
+    final mode = ref.watch(currentModeProvider);
+
+    // Use compass heading when stationary (speed < 0.5 m/s) or GPS heading
+    // is unavailable. GPS heading is only reliable while moving.
+    final double? effectiveHeading;
+    final speed = position?.speed ?? 0;
+    if (speed > 0.5 && position?.heading != null && position!.heading! > 0) {
+      effectiveHeading = position.heading;
+    } else {
+      effectiveHeading = compassHeading ?? position?.heading;
+    }
 
     // Compute MGRS at selected precision
     final String mgrsRaw = position != null
@@ -52,6 +65,22 @@ class GridScreen extends ConsumerWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
+              // ---- MODE HEADER ----
+              Row(
+                children: [
+                  Icon(mode.icon, size: 16, color: colors.accent),
+                  const SizedBox(width: 6),
+                  Text(
+                    'GRID \u2022 ${mode.gridSubtitle.toUpperCase()}',
+                    style: TacticalTextStyles.label(colors).copyWith(
+                      color: colors.accent,
+                      letterSpacing: 1,
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 12),
+
               // ---- MGRS DISPLAY ----
               _MgrsSection(
                 mgrsFormatted: mgrsFormatted,
@@ -68,7 +97,7 @@ class GridScreen extends ConsumerWidget {
 
               // ---- HEADING / SPEED ----
               _HeadingSection(
-                heading: position?.heading,
+                heading: effectiveHeading,
                 speed: position?.speed,
                 colors: colors,
               ),
@@ -93,7 +122,7 @@ class GridScreen extends ConsumerWidget {
               const SizedBox(height: 16),
 
               // ---- WAYFINDER PANEL ----
-              WayfinderPanel(colors: colors),
+              WayfinderPanel(colors: colors, mode: mode),
 
               const SizedBox(height: 24),
             ],
