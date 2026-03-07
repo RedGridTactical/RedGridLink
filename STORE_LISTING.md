@@ -103,8 +103,11 @@ PRICING:
 - Team ($199.99/yr): Pro+Link for 8 seats
 - Lifetime ($99.99): Pro+Link forever, one-time purchase
 
+## Promotional Text (iOS, max 170 chars)
+Offline MGRS navigation + encrypted BLE team sync for 2-8 people. No cell towers, no accounts, no servers. 11 tactical tools, 4 display themes, zero tracking.
+
 ## Keywords (iOS, max 100 chars)
-MGRS,tactical,navigation,offline,team,sync,BLE,military,grid,SAR,hunting,backcountry,map
+mgrs,tactical,navigation,offline,team,sync,BLE,military,grid,SAR,hunting,backcountry,map,GPS,compass
 
 ## What's New (v1.2.1)
 Red Grid Link v1.2.1 -- reliability and navigation update:

@@ -1,0 +1,903 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: #333;
+    font-family: 'Share Tech Mono', monospace;
+  }
+
+  /* Each screenshot is exactly 1290x2796 at 1:1 pixel ratio
+     For Playwright: set viewport to 1290x2796, screenshot viewport */
+  .screenshot {
+    width: 1290px;
+    height: 2796px;
+    background: #0A0000;
+    position: relative;
+    overflow: hidden;
+    margin: 20px auto;
+    outline: 2px solid #444;
+    color: #BB0000;
+  }
+
+  /* Status bar */
+  .sbar {
+    display: flex;
+    justify-content: space-between;
+    font-size: 28px;
+    color: #664444;
+    padding: 60px 50px 20px;
+    letter-spacing: 2px;
+  }
+
+  /* Dynamic Island */
+  .dynamic-island {
+    position: absolute;
+    top: 14px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 240px;
+    height: 72px;
+    background: #000;
+    border-radius: 36px;
+    z-index: 100;
+  }
+
+  /* Bottom nav */
+  .bottom-nav {
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    display: flex;
+    justify-content: space-around;
+    padding: 24px 10px 60px;
+    background: #0A0000;
+    border-top: 2px solid #1a0808;
+  }
+  .nav-item {
+    text-align: center;
+    font-size: 22px;
+    color: #553333;
+    letter-spacing: 2px;
+  }
+  .nav-item.active { color: #BB0000; }
+  .nav-icon {
+    font-size: 44px;
+    margin-bottom: 6px;
+    display: block;
+  }
+
+  /* Mode bar */
+  .mode-bar {
+    position: absolute;
+    bottom: 140px; left: 0; right: 0;
+    background: #110404;
+    padding: 14px 40px;
+    font-size: 22px;
+    color: #663333;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    border-top: 2px solid #1a0808;
+  }
+  .mode-bar .mode-icon { color: #DD2222; font-size: 28px; }
+  .mode-bar .mode-name { color: #DD2222; letter-spacing: 3px; }
+
+  /* Screen header */
+  .screen-hdr {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    padding: 10px 40px 24px;
+  }
+  .screen-hdr .icon { color: #DD2222; font-size: 44px; }
+  .screen-hdr .title { font-size: 42px; color: #BB0000; letter-spacing: 4px; }
+  .screen-hdr .sub { font-size: 24px; color: #553333; margin-left: 18px; }
+
+  /* Tactical card */
+  .tcard {
+    background: #110404;
+    border: 2px solid #221111;
+    border-radius: 24px;
+    padding: 28px;
+    margin: 0 40px 22px;
+  }
+
+  .section-hdr {
+    font-size: 28px;
+    color: #664444;
+    letter-spacing: 4px;
+    margin-bottom: 16px;
+    padding: 0 40px;
+  }
+
+  /* Tactical button */
+  .tbtn {
+    background: #DD2222;
+    color: #0A0000;
+    border: none;
+    border-radius: 22px;
+    padding: 28px 44px;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 30px;
+    letter-spacing: 4px;
+    text-align: center;
+    min-height: 100px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 40px;
+  }
+
+  /* ===== SCREEN 1: MAP ===== */
+  .s1 .map-area {
+    position: absolute;
+    top: 100px; left: 0; right: 0; bottom: 200px;
+    background:
+      linear-gradient(rgba(15,25,15,0.95), rgba(15,25,15,0.95)),
+      repeating-linear-gradient(0deg, transparent, transparent 79px, rgba(80,120,80,0.12) 79px, rgba(80,120,80,0.12) 80px),
+      repeating-linear-gradient(90deg, transparent, transparent 79px, rgba(80,120,80,0.12) 79px, rgba(80,120,80,0.12) 80px);
+    overflow: hidden;
+  }
+  .s1 .topo {
+    position: absolute;
+    border: 2px solid rgba(80,120,80,0.08);
+    border-radius: 50%;
+  }
+  .s1 .mgrs-label {
+    position: absolute;
+    font-size: 20px;
+    color: rgba(187,0,0,0.3);
+  }
+  .s1 .self-marker {
+    position: absolute;
+    width: 52px; height: 52px;
+    background: #2196F3;
+    border: 5px solid white;
+    border-radius: 50%;
+    box-shadow: 0 0 30px rgba(33,150,243,0.6);
+  }
+  .s1 .peer-marker {
+    position: absolute;
+    width: 40px; height: 40px;
+    border-radius: 50%;
+    border: 4px solid;
+  }
+  .s1 .peer-tag {
+    position: absolute;
+    font-size: 22px;
+    padding: 4px 14px;
+    background: rgba(0,0,0,0.8);
+    border-radius: 8px;
+    letter-spacing: 2px;
+  }
+  .s1 .coord-bar {
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    background: rgba(10,0,0,0.92);
+    padding: 20px 30px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-top: 2px solid #221111;
+    font-size: 28px;
+  }
+  .s1 .zoom-btns {
+    position: absolute;
+    right: 24px; top: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .s1 .zoom-btn {
+    width: 88px; height: 88px;
+    background: rgba(17,4,4,0.92);
+    border: 2px solid #221111;
+    border-radius: 18px;
+    color: #BB0000;
+    font-size: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .s1 .recenter {
+    position: absolute;
+    right: 24px; bottom: 70px;
+    width: 88px; height: 88px;
+    background: rgba(17,4,4,0.92);
+    border: 2px solid #221111;
+    border-radius: 18px;
+    color: #BB0000;
+    font-size: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .s1 .peer-hud {
+    position: absolute;
+    top: 24px; left: 24px;
+    background: rgba(10,0,0,0.88);
+    border: 2px solid #221111;
+    border-radius: 18px;
+    padding: 14px 24px;
+  }
+  .s1 .peer-hud-row {
+    display: flex;
+    gap: 20px;
+    align-items: center;
+    margin-bottom: 8px;
+    font-size: 22px;
+  }
+
+  /* ===== SCREEN 2: GRID ===== */
+  .s2 .content { padding: 0 0 200px; }
+  .s2 .mgrs-card { text-align: center; padding: 40px 28px; }
+  .s2 .mgrs-large {
+    font-size: 64px;
+    color: #BB0000;
+    font-weight: bold;
+    letter-spacing: 4px;
+  }
+  .s2 .latlon {
+    font-size: 26px;
+    color: #553333;
+    margin-top: 8px;
+  }
+  .s2 .precision-row {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    margin-top: 18px;
+  }
+  .s2 .prec-btn {
+    width: 80px; height: 68px;
+    background: #0A0000;
+    border: 2px solid #221111;
+    border-radius: 12px;
+    color: #664444;
+    font-size: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .s2 .prec-btn.active {
+    border-color: #DD2222;
+    color: #DD2222;
+    background: #1a0808;
+  }
+  .s2 .heading-card {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 34px;
+  }
+  .s2 .compass-ring {
+    width: 130px; height: 130px;
+    border: 4px solid #331111;
+    border-radius: 50%;
+    position: relative;
+  }
+  .s2 .compass-needle {
+    position: absolute;
+    top: 22px; left: 50%;
+    transform: translateX(-50%) rotate(47deg);
+    width: 6px; height: 48px;
+    background: #DD2222;
+    transform-origin: bottom center;
+    border-radius: 3px;
+  }
+  .s2 .heading-val {
+    font-size: 76px;
+    color: #BB0000;
+    text-align: center;
+  }
+  .s2 .heading-lbl {
+    font-size: 22px;
+    color: #553333;
+    text-align: center;
+    letter-spacing: 4px;
+  }
+  .s2 .speed-val { font-size: 42px; color: #BB0000; text-align: right; }
+  .s2 .speed-lbl { font-size: 22px; color: #553333; text-align: right; letter-spacing: 4px; }
+  .s2 .info-row { display: flex; gap: 16px; padding: 0 40px; margin-bottom: 18px; }
+  .s2 .info-card {
+    flex: 1;
+    text-align: center;
+    padding: 22px 10px;
+    background: #110404;
+    border: 2px solid #221111;
+    border-radius: 24px;
+  }
+  .s2 .info-lbl { font-size: 22px; color: #553333; letter-spacing: 3px; }
+  .s2 .info-val { font-size: 38px; color: #BB0000; margin-top: 6px; }
+  .s2 .info-sub { font-size: 20px; color: #443333; margin-top: 4px; }
+  .s2 .action-row { display: flex; gap: 22px; padding: 0 40px; margin-top: 12px; }
+  .s2 .action-btn {
+    flex: 1;
+    padding: 28px;
+    background: #DD2222;
+    color: #0A0000;
+    border-radius: 22px;
+    text-align: center;
+    font-size: 28px;
+    letter-spacing: 4px;
+    min-height: 100px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+  }
+
+  /* ===== SCREEN 3: FIELD LINK ===== */
+  .s3 .content { padding: 0 0 200px; }
+  .s3 .sync-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 14px 24px;
+    background: #0d0303;
+    border: 2px solid #221111;
+    border-radius: 18px;
+    margin: 0 40px 22px;
+    font-size: 24px;
+  }
+  .s3 .sync-dot {
+    width: 18px; height: 18px;
+    border-radius: 50%;
+    display: inline-block;
+    margin-right: 8px;
+    vertical-align: middle;
+  }
+  .s3 .peer-row {
+    display: flex;
+    align-items: center;
+    padding: 22px 0;
+    border-bottom: 2px solid #1a0808;
+    gap: 22px;
+  }
+  .s3 .avatar {
+    width: 88px; height: 88px;
+    border-radius: 50%;
+    border: 4px solid;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 28px;
+    font-weight: bold;
+    flex-shrink: 0;
+  }
+  .s3 .peer-info { flex: 1; }
+  .s3 .peer-name { font-size: 30px; color: #ccc; letter-spacing: 2px; }
+  .s3 .peer-grid { font-size: 22px; color: #553333; margin-top: 4px; }
+  .s3 .peer-dist { font-size: 28px; color: #BB0000; text-align: right; }
+  .s3 .peer-status {
+    font-size: 20px;
+    padding: 6px 16px;
+    border-radius: 20px;
+    border: 2px solid;
+  }
+  .s3 .encrypt-badge {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 22px;
+    color: #00BB00;
+    padding: 14px 24px;
+    background: rgba(0,187,0,0.05);
+    border: 2px solid rgba(0,187,0,0.15);
+    border-radius: 18px;
+    margin: 0 40px;
+  }
+
+  /* ===== SCREEN 4: TOOLS ===== */
+  .s4 .content { padding: 0 0 200px; }
+  .s4 .tools-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 18px;
+    padding: 0 40px;
+  }
+  .s4 .tool-card {
+    background: #110404;
+    border: 2px solid #221111;
+    border-radius: 24px;
+    padding: 30px 20px;
+    text-align: center;
+    min-height: 200px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+  .s4 .tool-icon {
+    font-size: 58px;
+    color: #DD2222;
+    margin-bottom: 12px;
+  }
+  .s4 .tool-name {
+    font-size: 24px;
+    color: #BB0000;
+    letter-spacing: 3px;
+    line-height: 1.4;
+  }
+
+  /* ===== SCREEN 5: THEMES ===== */
+  .s5 .content { padding: 0 0 200px; }
+  .s5 .theme-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 22px;
+    padding: 0 40px;
+  }
+  .s5 .theme-card {
+    border-radius: 24px;
+    padding: 34px 22px;
+    text-align: center;
+    border: 4px solid;
+    position: relative;
+  }
+  .s5 .theme-card .pro-badge {
+    position: absolute;
+    top: 14px; right: 14px;
+    font-size: 18px;
+    padding: 4px 14px;
+    border-radius: 10px;
+    letter-spacing: 2px;
+  }
+  .s5 .tc-red { background: #0A0000; border-color: #331111; color: #BB0000; }
+  .s5 .tc-nvg { background: #001400; border-color: #113311; color: #00BB00; }
+  .s5 .tc-day { background: #F5F5F5; border-color: #ddd; color: #111111; }
+  .s5 .tc-blue { background: #000A14; border-color: #112233; color: #0099DD; }
+  .s5 .theme-name { font-size: 24px; letter-spacing: 4px; opacity: 0.6; margin-bottom: 16px; }
+  .s5 .theme-mgrs { font-size: 32px; font-weight: bold; letter-spacing: 2px; }
+  .s5 .theme-heading { font-size: 52px; margin: 12px 0; }
+  .s5 .theme-compass {
+    width: 110px; height: 110px;
+    border-radius: 50%;
+    border: 3px solid;
+    margin: 10px auto 0;
+    position: relative;
+  }
+  .s5 .theme-compass .needle {
+    position: absolute;
+    top: 22px; left: 50%;
+    transform: translateX(-50%) rotate(47deg);
+    width: 5px; height: 38px;
+    transform-origin: bottom center;
+    border-radius: 3px;
+  }
+  .s5 .mode-chips {
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+    padding: 0 40px;
+  }
+  .s5 .mode-chip {
+    padding: 16px 28px;
+    border-radius: 16px;
+    font-size: 24px;
+    letter-spacing: 2px;
+  }
+
+  /* ===== SCREEN 6: GHOST MARKERS ===== */
+  .s6 .map-area {
+    position: absolute;
+    top: 100px; left: 0; right: 0; bottom: 200px;
+    background:
+      linear-gradient(rgba(15,25,15,0.95), rgba(15,25,15,0.95)),
+      repeating-linear-gradient(0deg, transparent, transparent 79px, rgba(80,120,80,0.12) 79px, rgba(80,120,80,0.12) 80px),
+      repeating-linear-gradient(90deg, transparent, transparent 79px, rgba(80,120,80,0.12) 79px, rgba(80,120,80,0.12) 80px);
+    overflow: hidden;
+  }
+  .s6 .ghost {
+    position: absolute;
+    width: 40px; height: 40px;
+    border-radius: 50%;
+  }
+  .s6 .ghost.live {
+    background: #2196F3;
+    border: 4px solid white;
+    box-shadow: 0 0 20px rgba(33,150,243,0.5);
+  }
+  .s6 .ghost.fading {
+    background: rgba(33,150,243,0.35);
+    border: 4px solid rgba(33,150,243,0.5);
+  }
+  .s6 .ghost.outline {
+    background: transparent;
+    border: 4px dashed rgba(33,150,243,0.2);
+  }
+  .s6 .ghost-tag {
+    position: absolute;
+    font-size: 22px;
+    padding: 4px 14px;
+    background: rgba(0,0,0,0.8);
+    border-radius: 8px;
+  }
+  .s6 .velocity-arrow {
+    position: absolute;
+    height: 3px;
+    transform-origin: left center;
+  }
+  .s6 .legend {
+    position: absolute;
+    bottom: 80px; left: 24px;
+    background: rgba(10,0,0,0.92);
+    border: 2px solid #221111;
+    border-radius: 18px;
+    padding: 18px 24px;
+  }
+  .s6 .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    font-size: 22px;
+    color: #664444;
+    margin-bottom: 8px;
+  }
+  .s6 .legend-dot {
+    width: 18px; height: 18px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  /* Home indicator bar */
+  .home-indicator {
+    position: absolute;
+    bottom: 16px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 200px;
+    height: 8px;
+    background: #443333;
+    border-radius: 4px;
+  }
+</style>
+</head>
+<body>
+
+<!-- ============================================================ -->
+<!-- SCREENSHOT 1: MAP WITH TEAM PEERS                            -->
+<!-- ============================================================ -->
+<div class="screenshot s1" id="ss1">
+  <div class="dynamic-island"></div>
+  <div class="sbar"><span>9:41</span><span>&#9679; 87%</span></div>
+  <div class="map-area">
+    <!-- Topo contours -->
+    <div class="topo" style="width:660px;height:400px;top:160px;left:30px;"></div>
+    <div class="topo" style="width:480px;height:280px;top:240px;left:120px;"></div>
+    <div class="topo" style="width:600px;height:360px;top:500px;left:100px;"></div>
+    <div class="topo" style="width:500px;height:300px;top:800px;left:200px;"></div>
+    <div class="topo" style="width:700px;height:380px;top:1100px;left:50px;"></div>
+    <!-- MGRS grid labels -->
+    <div class="mgrs-label" style="top:12px;left:12px;">18S UJ</div>
+    <div class="mgrs-label" style="top:12px;right:12px;">47 91</div>
+    <div class="mgrs-label" style="top:830px;left:12px;">48 91</div>
+    <!-- Self marker -->
+    <div class="self-marker" style="top:620px;left:560px;"></div>
+    <!-- Peer markers -->
+    <div class="peer-marker" style="top:280px;left:820px;background:rgba(33,150,243,0.7);border-color:#2196F3;"></div>
+    <div class="peer-tag" style="top:245px;left:760px;color:#2196F3;">ALPHA</div>
+    <div class="peer-marker" style="top:780px;left:240px;background:rgba(76,175,80,0.7);border-color:#4CAF50;"></div>
+    <div class="peer-tag" style="top:745px;left:170px;color:#4CAF50;">BRAVO</div>
+    <div class="peer-marker" style="top:420px;left:160px;background:rgba(255,152,0,0.7);border-color:#FF9800;"></div>
+    <div class="peer-tag" style="top:385px;left:80px;color:#FF9800;">CHARLIE</div>
+    <!-- Peer HUD overlay -->
+    <div class="peer-hud">
+      <div class="peer-hud-row"><span style="color:#2196F3;">&#9679;</span><span style="color:#2196F3;">ALPHA</span><span style="color:#664444;">85m 047°</span></div>
+      <div class="peer-hud-row"><span style="color:#4CAF50;">&#9679;</span><span style="color:#4CAF50;">BRAVO</span><span style="color:#664444;">62m 215°</span></div>
+      <div class="peer-hud-row"><span style="color:#FF9800;">&#9679;</span><span style="color:#FF9800;">CHARLIE</span><span style="color:#664444;">48m 280°</span></div>
+    </div>
+    <!-- Zoom controls -->
+    <div class="zoom-btns">
+      <div class="zoom-btn">+</div>
+      <div class="zoom-btn">−</div>
+    </div>
+    <div class="recenter">◎</div>
+    <!-- Coordinate bar -->
+    <div class="coord-bar">
+      <span style="color:#BB0000;letter-spacing:3px;">18S UJ 47832 91204</span>
+      <span style="color:#553333;">Z14 047°</span>
+    </div>
+  </div>
+  <div class="mode-bar"><span class="mode-icon">&#128269;</span><span class="mode-name">SAR MODE</span><span>• Wilderness SAR</span></div>
+  <div class="bottom-nav">
+    <div class="nav-item active"><span class="nav-icon">&#9635;</span>MAP</div>
+    <div class="nav-item"><span class="nav-icon">&#9638;</span>GRID</div>
+    <div class="nav-item"><span class="nav-icon">&#9783;</span>LINK</div>
+    <div class="nav-item"><span class="nav-icon">&#9881;</span>TOOLS</div>
+    <div class="nav-item"><span class="nav-icon">&#9881;</span>SET</div>
+  </div>
+  <div class="home-indicator"></div>
+</div>
+
+<!-- ============================================================ -->
+<!-- SCREENSHOT 2: GRID VIEW                                      -->
+<!-- ============================================================ -->
+<div class="screenshot s2" id="ss2">
+  <div class="dynamic-island"></div>
+  <div class="sbar"><span>9:41</span><span>&#9679; 87%</span></div>
+  <div class="content">
+    <div class="screen-hdr">
+      <span class="icon">&#9638;</span>
+      <div><span class="title">GRID</span><span class="sub">• SAR</span></div>
+    </div>
+    <div class="tcard mgrs-card">
+      <div class="mgrs-large">18S UJ 47832 91204</div>
+      <div class="latlon">38.8977° N, 77.0365° W</div>
+      <div style="font-size:24px;color:#664444;letter-spacing:4px;margin-top:22px;">PRECISION</div>
+      <div class="precision-row">
+        <div class="prec-btn">1</div>
+        <div class="prec-btn">2</div>
+        <div class="prec-btn">3</div>
+        <div class="prec-btn">4</div>
+        <div class="prec-btn active">5</div>
+      </div>
+    </div>
+    <div class="tcard heading-card">
+      <div>
+        <div class="compass-ring">
+          <div class="compass-needle"></div>
+        </div>
+      </div>
+      <div>
+        <div class="heading-lbl">HEADING</div>
+        <div class="heading-val">047°</div>
+      </div>
+      <div>
+        <div class="speed-lbl">SPEED</div>
+        <div class="speed-val">3.2</div>
+        <div style="font-size:20px;color:#443333;text-align:right;">km/h</div>
+      </div>
+    </div>
+    <div class="info-row">
+      <div class="info-card">
+        <div class="info-lbl">ALT</div>
+        <div class="info-val">112m</div>
+      </div>
+      <div class="info-card">
+        <div class="info-lbl">GPS</div>
+        <div class="info-val">±4m</div>
+        <div class="info-sub" style="color:#00BB00;">EXCELLENT</div>
+      </div>
+      <div class="info-card">
+        <div class="info-lbl">DECL</div>
+        <div class="info-val">-11.2°</div>
+        <div class="info-sub">WEST</div>
+      </div>
+    </div>
+    <div class="action-row">
+      <div class="action-btn">&#128266; SPEAK</div>
+      <div class="action-btn">&#128203; COPY</div>
+    </div>
+  </div>
+  <div class="mode-bar"><span class="mode-icon">&#128269;</span><span class="mode-name">SAR MODE</span></div>
+  <div class="bottom-nav">
+    <div class="nav-item"><span class="nav-icon">&#9635;</span>MAP</div>
+    <div class="nav-item active"><span class="nav-icon">&#9638;</span>GRID</div>
+    <div class="nav-item"><span class="nav-icon">&#9783;</span>LINK</div>
+    <div class="nav-item"><span class="nav-icon">&#9881;</span>TOOLS</div>
+    <div class="nav-item"><span class="nav-icon">&#9881;</span>SET</div>
+  </div>
+  <div class="home-indicator"></div>
+</div>
+
+<!-- ============================================================ -->
+<!-- SCREENSHOT 3: FIELD LINK SESSION                             -->
+<!-- ============================================================ -->
+<div class="screenshot s3" id="ss3">
+  <div class="dynamic-island"></div>
+  <div class="sbar"><span>9:41</span><span>&#9679; 87%</span></div>
+  <div class="content">
+    <div class="screen-hdr">
+      <span class="icon">&#9783;</span>
+      <div><span class="title">FIELD LINK</span><span class="sub">• SAR</span></div>
+    </div>
+    <div class="sync-bar">
+      <div><span class="sync-dot" style="background:#00BB00;box-shadow:0 0 8px rgba(0,187,0,0.5);"></span><span style="color:#00BB00;"> SYNCED</span></div>
+      <span style="color:#553333;">PIN: 4827</span>
+      <span style="color:#553333;">3/8 PEERS</span>
+    </div>
+    <div class="tcard" style="padding:18px 28px;">
+      <div class="peer-row">
+        <div class="avatar" style="border-color:#DD2222;background:rgba(221,34,34,0.15);color:#DD2222;">ME</div>
+        <div class="peer-info">
+          <div class="peer-name" style="color:#BB0000;">YOU (HOST)</div>
+          <div class="peer-grid">18S UJ 47832 91204</div>
+        </div>
+        <div class="peer-status" style="color:#00BB00;border-color:#00BB00;">HOST</div>
+      </div>
+      <div class="peer-row">
+        <div class="avatar" style="border-color:#2196F3;background:rgba(33,150,243,0.15);color:#2196F3;">A</div>
+        <div class="peer-info">
+          <div class="peer-name">ALPHA</div>
+          <div class="peer-grid">18S UJ 47901 91180</div>
+        </div>
+        <div class="peer-dist">85m NE</div>
+      </div>
+      <div class="peer-row">
+        <div class="avatar" style="border-color:#4CAF50;background:rgba(76,175,80,0.15);color:#4CAF50;">B</div>
+        <div class="peer-info">
+          <div class="peer-name">BRAVO</div>
+          <div class="peer-grid">18S UJ 47780 91250</div>
+        </div>
+        <div class="peer-dist">62m SW</div>
+      </div>
+      <div class="peer-row" style="border:none;">
+        <div class="avatar" style="border-color:#FF9800;background:rgba(255,152,0,0.15);color:#FF9800;">C</div>
+        <div class="peer-info">
+          <div class="peer-name">CHARLIE</div>
+          <div class="peer-grid">18S UJ 47810 91190</div>
+        </div>
+        <div class="peer-dist">48m W</div>
+      </div>
+    </div>
+    <div class="encrypt-badge">&#128274; AES-256-GCM ENCRYPTED</div>
+    <div class="tcard" style="margin-top:18px;padding:22px 28px;display:flex;justify-content:space-between;font-size:26px;">
+      <span style="color:#553333;">EXPEDITION MODE</span>
+      <span style="color:#BB0000;">&lt;3%/HR</span>
+    </div>
+    <div style="margin-top:22px;">
+      <div class="tbtn" style="background:#CC0000;">LEAVE SESSION</div>
+    </div>
+  </div>
+  <div class="mode-bar"><span class="mode-icon">&#128269;</span><span class="mode-name">SAR MODE</span></div>
+  <div class="bottom-nav">
+    <div class="nav-item"><span class="nav-icon">&#9635;</span>MAP</div>
+    <div class="nav-item"><span class="nav-icon">&#9638;</span>GRID</div>
+    <div class="nav-item active"><span class="nav-icon">&#9783;</span>LINK</div>
+    <div class="nav-item"><span class="nav-icon">&#9881;</span>TOOLS</div>
+    <div class="nav-item"><span class="nav-icon">&#9881;</span>SET</div>
+  </div>
+  <div class="home-indicator"></div>
+</div>
+
+<!-- ============================================================ -->
+<!-- SCREENSHOT 4: TACTICAL TOOLS                                 -->
+<!-- ============================================================ -->
+<div class="screenshot s4" id="ss4">
+  <div class="dynamic-island"></div>
+  <div class="sbar"><span>9:41</span><span>&#9679; 87%</span></div>
+  <div class="content">
+    <div class="screen-hdr">
+      <span class="icon">&#9881;</span>
+      <div><span class="title">TACTICAL TOOLS</span><span class="sub">SAR Mode</span></div>
+    </div>
+    <div class="tools-grid">
+      <div class="tool-card"><div class="tool-icon">&#8982;</div><div class="tool-name">DEAD<br>RECKONING</div></div>
+      <div class="tool-card"><div class="tool-icon">&#8711;</div><div class="tool-name">RESECTION</div></div>
+      <div class="tool-card"><div class="tool-icon">&#128694;</div><div class="tool-name">PACE<br>COUNT</div></div>
+      <div class="tool-card"><div class="tool-icon">&#8634;</div><div class="tool-name">BACK<br>AZIMUTH</div></div>
+      <div class="tool-card"><div class="tool-icon">&#8644;</div><div class="tool-name">COORD<br>CONVERT</div></div>
+      <div class="tool-card"><div class="tool-icon">&#128207;</div><div class="tool-name">RANGE<br>ESTIMATE</div></div>
+      <div class="tool-card"><div class="tool-icon">&#9651;</div><div class="tool-name">SLOPE<br>CALC</div></div>
+      <div class="tool-card"><div class="tool-icon">&#9200;</div><div class="tool-name">TIME DIST<br>SPEED</div></div>
+      <div class="tool-card"><div class="tool-icon">&#127760;</div><div class="tool-name">DECLI-<br>NATION</div></div>
+      <div class="tool-card"><div class="tool-icon">&#9790;</div><div class="tool-name">CELESTIAL<br>NAV</div></div>
+      <div class="tool-card"><div class="tool-icon">&#9638;</div><div class="tool-name">MGRS<br>PRECISION</div></div>
+    </div>
+  </div>
+  <div class="mode-bar"><span class="mode-icon">&#128269;</span><span class="mode-name">SAR MODE</span></div>
+  <div class="bottom-nav">
+    <div class="nav-item"><span class="nav-icon">&#9635;</span>MAP</div>
+    <div class="nav-item"><span class="nav-icon">&#9638;</span>GRID</div>
+    <div class="nav-item"><span class="nav-icon">&#9783;</span>LINK</div>
+    <div class="nav-item active"><span class="nav-icon">&#9881;</span>TOOLS</div>
+    <div class="nav-item"><span class="nav-icon">&#9881;</span>SET</div>
+  </div>
+  <div class="home-indicator"></div>
+</div>
+
+<!-- ============================================================ -->
+<!-- SCREENSHOT 5: THEMES & MODES                                 -->
+<!-- ============================================================ -->
+<div class="screenshot s5" id="ss5">
+  <div class="dynamic-island"></div>
+  <div class="sbar"><span>9:41</span><span>&#9679; 87%</span></div>
+  <div class="content">
+    <div class="screen-hdr">
+      <span class="icon">&#9881;</span>
+      <div><span class="title">SETTINGS</span><span class="sub">Display &amp; Mode</span></div>
+    </div>
+    <div class="section-hdr">DISPLAY THEME</div>
+    <div class="theme-grid">
+      <div class="theme-card tc-red">
+        <div class="theme-name">RED LIGHT</div>
+        <div class="theme-mgrs">18S UJ</div>
+        <div class="theme-heading">047°</div>
+        <div class="theme-compass" style="border-color:#331111;"><div class="needle" style="background:#DD2222;"></div></div>
+      </div>
+      <div class="theme-card tc-nvg">
+        <div class="pro-badge" style="background:rgba(0,187,0,0.15);color:#00BB00;border:2px solid rgba(0,187,0,0.3);">PRO</div>
+        <div class="theme-name">NVG GREEN</div>
+        <div class="theme-mgrs">18S UJ</div>
+        <div class="theme-heading">047°</div>
+        <div class="theme-compass" style="border-color:#113311;"><div class="needle" style="background:#00BB00;"></div></div>
+      </div>
+      <div class="theme-card tc-day">
+        <div class="pro-badge" style="background:rgba(0,0,0,0.05);color:#666;border:2px solid #ccc;">PRO</div>
+        <div class="theme-name">DAY WHITE</div>
+        <div class="theme-mgrs">18S UJ</div>
+        <div class="theme-heading">047°</div>
+        <div class="theme-compass" style="border-color:#ccc;"><div class="needle" style="background:#CC0000;"></div></div>
+      </div>
+      <div class="theme-card tc-blue">
+        <div class="pro-badge" style="background:rgba(0,153,221,0.1);color:#0099DD;border:2px solid rgba(0,153,221,0.3);">PRO</div>
+        <div class="theme-name">BLUE FORCE</div>
+        <div class="theme-mgrs">18S UJ</div>
+        <div class="theme-heading">047°</div>
+        <div class="theme-compass" style="border-color:#112233;"><div class="needle" style="background:#0099DD;"></div></div>
+      </div>
+    </div>
+    <div style="margin-top:28px;">
+      <div class="section-hdr">OPERATIONAL MODE</div>
+      <div class="mode-chips">
+        <div class="mode-chip" style="border:2px solid #DD2222;color:#DD2222;background:#1a0808;">&#128269; SAR</div>
+        <div class="mode-chip" style="border:2px solid #221111;color:#553333;">&#127956; BACKCOUNTRY</div>
+        <div class="mode-chip" style="border:2px solid #221111;color:#553333;">&#127919; HUNTING</div>
+        <div class="mode-chip" style="border:2px solid #221111;color:#553333;">&#127941; TRAINING</div>
+      </div>
+    </div>
+  </div>
+  <div class="mode-bar"><span class="mode-icon">&#128269;</span><span class="mode-name">SAR MODE</span></div>
+  <div class="bottom-nav">
+    <div class="nav-item"><span class="nav-icon">&#9635;</span>MAP</div>
+    <div class="nav-item"><span class="nav-icon">&#9638;</span>GRID</div>
+    <div class="nav-item"><span class="nav-icon">&#9783;</span>LINK</div>
+    <div class="nav-item"><span class="nav-icon">&#9881;</span>TOOLS</div>
+    <div class="nav-item active"><span class="nav-icon">&#9881;</span>SET</div>
+  </div>
+  <div class="home-indicator"></div>
+</div>
+
+<!-- ============================================================ -->
+<!-- SCREENSHOT 6: GHOST MARKERS                                  -->
+<!-- ============================================================ -->
+<div class="screenshot s6" id="ss6">
+  <div class="dynamic-island"></div>
+  <div class="sbar"><span>9:41</span><span>&#9679; 87%</span></div>
+  <div class="map-area">
+    <div class="topo" style="width:600px;height:340px;top:200px;left:60px;border-color:rgba(80,120,80,0.08);border-radius:50%;border:2px solid rgba(80,120,80,0.08);position:absolute;"></div>
+    <div class="topo" style="width:540px;height:340px;top:500px;left:140px;border-color:rgba(80,120,80,0.08);border-radius:50%;border:2px solid rgba(80,120,80,0.08);position:absolute;"></div>
+    <div class="mgrs-label" style="top:12px;left:12px;font-size:20px;color:rgba(187,0,0,0.3);position:absolute;">18S UJ</div>
+    <!-- Self -->
+    <div class="self-marker" style="top:620px;left:500px;width:52px;height:52px;background:#2196F3;border:5px solid white;border-radius:50%;box-shadow:0 0 30px rgba(33,150,243,0.6);position:absolute;"></div>
+    <!-- Live ghost (2 min ago) -->
+    <div class="ghost live" style="top:280px;left:260px;"></div>
+    <div class="ghost-tag" style="top:245px;left:180px;color:#2196F3;">ALPHA · 2m ago</div>
+    <!-- Fading ghost (12 min) -->
+    <div class="ghost fading" style="top:480px;left:800px;"></div>
+    <div class="ghost-tag" style="top:445px;left:710px;color:rgba(33,150,243,0.5);">BRAVO · 12m</div>
+    <div class="velocity-arrow" style="top:500px;left:845px;width:60px;background:rgba(33,150,243,0.25);transform:rotate(-25deg);"></div>
+    <!-- Outline ghost (28 min) -->
+    <div class="ghost outline" style="top:850px;left:330px;"></div>
+    <div class="ghost-tag" style="top:815px;left:230px;color:rgba(33,150,243,0.25);">CHARLIE · 28m</div>
+    <div class="velocity-arrow" style="top:870px;left:375px;width:50px;background:rgba(33,150,243,0.1);transform:rotate(140deg);"></div>
+    <!-- Legend -->
+    <div class="legend">
+      <div class="legend-item"><div class="legend-dot" style="background:#2196F3;border:2px solid white;"></div>LIVE / &lt;5min</div>
+      <div class="legend-item"><div class="legend-dot" style="background:rgba(33,150,243,0.35);border:2px solid rgba(33,150,243,0.5);"></div>FADING 5-15min</div>
+      <div class="legend-item"><div class="legend-dot" style="background:transparent;border:2px dashed rgba(33,150,243,0.25);"></div>GHOST 15-30min</div>
+    </div>
+    <!-- Coord bar -->
+    <div class="coord-bar" style="position:absolute;bottom:0;left:0;right:0;background:rgba(10,0,0,0.92);padding:20px 30px;display:flex;justify-content:space-between;align-items:center;border-top:2px solid #221111;font-size:28px;">
+      <span style="color:#BB0000;letter-spacing:3px;">18S UJ 47832 91204</span>
+      <span style="color:#553333;">GHOSTS: 3</span>
+    </div>
+  </div>
+  <div class="mode-bar"><span class="mode-icon">&#128269;</span><span class="mode-name">SAR MODE</span></div>
+  <div class="bottom-nav">
+    <div class="nav-item active"><span class="nav-icon">&#9635;</span>MAP</div>
+    <div class="nav-item"><span class="nav-icon">&#9638;</span>GRID</div>
+    <div class="nav-item"><span class="nav-icon">&#9783;</span>LINK</div>
+    <div class="nav-item"><span class="nav-icon">&#9881;</span>TOOLS</div>
+    <div class="nav-item"><span class="nav-icon">&#9881;</span>SET</div>
+  </div>
+  <div class="home-indicator"></div>
+</div>
+
+</body>
+</html>
