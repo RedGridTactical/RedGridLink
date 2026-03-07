@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght@700;900&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    width: 1280px;
+    height: 400px;
+    background: #0a0a0a;
+    overflow: hidden;
+    font-family: 'Share Tech Mono', monospace;
+  }
+
+  .banner {
+    width: 1280px;
+    height: 400px;
+    position: relative;
+    background: radial-gradient(ellipse at center, #1a0000 0%, #0a0a0a 70%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+
+  /* Corner brackets */
+  .corner {
+    position: absolute;
+    width: 40px;
+    height: 40px;
+    border-color: #8B0000;
+    border-style: solid;
+    border-width: 0;
+    opacity: 0.6;
+  }
+  .corner.tl { top: 15px; left: 15px; border-top-width: 2px; border-left-width: 2px; }
+  .corner.tr { top: 15px; right: 15px; border-top-width: 2px; border-right-width: 2px; }
+  .corner.bl { bottom: 15px; left: 15px; border-bottom-width: 2px; border-left-width: 2px; }
+  .corner.br { bottom: 15px; right: 15px; border-bottom-width: 2px; border-right-width: 2px; }
+
+  /* Crosshair left */
+  .crosshair-left {
+    position: absolute;
+    left: 80px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 120px;
+    height: 120px;
+    opacity: 0.15;
+  }
+  .crosshair-left::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: #CC0000;
+  }
+  .crosshair-left::after {
+    content: '';
+    position: absolute;
+    left: 50%;
+    top: 0;
+    bottom: 0;
+    width: 1px;
+    background: #CC0000;
+  }
+  .crosshair-circle {
+    position: absolute;
+    border: 1px solid #CC0000;
+    border-radius: 50%;
+  }
+  .crosshair-left .crosshair-circle:nth-child(1) {
+    width: 120px; height: 120px; top: 0; left: 0;
+  }
+  .crosshair-left .crosshair-circle:nth-child(2) {
+    width: 80px; height: 80px; top: 20px; left: 20px;
+  }
+  .crosshair-left .crosshair-circle:nth-child(3) {
+    width: 40px; height: 40px; top: 40px; left: 40px;
+  }
+
+  /* Crosshair right */
+  .crosshair-right {
+    position: absolute;
+    right: 80px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 120px;
+    height: 120px;
+    opacity: 0.15;
+  }
+  .crosshair-right::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: #CC0000;
+  }
+  .crosshair-right::after {
+    content: '';
+    position: absolute;
+    left: 50%;
+    top: 0;
+    bottom: 0;
+    width: 1px;
+    background: #CC0000;
+  }
+
+  /* Left info panel */
+  .info-left {
+    position: absolute;
+    left: 40px;
+    top: 80px;
+    color: #CC0000;
+    font-size: 11px;
+    line-height: 1.8;
+    opacity: 0.5;
+  }
+  .info-left .mgrs {
+    font-size: 14px;
+    color: #CC0000;
+    opacity: 1;
+  }
+
+  /* Right info panel */
+  .info-right {
+    position: absolute;
+    right: 40px;
+    top: 80px;
+    text-align: right;
+    color: #CC0000;
+    font-size: 11px;
+    line-height: 1.8;
+    opacity: 0.5;
+  }
+
+  /* Grid lines background */
+  .grid-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    opacity: 0.04;
+    background-image:
+      linear-gradient(#CC0000 1px, transparent 1px),
+      linear-gradient(90deg, #CC0000 1px, transparent 1px);
+    background-size: 60px 60px;
+  }
+
+  /* Title */
+  .title {
+    font-family: 'Orbitron', sans-serif;
+    font-weight: 900;
+    font-size: 72px;
+    color: #CC0000;
+    letter-spacing: 8px;
+    text-shadow:
+      0 0 40px rgba(204, 0, 0, 0.6),
+      0 0 80px rgba(139, 0, 0, 0.3);
+    z-index: 2;
+    line-height: 1;
+  }
+
+  .subtitle {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 22px;
+    color: #CC0000;
+    letter-spacing: 14px;
+    margin-top: 8px;
+    opacity: 0.8;
+    z-index: 2;
+  }
+
+  .tagline {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 12px;
+    color: #CC0000;
+    letter-spacing: 4px;
+    margin-top: 30px;
+    opacity: 0.4;
+    z-index: 2;
+    display: flex;
+    gap: 30px;
+  }
+
+  /* Horizontal scan line */
+  .scanline {
+    position: absolute;
+    width: 100%;
+    height: 1px;
+    background: linear-gradient(90deg, transparent 0%, #CC0000 20%, #CC0000 80%, transparent 100%);
+    opacity: 0.08;
+  }
+  .scanline:nth-child(1) { top: 60px; }
+  .scanline:nth-child(2) { bottom: 60px; }
+
+  /* BLE signal rings */
+  .ble-rings {
+    position: absolute;
+    bottom: 60px;
+    left: 50%;
+    transform: translateX(-50%);
+    opacity: 0.08;
+  }
+  .ble-ring {
+    position: absolute;
+    border: 1px solid #CC0000;
+    border-radius: 50%;
+    left: 50%;
+    bottom: 0;
+    transform: translateX(-50%);
+  }
+  .ble-ring:nth-child(1) { width: 200px; height: 100px; }
+  .ble-ring:nth-child(2) { width: 350px; height: 175px; }
+  .ble-ring:nth-child(3) { width: 500px; height: 250px; }
+</style>
+</head>
+<body>
+<div class="banner">
+  <div class="grid-overlay"></div>
+  <div class="scanline"></div>
+  <div class="scanline"></div>
+
+  <div class="corner tl"></div>
+  <div class="corner tr"></div>
+  <div class="corner bl"></div>
+  <div class="corner br"></div>
+
+  <div class="crosshair-left">
+    <div class="crosshair-circle"></div>
+    <div class="crosshair-circle"></div>
+    <div class="crosshair-circle"></div>
+  </div>
+
+  <div class="crosshair-right">
+    <div class="crosshair-circle"></div>
+    <div class="crosshair-circle"></div>
+    <div class="crosshair-circle"></div>
+  </div>
+
+  <div class="info-left">
+    <div>MGRS GRID</div>
+    <div class="mgrs">18S UJ 47832 91204</div>
+    <div>±4m ALT 112m</div>
+    <br>
+    <div>BEARING 047°</div>
+    <div>DIST 1.3km</div>
+    <br>
+    <div>FIELD LINK: ACTIVE</div>
+    <div>PEERS: 3/8</div>
+    <div>AES-256-GCM</div>
+  </div>
+
+  <div class="info-right">
+    <div>TOOLS</div>
+    <div>BACK AZIMUTH</div>
+    <div>DEAD RECKONING</div>
+    <div>RESECTION</div>
+    <div>PACE COUNT</div>
+    <div>COORD CONVERTER</div>
+    <div>RANGE ESTIMATION</div>
+    <div>SLOPE CALC</div>
+    <br>
+    <div>BLE + WIFI DIRECT</div>
+    <div>OFFLINE MAPS</div>
+    <div>ZERO TRACKING</div>
+  </div>
+
+  <div class="title">RED GRID</div>
+  <div class="subtitle">L I N K</div>
+  <div class="tagline">
+    <span>OFFLINE FIRST</span>
+    <span>ZERO TRACKING</span>
+    <span>OPEN SOURCE</span>
+  </div>
+
+  <div class="ble-rings">
+    <div class="ble-ring"></div>
+    <div class="ble-ring"></div>
+    <div class="ble-ring"></div>
+  </div>
+</div>
+</body>
+</html>

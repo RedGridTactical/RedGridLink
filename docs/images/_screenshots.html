@@ -1,0 +1,1240 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: #1a1a1a;
+    padding: 40px;
+    font-family: 'Share Tech Mono', monospace;
+    color: #BB0000;
+  }
+
+  .screenshots-row {
+    display: flex;
+    gap: 30px;
+    margin-bottom: 30px;
+    justify-content: center;
+  }
+
+  /* Phone frame */
+  .phone {
+    width: 280px;
+    height: 560px;
+    background: #0A0000;
+    border: 2px solid #333;
+    border-radius: 24px;
+    position: relative;
+    overflow: hidden;
+    flex-shrink: 0;
+  }
+  .phone .notch {
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100px;
+    height: 22px;
+    background: #000;
+    border-radius: 0 0 14px 14px;
+    z-index: 10;
+    border: 1px solid #222;
+    border-top: none;
+  }
+  .phone .screen {
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    padding: 30px 12px 12px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .label {
+    text-align: center;
+    color: #999;
+    font-size: 13px;
+    margin-top: 10px;
+    letter-spacing: 2px;
+  }
+
+  /* ===== COMMON COMPONENTS ===== */
+
+  /* Bottom nav bar */
+  .bottom-nav {
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    display: flex;
+    justify-content: space-around;
+    padding: 8px 4px 12px;
+    background: #0A0000;
+    border-top: 1px solid #1a0808;
+  }
+  .nav-item {
+    text-align: center;
+    font-size: 8px;
+    color: #553333;
+    letter-spacing: 1px;
+  }
+  .nav-item.active { color: #BB0000; }
+  .nav-icon {
+    font-size: 16px;
+    margin-bottom: 2px;
+    display: block;
+  }
+
+  /* Mode bar */
+  .mode-bar {
+    position: absolute;
+    bottom: 44px; left: 0; right: 0;
+    background: #110404;
+    padding: 4px 12px;
+    font-size: 8px;
+    color: #663333;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    border-top: 1px solid #1a0808;
+  }
+  .mode-bar .mode-icon { color: #DD2222; font-size: 10px; }
+  .mode-bar .mode-name { color: #DD2222; }
+
+  /* TacticalCard */
+  .tcard {
+    background: #110404;
+    border: 1px solid #221111;
+    border-radius: 8px;
+    padding: 10px;
+    margin-bottom: 8px;
+  }
+
+  /* TacticalButton */
+  .tbtn {
+    background: #DD2222;
+    color: #0A0000;
+    border: none;
+    border-radius: 8px;
+    padding: 10px 16px;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 2px;
+    text-align: center;
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+  }
+  .tbtn.destructive { background: #CC0000; }
+  .tbtn.secondary {
+    background: transparent;
+    border: 1px solid #DD2222;
+    color: #DD2222;
+  }
+
+  /* Section header */
+  .section-hdr {
+    font-size: 11px;
+    color: #664444;
+    letter-spacing: 2px;
+    margin-bottom: 6px;
+  }
+
+  /* Status bar */
+  .sbar {
+    display: flex;
+    justify-content: space-between;
+    font-size: 8px;
+    color: #553333;
+    margin-bottom: 6px;
+    padding: 0 4px;
+  }
+
+  /* Screen title area */
+  .screen-hdr {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 8px;
+  }
+  .screen-hdr .icon { color: #DD2222; font-size: 14px; }
+  .screen-hdr .title { font-size: 14px; color: #BB0000; letter-spacing: 2px; }
+  .screen-hdr .sub { font-size: 9px; color: #553333; }
+
+  /* ===== SCREEN 1: MAP ===== */
+  .s1-map-area {
+    flex: 1;
+    position: relative;
+    background:
+      linear-gradient(rgba(15,25,15,0.95), rgba(15,25,15,0.95)),
+      repeating-linear-gradient(0deg, transparent, transparent 29px, rgba(80,120,80,0.12) 29px, rgba(80,120,80,0.12) 30px),
+      repeating-linear-gradient(90deg, transparent, transparent 29px, rgba(80,120,80,0.12) 29px, rgba(80,120,80,0.12) 30px);
+    border-radius: 4px;
+    overflow: hidden;
+    margin-bottom: 60px;
+  }
+  .s1-topo {
+    position: absolute;
+    border: 1px solid rgba(80,120,80,0.08);
+    border-radius: 50%;
+  }
+  .s1-mgrs-grid-label {
+    position: absolute;
+    font-size: 7px;
+    color: rgba(187,0,0,0.3);
+  }
+  .s1-self-marker {
+    position: absolute;
+    width: 16px; height: 16px;
+    background: #2196F3;
+    border: 2px solid white;
+    border-radius: 50%;
+    box-shadow: 0 0 10px rgba(33,150,243,0.6);
+  }
+  .s1-peer-marker {
+    position: absolute;
+    width: 12px; height: 12px;
+    border-radius: 50%;
+    border: 2px solid;
+  }
+  .s1-peer-tag {
+    position: absolute;
+    font-size: 7px;
+    padding: 1px 4px;
+    background: rgba(0,0,0,0.7);
+    border-radius: 3px;
+  }
+  .s1-coord-bar {
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    background: rgba(10,0,0,0.9);
+    padding: 6px 8px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-top: 1px solid #221111;
+    font-size: 9px;
+  }
+  .s1-zoom-btns {
+    position: absolute;
+    right: 8px; top: 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  .s1-zoom-btn {
+    width: 32px; height: 32px;
+    background: rgba(17,4,4,0.9);
+    border: 1px solid #221111;
+    border-radius: 6px;
+    color: #BB0000;
+    font-size: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .s1-recenter {
+    position: absolute;
+    right: 8px; bottom: 40px;
+    width: 32px; height: 32px;
+    background: rgba(17,4,4,0.9);
+    border: 1px solid #221111;
+    border-radius: 6px;
+    color: #BB0000;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .s1-peer-hud {
+    position: absolute;
+    top: 8px; left: 8px;
+    background: rgba(10,0,0,0.85);
+    border: 1px solid #221111;
+    border-radius: 6px;
+    padding: 4px 8px;
+    font-size: 8px;
+  }
+  .s1-peer-hud-row {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    margin-bottom: 2px;
+  }
+
+  /* ===== SCREEN 2: GRID ===== */
+  .s2-content { flex: 1; overflow: hidden; padding-bottom: 60px; }
+  .s2-mgrs-card {
+    text-align: center;
+    padding: 16px 10px;
+  }
+  .s2-mgrs-large {
+    font-size: 22px;
+    color: #BB0000;
+    font-weight: bold;
+    letter-spacing: 2px;
+  }
+  .s2-latlon {
+    font-size: 9px;
+    color: #553333;
+    margin-top: 2px;
+  }
+  .s2-precision-row {
+    display: flex;
+    justify-content: center;
+    gap: 4px;
+    margin-top: 6px;
+  }
+  .s2-prec-btn {
+    width: 28px; height: 24px;
+    background: #0A0000;
+    border: 1px solid #221111;
+    border-radius: 4px;
+    color: #664444;
+    font-size: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .s2-prec-btn.active {
+    border-color: #DD2222;
+    color: #DD2222;
+    background: #1a0808;
+  }
+  .s2-heading-card {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px;
+  }
+  .s2-compass-small {
+    width: 44px; height: 44px;
+    border: 2px solid #331111;
+    border-radius: 50%;
+    position: relative;
+  }
+  .s2-compass-needle {
+    position: absolute;
+    top: 8px; left: 50%;
+    transform: translateX(-50%) rotate(47deg);
+    width: 2px; height: 16px;
+    background: #DD2222;
+    transform-origin: bottom center;
+    border-radius: 1px;
+  }
+  .s2-heading-val {
+    font-size: 26px;
+    color: #BB0000;
+    text-align: center;
+  }
+  .s2-heading-lbl {
+    font-size: 8px;
+    color: #553333;
+    text-align: center;
+    letter-spacing: 2px;
+  }
+  .s2-speed-val {
+    font-size: 14px;
+    color: #BB0000;
+    text-align: right;
+  }
+  .s2-speed-lbl {
+    font-size: 8px;
+    color: #553333;
+    text-align: right;
+    letter-spacing: 2px;
+  }
+  .s2-info-row {
+    display: flex;
+    gap: 6px;
+  }
+  .s2-info-card {
+    flex: 1;
+    text-align: center;
+    padding: 8px 4px;
+  }
+  .s2-info-lbl {
+    font-size: 8px;
+    color: #553333;
+    letter-spacing: 1px;
+  }
+  .s2-info-val {
+    font-size: 13px;
+    color: #BB0000;
+    margin-top: 2px;
+  }
+  .s2-info-sub {
+    font-size: 7px;
+    color: #443333;
+    margin-top: 1px;
+  }
+  .s2-action-row {
+    display: flex;
+    gap: 8px;
+    margin-top: 4px;
+  }
+  .s2-action-btn {
+    flex: 1;
+    padding: 10px;
+    background: #DD2222;
+    color: #0A0000;
+    border-radius: 8px;
+    text-align: center;
+    font-size: 10px;
+    letter-spacing: 2px;
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+  }
+
+  /* ===== SCREEN 3: FIELD LINK ===== */
+  .s3-content { flex: 1; overflow: hidden; padding-bottom: 60px; }
+  .s3-peer-row {
+    display: flex;
+    align-items: center;
+    padding: 8px 0;
+    border-bottom: 1px solid #1a0808;
+    gap: 8px;
+  }
+  .s3-avatar {
+    width: 32px; height: 32px;
+    border-radius: 50%;
+    border: 2px solid;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    font-weight: bold;
+  }
+  .s3-peer-info { flex: 1; }
+  .s3-peer-name { font-size: 11px; color: #ccc; }
+  .s3-peer-grid { font-size: 8px; color: #553333; }
+  .s3-peer-status {
+    font-size: 7px;
+    padding: 2px 6px;
+    border-radius: 10px;
+    border: 1px solid;
+  }
+  .s3-peer-dist { font-size: 10px; color: #BB0000; text-align: right; }
+  .s3-sync-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 4px 8px;
+    background: #0d0303;
+    border: 1px solid #221111;
+    border-radius: 6px;
+    margin-bottom: 8px;
+    font-size: 8px;
+  }
+  .s3-sync-dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    display: inline-block;
+  }
+  .s3-encrypt-badge {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 8px;
+    color: #00BB00;
+    padding: 4px 8px;
+    background: rgba(0,187,0,0.05);
+    border: 1px solid rgba(0,187,0,0.15);
+    border-radius: 6px;
+    margin-top: 6px;
+  }
+
+  /* ===== SCREEN 4: GHOST MARKERS ===== */
+  .s4-map-area {
+    flex: 1;
+    position: relative;
+    background:
+      linear-gradient(rgba(15,25,15,0.95), rgba(15,25,15,0.95)),
+      repeating-linear-gradient(0deg, transparent, transparent 29px, rgba(80,120,80,0.12) 29px, rgba(80,120,80,0.12) 30px),
+      repeating-linear-gradient(90deg, transparent, transparent 29px, rgba(80,120,80,0.12) 29px, rgba(80,120,80,0.12) 30px);
+    border-radius: 4px;
+    overflow: hidden;
+    margin-bottom: 60px;
+  }
+  .s4-ghost {
+    position: absolute;
+    width: 12px; height: 12px;
+    border-radius: 50%;
+  }
+  .s4-ghost.live {
+    background: #2196F3;
+    border: 2px solid white;
+    box-shadow: 0 0 8px rgba(33,150,243,0.4);
+  }
+  .s4-ghost.fading {
+    background: rgba(33,150,243,0.35);
+    border: 2px solid rgba(33,150,243,0.5);
+  }
+  .s4-ghost.outline {
+    background: transparent;
+    border: 2px dashed rgba(33,150,243,0.2);
+  }
+  .s4-ghost-tag {
+    position: absolute;
+    font-size: 7px;
+    padding: 1px 4px;
+    background: rgba(0,0,0,0.7);
+    border-radius: 3px;
+  }
+  .s4-velocity-arrow {
+    position: absolute;
+    height: 1px;
+    transform-origin: left center;
+  }
+  .s4-legend {
+    position: absolute;
+    bottom: 8px; left: 8px;
+    background: rgba(10,0,0,0.9);
+    border: 1px solid #221111;
+    border-radius: 6px;
+    padding: 6px 8px;
+  }
+  .s4-legend-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 7px;
+    color: #664444;
+    margin-bottom: 2px;
+  }
+  .s4-legend-dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  /* ===== SCREEN 5: AAR ===== */
+  .s5-content { flex: 1; overflow: hidden; padding-bottom: 60px; }
+  .s5-pdf-preview {
+    background: #f5f5f0;
+    border-radius: 6px;
+    padding: 10px;
+    color: #1a1a1a;
+  }
+  .s5-pdf-title {
+    font-size: 11px;
+    color: #8B0000;
+    font-weight: bold;
+    margin-bottom: 2px;
+  }
+  .s5-pdf-sub {
+    font-size: 8px;
+    color: #666;
+    margin-bottom: 8px;
+  }
+  .s5-pdf-map {
+    height: 80px;
+    background: linear-gradient(135deg, #e8ede8, #d0d8d0);
+    border: 1px solid #ccc;
+    border-radius: 3px;
+    margin-bottom: 8px;
+    position: relative;
+  }
+  .s5-pdf-track {
+    position: absolute;
+    top: 20%; left: 15%; width: 70%; height: 60%;
+    border: 2px solid #CC0000;
+    border-radius: 30px;
+    background: transparent;
+  }
+  .s5-pdf-sect {
+    margin-bottom: 6px;
+  }
+  .s5-pdf-sect-title {
+    font-size: 8px;
+    color: #8B0000;
+    border-bottom: 1px solid #ddd;
+    padding-bottom: 2px;
+    margin-bottom: 3px;
+    letter-spacing: 1px;
+  }
+  .s5-pdf-row {
+    display: flex;
+    justify-content: space-between;
+    font-size: 7px;
+    color: #444;
+    padding: 1px 0;
+  }
+
+  /* ===== SCREEN 6: THEMES ===== */
+  .s6-content { flex: 1; overflow: hidden; padding-bottom: 60px; }
+  .s6-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+  .s6-theme-card {
+    border-radius: 8px;
+    padding: 12px 8px;
+    text-align: center;
+    border: 2px solid;
+    position: relative;
+  }
+  .s6-theme-card .pro-badge {
+    position: absolute;
+    top: 4px; right: 4px;
+    font-size: 6px;
+    padding: 1px 4px;
+    border-radius: 4px;
+    letter-spacing: 1px;
+  }
+  .s6-tc-red {
+    background: #0A0000;
+    border-color: #331111;
+    color: #BB0000;
+  }
+  .s6-tc-nvg {
+    background: #001400;
+    border-color: #113311;
+    color: #00BB00;
+  }
+  .s6-tc-day {
+    background: #F5F5F5;
+    border-color: #ddd;
+    color: #111111;
+  }
+  .s6-tc-blue {
+    background: #000A14;
+    border-color: #112233;
+    color: #0099DD;
+  }
+  .s6-theme-name {
+    font-size: 9px;
+    letter-spacing: 2px;
+    opacity: 0.6;
+    margin-bottom: 6px;
+  }
+  .s6-theme-mgrs {
+    font-size: 11px;
+    font-weight: bold;
+    letter-spacing: 1px;
+  }
+  .s6-theme-heading {
+    font-size: 18px;
+    margin: 4px 0;
+  }
+  .s6-theme-compass {
+    width: 40px; height: 40px;
+    border-radius: 50%;
+    border: 1px solid;
+    margin: 4px auto 0;
+    position: relative;
+  }
+  .s6-theme-compass .needle {
+    position: absolute;
+    top: 8px; left: 50%;
+    transform: translateX(-50%) rotate(47deg);
+    width: 2px; height: 14px;
+    transform-origin: bottom center;
+    border-radius: 1px;
+  }
+
+  /* ===== SCREEN 7: TOOLS ===== */
+  .s7-content { flex: 1; overflow: hidden; padding-bottom: 60px; }
+  .s7-tools-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 6px;
+  }
+  .s7-tool-card {
+    background: #110404;
+    border: 1px solid #221111;
+    border-radius: 8px;
+    padding: 10px 8px;
+    text-align: center;
+    min-height: 70px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+  .s7-tool-icon {
+    font-size: 20px;
+    color: #DD2222;
+    margin-bottom: 4px;
+  }
+  .s7-tool-name {
+    font-size: 9px;
+    color: #BB0000;
+    letter-spacing: 1px;
+    line-height: 1.3;
+  }
+  .s7-tool-desc {
+    font-size: 7px;
+    color: #443333;
+    margin-top: 2px;
+  }
+
+  /* ===== SCREEN 8: ONBOARDING ===== */
+  .s8-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding-top: 20px;
+  }
+  .s8-icon-box {
+    width: 72px; height: 72px;
+    background: radial-gradient(circle, #DD2222 0%, #660000 70%);
+    border-radius: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 14px;
+    box-shadow: 0 0 24px rgba(204,0,0,0.3);
+    font-size: 22px;
+    color: white;
+    font-weight: bold;
+  }
+  .s8-app-title {
+    font-size: 20px;
+    color: #BB0000;
+    letter-spacing: 4px;
+    margin-bottom: 2px;
+  }
+  .s8-app-sub {
+    font-size: 10px;
+    color: #553333;
+    letter-spacing: 6px;
+    margin-bottom: 16px;
+  }
+  .s8-feature-list {
+    width: 100%;
+    text-align: left;
+  }
+  .s8-feature {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 8px 0;
+    border-bottom: 1px solid #110404;
+  }
+  .s8-feat-icon {
+    width: 28px; height: 28px;
+    background: #110404;
+    border: 1px solid #221111;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    color: #DD2222;
+    flex-shrink: 0;
+  }
+  .s8-feat-title { font-size: 10px; color: #BB0000; }
+  .s8-feat-desc { font-size: 8px; color: #553333; margin-top: 2px; }
+  .s8-dots {
+    display: flex;
+    gap: 6px;
+    margin-top: 14px;
+    margin-bottom: 8px;
+  }
+  .s8-dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: #221111;
+  }
+  .s8-dot.active {
+    width: 20px;
+    border-radius: 4px;
+    background: #DD2222;
+  }
+</style>
+</head>
+<body>
+
+<!-- Row 1 -->
+<div class="screenshots-row">
+
+  <!-- 1: MAP SCREEN -->
+  <div>
+  <div class="phone">
+    <div class="notch"></div>
+    <div class="screen">
+      <div class="sbar"><span>9:41</span><span>87%</span></div>
+      <div class="s1-map-area">
+        <!-- Topo contours -->
+        <div class="s1-topo" style="width:200px;height:120px;top:50px;left:10px;"></div>
+        <div class="s1-topo" style="width:140px;height:80px;top:70px;left:40px;"></div>
+        <div class="s1-topo" style="width:180px;height:110px;top:150px;left:30px;"></div>
+        <!-- MGRS grid labels -->
+        <div class="s1-mgrs-grid-label" style="top:4px;left:4px;">18S UJ</div>
+        <div class="s1-mgrs-grid-label" style="top:4px;right:4px;">47 91</div>
+        <!-- Self marker (blue dot with white border) -->
+        <div class="s1-self-marker" style="top:140px;left:115px;"></div>
+        <!-- Peer markers -->
+        <div class="s1-peer-marker" style="top:75px;left:175px;background:rgba(33,150,243,0.7);border-color:#2196F3;"></div>
+        <div class="s1-peer-tag" style="top:63px;left:162px;color:#2196F3;">ALPHA</div>
+        <div class="s1-peer-marker" style="top:195px;left:60px;background:rgba(76,175,80,0.7);border-color:#4CAF50;"></div>
+        <div class="s1-peer-tag" style="top:183px;left:47px;color:#4CAF50;">BRAVO</div>
+        <div class="s1-peer-marker" style="top:100px;left:40px;background:rgba(255,152,0,0.7);border-color:#FF9800;"></div>
+        <div class="s1-peer-tag" style="top:88px;left:22px;color:#FF9800;">CHARLIE</div>
+        <!-- Peer HUD overlay -->
+        <div class="s1-peer-hud">
+          <div class="s1-peer-hud-row"><span style="color:#2196F3;">&#9679;</span><span style="color:#2196F3;">ALPHA</span><span style="color:#664444;">85m 047°</span></div>
+          <div class="s1-peer-hud-row"><span style="color:#4CAF50;">&#9679;</span><span style="color:#4CAF50;">BRAVO</span><span style="color:#664444;">62m 215°</span></div>
+          <div class="s1-peer-hud-row"><span style="color:#FF9800;">&#9679;</span><span style="color:#FF9800;">CHARLIE</span><span style="color:#664444;">48m 280°</span></div>
+        </div>
+        <!-- Zoom controls -->
+        <div class="s1-zoom-btns">
+          <div class="s1-zoom-btn">+</div>
+          <div class="s1-zoom-btn">−</div>
+        </div>
+        <div class="s1-recenter">◎</div>
+        <!-- Coordinate bar -->
+        <div class="s1-coord-bar">
+          <span style="color:#BB0000;">18S UJ 47832 91204</span>
+          <span style="color:#553333;">Z14 047°</span>
+        </div>
+      </div>
+      <!-- Mode bar + bottom nav -->
+      <div class="mode-bar"><span class="mode-icon">&#128269;</span><span class="mode-name">SAR MODE</span><span>• Wilderness SAR terminology</span></div>
+      <div class="bottom-nav">
+        <div class="nav-item active"><span class="nav-icon">&#9635;</span>MAP</div>
+        <div class="nav-item"><span class="nav-icon">&#9638;</span>GRID</div>
+        <div class="nav-item"><span class="nav-icon">&#9783;</span>LINK</div>
+        <div class="nav-item"><span class="nav-icon">&#9881;</span>TOOLS</div>
+        <div class="nav-item"><span class="nav-icon">&#9881;</span>SET</div>
+      </div>
+    </div>
+  </div>
+  <div class="label">Map & Team</div>
+  </div>
+
+  <!-- 2: GRID SCREEN -->
+  <div>
+  <div class="phone">
+    <div class="notch"></div>
+    <div class="screen">
+      <div class="sbar"><span>9:41</span><span>87%</span></div>
+      <div class="s2-content">
+        <div class="screen-hdr">
+          <span class="icon">&#9638;</span>
+          <div><span class="title">GRID</span><span class="sub" style="margin-left:8px;">• SAR</span></div>
+        </div>
+        <!-- MGRS Display Card -->
+        <div class="tcard s2-mgrs-card">
+          <div class="s2-mgrs-large">18S UJ 47832 91204</div>
+          <div class="s2-latlon">38.8977° N, 77.0365° W</div>
+          <div class="section-hdr" style="margin-top:8px;">PRECISION</div>
+          <div class="s2-precision-row">
+            <div class="s2-prec-btn">1</div>
+            <div class="s2-prec-btn">2</div>
+            <div class="s2-prec-btn">3</div>
+            <div class="s2-prec-btn">4</div>
+            <div class="s2-prec-btn active">5</div>
+          </div>
+        </div>
+        <!-- Heading Card -->
+        <div class="tcard s2-heading-card">
+          <div>
+            <div class="s2-compass-small">
+              <div class="s2-compass-needle"></div>
+            </div>
+          </div>
+          <div>
+            <div class="s2-heading-lbl">HEADING</div>
+            <div class="s2-heading-val">047°</div>
+          </div>
+          <div>
+            <div class="s2-speed-lbl">SPEED</div>
+            <div class="s2-speed-val">3.2</div>
+            <div style="font-size:7px;color:#443333;text-align:right;">km/h</div>
+          </div>
+        </div>
+        <!-- Info Row -->
+        <div class="s2-info-row">
+          <div class="tcard s2-info-card">
+            <div class="s2-info-lbl">ALT</div>
+            <div class="s2-info-val">112m</div>
+          </div>
+          <div class="tcard s2-info-card">
+            <div class="s2-info-lbl">GPS</div>
+            <div class="s2-info-val">±4m</div>
+            <div class="s2-info-sub" style="color:#00BB00;">EXCELLENT</div>
+          </div>
+          <div class="tcard s2-info-card">
+            <div class="s2-info-lbl">DECL</div>
+            <div class="s2-info-val">-11.2°</div>
+            <div class="s2-info-sub">WEST</div>
+          </div>
+        </div>
+        <!-- Action buttons -->
+        <div class="s2-action-row">
+          <div class="s2-action-btn">&#128266; SPEAK</div>
+          <div class="s2-action-btn">&#128203; COPY</div>
+        </div>
+      </div>
+      <div class="mode-bar"><span class="mode-icon">&#128269;</span><span class="mode-name">SAR MODE</span></div>
+      <div class="bottom-nav">
+        <div class="nav-item"><span class="nav-icon">&#9635;</span>MAP</div>
+        <div class="nav-item active"><span class="nav-icon">&#9638;</span>GRID</div>
+        <div class="nav-item"><span class="nav-icon">&#9783;</span>LINK</div>
+        <div class="nav-item"><span class="nav-icon">&#9881;</span>TOOLS</div>
+        <div class="nav-item"><span class="nav-icon">&#9881;</span>SET</div>
+      </div>
+    </div>
+  </div>
+  <div class="label">Grid View</div>
+  </div>
+
+  <!-- 3: FIELD LINK -->
+  <div>
+  <div class="phone">
+    <div class="notch"></div>
+    <div class="screen">
+      <div class="sbar"><span>9:41</span><span>87%</span></div>
+      <div class="s3-content">
+        <div class="screen-hdr">
+          <span class="icon">&#9783;</span>
+          <div><span class="title">FIELD LINK</span><span class="sub" style="margin-left:6px;">• SAR</span></div>
+        </div>
+        <!-- Sync status bar -->
+        <div class="s3-sync-bar">
+          <div><span class="s3-sync-dot" style="background:#00BB00;box-shadow:0 0 4px rgba(0,187,0,0.5);"></span> <span style="color:#00BB00;">SYNCED</span></div>
+          <span style="color:#553333;">PIN: 4827</span>
+          <span style="color:#553333;">3/8 PEERS</span>
+        </div>
+        <!-- Peer list -->
+        <div class="tcard" style="padding:6px 10px;">
+          <div class="s3-peer-row">
+            <div class="s3-avatar" style="border-color:#DD2222;background:rgba(221,34,34,0.15);color:#DD2222;">ME</div>
+            <div class="s3-peer-info">
+              <div class="s3-peer-name" style="color:#BB0000;">YOU (HOST)</div>
+              <div class="s3-peer-grid">18S UJ 47832 91204</div>
+            </div>
+            <div class="s3-peer-status" style="color:#00BB00;border-color:#00BB00;">HOST</div>
+          </div>
+          <div class="s3-peer-row">
+            <div class="s3-avatar" style="border-color:#2196F3;background:rgba(33,150,243,0.15);color:#2196F3;">A</div>
+            <div class="s3-peer-info">
+              <div class="s3-peer-name">ALPHA</div>
+              <div class="s3-peer-grid">18S UJ 47901 91180</div>
+            </div>
+            <div class="s3-peer-dist">85m NE</div>
+          </div>
+          <div class="s3-peer-row">
+            <div class="s3-avatar" style="border-color:#4CAF50;background:rgba(76,175,80,0.15);color:#4CAF50;">B</div>
+            <div class="s3-peer-info">
+              <div class="s3-peer-name">BRAVO</div>
+              <div class="s3-peer-grid">18S UJ 47780 91250</div>
+            </div>
+            <div class="s3-peer-dist">62m SW</div>
+          </div>
+          <div class="s3-peer-row" style="border:none;">
+            <div class="s3-avatar" style="border-color:#FF9800;background:rgba(255,152,0,0.15);color:#FF9800;">C</div>
+            <div class="s3-peer-info">
+              <div class="s3-peer-name">CHARLIE</div>
+              <div class="s3-peer-grid">18S UJ 47810 91190</div>
+            </div>
+            <div class="s3-peer-dist">48m W</div>
+          </div>
+        </div>
+        <div class="s3-encrypt-badge">&#128274; AES-256-GCM ENCRYPTED</div>
+        <div class="tcard" style="margin-top:6px;padding:8px 10px;display:flex;justify-content:space-between;font-size:9px;">
+          <span style="color:#553333;">EXPEDITION MODE</span>
+          <span style="color:#BB0000;">&lt;3%/HR</span>
+        </div>
+        <div style="margin-top:8px;">
+          <div class="tbtn destructive">LEAVE SESSION</div>
+        </div>
+      </div>
+      <div class="mode-bar"><span class="mode-icon">&#128269;</span><span class="mode-name">SAR MODE</span></div>
+      <div class="bottom-nav">
+        <div class="nav-item"><span class="nav-icon">&#9635;</span>MAP</div>
+        <div class="nav-item"><span class="nav-icon">&#9638;</span>GRID</div>
+        <div class="nav-item active"><span class="nav-icon">&#9783;</span>LINK</div>
+        <div class="nav-item"><span class="nav-icon">&#9881;</span>TOOLS</div>
+        <div class="nav-item"><span class="nav-icon">&#9881;</span>SET</div>
+      </div>
+    </div>
+  </div>
+  <div class="label">Field Link</div>
+  </div>
+
+  <!-- 4: GHOST MARKERS -->
+  <div>
+  <div class="phone">
+    <div class="notch"></div>
+    <div class="screen">
+      <div class="sbar"><span>9:41</span><span>87%</span></div>
+      <div class="s4-map-area">
+        <div class="s1-topo" style="width:180px;height:100px;top:60px;left:20px;"></div>
+        <div class="s1-topo" style="width:160px;height:100px;top:130px;left:40px;"></div>
+        <div class="s1-mgrs-grid-label" style="top:4px;left:4px;">18S UJ</div>
+        <!-- Self -->
+        <div class="s1-self-marker" style="top:150px;left:110px;"></div>
+        <!-- Live peer (just disconnected, 2 min) -->
+        <div class="s4-ghost live" style="top:70px;left:65px;"></div>
+        <div class="s4-ghost-tag" style="top:58px;left:48px;color:#2196F3;">ALPHA · 2m ago</div>
+        <!-- Fading ghost (12 min, ~40% opacity) -->
+        <div class="s4-ghost fading" style="top:120px;left:195px;"></div>
+        <div class="s4-ghost-tag" style="top:108px;left:175px;color:rgba(33,150,243,0.5);">BRAVO · 12m</div>
+        <div class="s4-velocity-arrow" style="top:126px;left:207px;width:20px;background:rgba(33,150,243,0.25);transform:rotate(-25deg);"></div>
+        <!-- Outline ghost (28 min, almost gone) -->
+        <div class="s4-ghost outline" style="top:210px;left:80px;"></div>
+        <div class="s4-ghost-tag" style="top:198px;left:55px;color:rgba(33,150,243,0.25);">CHARLIE · 28m</div>
+        <div class="s4-velocity-arrow" style="top:216px;left:92px;width:18px;background:rgba(33,150,243,0.1);transform:rotate(140deg);"></div>
+        <!-- Legend -->
+        <div class="s4-legend">
+          <div class="s4-legend-item"><div class="s4-legend-dot" style="background:#2196F3;border:1px solid white;"></div>LIVE / &lt;5min</div>
+          <div class="s4-legend-item"><div class="s4-legend-dot" style="background:rgba(33,150,243,0.35);border:1px solid rgba(33,150,243,0.5);"></div>FADING 5-15min</div>
+          <div class="s4-legend-item"><div class="s4-legend-dot" style="background:transparent;border:1px dashed rgba(33,150,243,0.25);"></div>GHOST 15-30min</div>
+        </div>
+        <!-- Coord bar -->
+        <div class="s1-coord-bar">
+          <span style="color:#BB0000;">18S UJ 47832 91204</span>
+          <span style="color:#553333;">GHOSTS: 3</span>
+        </div>
+      </div>
+      <div class="mode-bar"><span class="mode-icon">&#128269;</span><span class="mode-name">SAR MODE</span></div>
+      <div class="bottom-nav">
+        <div class="nav-item active"><span class="nav-icon">&#9635;</span>MAP</div>
+        <div class="nav-item"><span class="nav-icon">&#9638;</span>GRID</div>
+        <div class="nav-item"><span class="nav-icon">&#9783;</span>LINK</div>
+        <div class="nav-item"><span class="nav-icon">&#9881;</span>TOOLS</div>
+        <div class="nav-item"><span class="nav-icon">&#9881;</span>SET</div>
+      </div>
+    </div>
+  </div>
+  <div class="label">Ghost Markers</div>
+  </div>
+
+</div>
+
+<!-- Row 2 -->
+<div class="screenshots-row">
+
+  <!-- 5: AAR EXPORT -->
+  <div>
+  <div class="phone">
+    <div class="notch"></div>
+    <div class="screen">
+      <div class="sbar"><span>9:41</span><span>87%</span></div>
+      <div class="s5-content">
+        <div class="screen-hdr">
+          <span class="icon">&#128196;</span>
+          <div>
+            <div class="title">AFTER-ACTION REPORT</div>
+            <div class="sub">Session review and PDF export</div>
+          </div>
+        </div>
+        <div class="s5-pdf-preview">
+          <div class="s5-pdf-title">AFTER-ACTION REPORT</div>
+          <div class="s5-pdf-sub">Session: 07 MAR 2026 — SAR Mode</div>
+          <div class="s5-pdf-map"><div class="s5-pdf-track"></div></div>
+          <div class="s5-pdf-sect">
+            <div class="s5-pdf-sect-title">MISSION SUMMARY</div>
+            <div class="s5-pdf-row"><span>Duration</span><span>2h 34m</span></div>
+            <div class="s5-pdf-row"><span>Distance</span><span>8.7 km</span></div>
+            <div class="s5-pdf-row"><span>Waypoints</span><span>12</span></div>
+            <div class="s5-pdf-row"><span>Markers</span><span>5</span></div>
+          </div>
+          <div class="s5-pdf-sect">
+            <div class="s5-pdf-sect-title">TEAM ROSTER</div>
+            <div class="s5-pdf-row"><span>Host (You)</span><span>18S UJ 478 912</span></div>
+            <div class="s5-pdf-row"><span>Alpha</span><span>18S UJ 479 911</span></div>
+            <div class="s5-pdf-row"><span>Bravo</span><span>18S UJ 477 912</span></div>
+            <div class="s5-pdf-row"><span>Charlie</span><span>18S UJ 478 911</span></div>
+          </div>
+          <div class="s5-pdf-sect">
+            <div class="s5-pdf-sect-title">SESSION LOG</div>
+            <div class="s5-pdf-row"><span>14:00</span><span>Session started</span></div>
+            <div class="s5-pdf-row"><span>14:02</span><span>Alpha joined</span></div>
+            <div class="s5-pdf-row"><span>14:05</span><span>Bravo joined</span></div>
+            <div class="s5-pdf-row"><span>14:08</span><span>Charlie joined</span></div>
+            <div class="s5-pdf-row"><span>15:21</span><span>Marker: Clue #1</span></div>
+          </div>
+        </div>
+        <div style="margin-top:8px;">
+          <div class="tbtn">EXPORT PDF</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="label">AAR Export</div>
+  </div>
+
+  <!-- 6: THEMES -->
+  <div>
+  <div class="phone">
+    <div class="notch"></div>
+    <div class="screen">
+      <div class="sbar"><span>9:41</span><span>87%</span></div>
+      <div class="s6-content">
+        <div class="screen-hdr">
+          <span class="icon">&#9881;</span>
+          <div>
+            <div class="title">SETTINGS</div>
+            <div class="sub">Display theme</div>
+          </div>
+        </div>
+        <div class="section-hdr">DISPLAY THEME</div>
+        <div class="s6-grid">
+          <div class="s6-theme-card s6-tc-red">
+            <div class="s6-theme-name">RED LIGHT</div>
+            <div class="s6-theme-mgrs">18S UJ</div>
+            <div class="s6-theme-heading">047°</div>
+            <div class="s6-theme-compass" style="border-color:#331111;"><div class="needle" style="background:#DD2222;"></div></div>
+          </div>
+          <div class="s6-theme-card s6-tc-nvg">
+            <div class="pro-badge" style="background:rgba(0,187,0,0.15);color:#00BB00;border:1px solid rgba(0,187,0,0.3);">PRO</div>
+            <div class="s6-theme-name">NVG GREEN</div>
+            <div class="s6-theme-mgrs">18S UJ</div>
+            <div class="s6-theme-heading">047°</div>
+            <div class="s6-theme-compass" style="border-color:#113311;"><div class="needle" style="background:#00BB00;"></div></div>
+          </div>
+          <div class="s6-theme-card s6-tc-day">
+            <div class="pro-badge" style="background:rgba(0,0,0,0.05);color:#666;border:1px solid #ccc;">PRO</div>
+            <div class="s6-theme-name">DAY WHITE</div>
+            <div class="s6-theme-mgrs">18S UJ</div>
+            <div class="s6-theme-heading">047°</div>
+            <div class="s6-theme-compass" style="border-color:#ccc;"><div class="needle" style="background:#CC0000;"></div></div>
+          </div>
+          <div class="s6-theme-card s6-tc-blue">
+            <div class="pro-badge" style="background:rgba(0,153,221,0.1);color:#0099DD;border:1px solid rgba(0,153,221,0.3);">PRO</div>
+            <div class="s6-theme-name">BLUE FORCE</div>
+            <div class="s6-theme-mgrs">18S UJ</div>
+            <div class="s6-theme-heading">047°</div>
+            <div class="s6-theme-compass" style="border-color:#112233;"><div class="needle" style="background:#0099DD;"></div></div>
+          </div>
+        </div>
+        <div style="margin-top:8px;">
+          <div class="section-hdr">OPERATIONAL MODE</div>
+          <div class="tcard" style="display:flex;gap:6px;flex-wrap:wrap;">
+            <div style="padding:6px 10px;border:1px solid #DD2222;border-radius:6px;font-size:9px;color:#DD2222;background:#1a0808;">&#128269; SAR</div>
+            <div style="padding:6px 10px;border:1px solid #221111;border-radius:6px;font-size:9px;color:#553333;">&#127956; BACKCOUNTRY</div>
+            <div style="padding:6px 10px;border:1px solid #221111;border-radius:6px;font-size:9px;color:#553333;">&#127919; HUNTING</div>
+            <div style="padding:6px 10px;border:1px solid #221111;border-radius:6px;font-size:9px;color:#553333;">&#127941; TRAINING</div>
+          </div>
+        </div>
+      </div>
+      <div class="mode-bar"><span class="mode-icon">&#128269;</span><span class="mode-name">SAR MODE</span></div>
+      <div class="bottom-nav">
+        <div class="nav-item"><span class="nav-icon">&#9635;</span>MAP</div>
+        <div class="nav-item"><span class="nav-icon">&#9638;</span>GRID</div>
+        <div class="nav-item"><span class="nav-icon">&#9783;</span>LINK</div>
+        <div class="nav-item"><span class="nav-icon">&#9881;</span>TOOLS</div>
+        <div class="nav-item active"><span class="nav-icon">&#9881;</span>SET</div>
+      </div>
+    </div>
+  </div>
+  <div class="label">Themes & Settings</div>
+  </div>
+
+  <!-- 7: TOOLS -->
+  <div>
+  <div class="phone">
+    <div class="notch"></div>
+    <div class="screen">
+      <div class="sbar"><span>9:41</span><span>87%</span></div>
+      <div class="s7-content">
+        <div class="screen-hdr">
+          <span class="icon">&#9881;</span>
+          <div>
+            <div class="title">TACTICAL TOOLS</div>
+            <div class="sub">SAR Mode</div>
+          </div>
+        </div>
+        <div class="s7-tools-grid">
+          <div class="s7-tool-card"><div class="s7-tool-icon">&#8982;</div><div class="s7-tool-name">DEAD<br>RECKON</div></div>
+          <div class="s7-tool-card"><div class="s7-tool-icon">&#8711;</div><div class="s7-tool-name">RESECT</div></div>
+          <div class="s7-tool-card"><div class="s7-tool-icon">&#128694;</div><div class="s7-tool-name">PACE<br>COUNT</div></div>
+          <div class="s7-tool-card"><div class="s7-tool-icon">&#8634;</div><div class="s7-tool-name">BACK<br>AZIMUTH</div></div>
+          <div class="s7-tool-card"><div class="s7-tool-icon">&#8644;</div><div class="s7-tool-name">COORD<br>CONVERT</div></div>
+          <div class="s7-tool-card"><div class="s7-tool-icon">&#128207;</div><div class="s7-tool-name">RANGE<br>ESTIMATE</div></div>
+          <div class="s7-tool-card"><div class="s7-tool-icon">&#9651;</div><div class="s7-tool-name">SLOPE<br>CALC</div></div>
+          <div class="s7-tool-card"><div class="s7-tool-icon">&#9200;</div><div class="s7-tool-name">TIME DIST<br>SPD</div></div>
+          <div class="s7-tool-card"><div class="s7-tool-icon">&#127760;</div><div class="s7-tool-name">DECLI-<br>NATION</div></div>
+          <div class="s7-tool-card"><div class="s7-tool-icon">&#9790;</div><div class="s7-tool-name">CELESTIAL<br>NAV</div></div>
+        </div>
+      </div>
+      <div class="mode-bar"><span class="mode-icon">&#128269;</span><span class="mode-name">SAR MODE</span></div>
+      <div class="bottom-nav">
+        <div class="nav-item"><span class="nav-icon">&#9635;</span>MAP</div>
+        <div class="nav-item"><span class="nav-icon">&#9638;</span>GRID</div>
+        <div class="nav-item"><span class="nav-icon">&#9783;</span>LINK</div>
+        <div class="nav-item active"><span class="nav-icon">&#9881;</span>TOOLS</div>
+        <div class="nav-item"><span class="nav-icon">&#9881;</span>SET</div>
+      </div>
+    </div>
+  </div>
+  <div class="label">Tools</div>
+  </div>
+
+  <!-- 8: ONBOARDING -->
+  <div>
+  <div class="phone">
+    <div class="notch"></div>
+    <div class="screen">
+      <div class="sbar"><span>9:41</span><span>87%</span></div>
+      <div class="s8-content">
+        <div class="s8-icon-box">&#9638;</div>
+        <div class="s8-app-title">RED GRID LINK</div>
+        <div class="s8-app-sub">PROXIMITY COORDINATION</div>
+        <div class="s8-feature-list">
+          <div class="s8-feature">
+            <div class="s8-feat-icon">&#9678;</div>
+            <div>
+              <div class="s8-feat-title">MGRS NAVIGATION</div>
+              <div class="s8-feat-desc">Precision grid coordinates, offline</div>
+            </div>
+          </div>
+          <div class="s8-feature">
+            <div class="s8-feat-icon">&#9783;</div>
+            <div>
+              <div class="s8-feat-title">FIELD LINK</div>
+              <div class="s8-feat-desc">Zero-config team sync over BLE (2-8 devices)</div>
+            </div>
+          </div>
+          <div class="s8-feature">
+            <div class="s8-feat-icon">&#9881;</div>
+            <div>
+              <div class="s8-feat-title">11 TACTICAL TOOLS</div>
+              <div class="s8-feat-desc">Dead reckoning, resection, pace count...</div>
+            </div>
+          </div>
+          <div class="s8-feature">
+            <div class="s8-feat-icon">&#128274;</div>
+            <div>
+              <div class="s8-feat-title">ZERO TRACKING</div>
+              <div class="s8-feat-desc">No accounts, no analytics, no ads</div>
+            </div>
+          </div>
+          <div class="s8-feature" style="border:none;">
+            <div class="s8-feat-icon">&#9735;</div>
+            <div>
+              <div class="s8-feat-title">OFFLINE MAPS</div>
+              <div class="s8-feat-desc">USGS Topo + OpenTopoMap, cached locally</div>
+            </div>
+          </div>
+        </div>
+        <div class="s8-dots">
+          <div class="s8-dot active"></div>
+          <div class="s8-dot"></div>
+          <div class="s8-dot"></div>
+          <div class="s8-dot"></div>
+        </div>
+        <div style="width:120px;">
+          <div class="tbtn" style="font-size:10px;padding:8px;">NEXT</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="label">Onboarding</div>
+  </div>
+
+</div>
+</body>
+</html>

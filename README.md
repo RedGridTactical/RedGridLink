@@ -1,4 +1,4 @@
-<!-- screenshot banner -->
+![Red Grid Link](docs/images/banner.png)
 
 # Red Grid Link
 
@@ -23,13 +23,13 @@ Built on the MGRS engine from [Red Grid Tactical](https://github.com/RedGridTact
 
 ## Screenshots
 
-| Map & Team | Field Link | Ghost Markers | AAR Export |
+| Map & Team | Grid View | Field Link | Ghost Markers |
 |:---:|:---:|:---:|:---:|
-| <!-- screenshot: map view with peer markers --> | <!-- screenshot: field link session --> | <!-- screenshot: ghost marker decay --> | <!-- screenshot: AAR PDF export --> |
+| ![Map & Team](docs/images/screenshot_1_map_team.png) | ![Grid View](docs/images/screenshot_2_grid_view.png) | ![Field Link](docs/images/screenshot_3_field_link.png) | ![Ghost Markers](docs/images/screenshot_4_ghost_markers.png) |
 
-| Tactical Themes | Grid View | Tools | Onboarding |
+| AAR Export | Tactical Themes | Tools | Onboarding |
 |:---:|:---:|:---:|:---:|
-| <!-- screenshot: theme comparison --> | <!-- screenshot: solo MGRS grid --> | <!-- screenshot: tactical tools --> | <!-- screenshot: onboarding flow --> |
+| ![AAR Export](docs/images/screenshot_5_aar_export.png) | ![Tactical Themes](docs/images/screenshot_6_themes.png) | ![Tools](docs/images/screenshot_7_tools.png) | ![Onboarding](docs/images/screenshot_8_onboarding.png) |
 
 ---
 
