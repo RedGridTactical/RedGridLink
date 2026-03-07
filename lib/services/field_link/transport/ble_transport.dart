@@ -141,8 +141,27 @@ class BleTransport implements TransportService {
     }
 
     // Ensure Bluetooth is available and turned on.
+    //
+    // On iOS, CoreBluetooth initially reports the adapter state as `unknown`
+    // while CBCentralManager initializes (~100-500ms). Using `.first` would
+    // capture that initial `unknown` and incorrectly treat BT as unavailable.
+    // We filter out `unknown` and wait for a definitive state (on/off/etc).
     debugPrint('[BleTransport] initialize: checking adapter state...');
-    final adapterState = await FlutterBluePlus.adapterState.first;
+    BluetoothAdapterState adapterState;
+    try {
+      adapterState = await FlutterBluePlus.adapterState
+          .where((s) => s != BluetoothAdapterState.unknown)
+          .first
+          .timeout(const Duration(seconds: 5));
+    } on TimeoutException {
+      debugPrint('[BleTransport] adapter state check timed out after 5s');
+      _setState(TransportState.error);
+      throw const TransportException(
+        'Bluetooth adapter state could not be determined. '
+        'Please ensure Bluetooth is enabled and try again.',
+      );
+    }
+
     debugPrint('[BleTransport] adapter state: $adapterState');
     if (adapterState != BluetoothAdapterState.on) {
       _setState(TransportState.error);

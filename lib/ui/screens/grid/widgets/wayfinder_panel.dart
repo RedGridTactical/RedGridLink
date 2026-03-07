@@ -14,7 +14,6 @@ import '../../../common/widgets/mgrs_display.dart';
 import '../../../common/widgets/tactical_button.dart';
 import '../../../common/widgets/tactical_card.dart';
 import '../../../../providers/location_provider.dart';
-import '../../../../providers/theme_provider.dart';
 
 /// Navigation guidance panel showing bearing and distance to a saved waypoint.
 ///

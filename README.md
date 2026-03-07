@@ -5,7 +5,7 @@
 <h1 align="center">Red Grid Link</h1>
 
 [![Download on App Store](https://img.shields.io/badge/App%20Store-Download-0D96F6?logo=apple&logoColor=white)](https://apps.apple.com/app/red-grid-link/id6760084718)
-[![Get it on Google Play](https://img.shields.io/badge/Google%20Play-Coming%20Soon-CC0000?logo=googleplay)](https://github.com/RedGridTactical/RedGridLink)
+[![Get it on Google Play](https://img.shields.io/badge/Google%20Play-Coming%20Soon-CC0000?logo=googleplay)](https://github.com/RedGridMGRS/RedGridLink)
 [![License](https://img.shields.io/badge/License-MIT%20%2B%20Commons%20Clause-8B0000)](LICENSE)
 [![No Tracking](https://img.shields.io/badge/Tracking-None-CC0000)](PRIVACY.md)
 [![Offline First](https://img.shields.io/badge/Offline-First-8B0000)]()
@@ -14,12 +14,12 @@
 [![Flutter](https://img.shields.io/badge/Built%20with-Flutter-CC0000?logo=flutter)]()
 [![Tests](https://img.shields.io/badge/Tests-783%20Passing-brightgreen)]()
 [![Platform](https://img.shields.io/badge/Platform-iOS-8B0000)]()
-[![PRs Welcome](https://img.shields.io/badge/PRs-Welcome-CC0000)](https://github.com/RedGridTactical/RedGridLink/pulls)
+[![PRs Welcome](https://img.shields.io/badge/PRs-Welcome-CC0000)](https://github.com/RedGridMGRS/RedGridLink/pulls)
 [![Buy Me a Coffee](https://img.shields.io/badge/Buy%20Me%20a%20Coffee-Support-FFDD00?logo=buymeacoffee&logoColor=black)](https://buymeacoffee.com/redgridtac0)
 
 **Offline MGRS navigation and proximity team coordination for small teams (2-8 people). No cell service needed.**
 
-Built on the MGRS engine from [Red Grid MGRS](https://github.com/RedGridTactical/RedGridMGRS). Field Link adds zero-config proximity sync over Bluetooth and WiFi Direct -- your team appears on the map the moment they're in range.
+Built on the MGRS engine from [Red Grid MGRS](https://github.com/RedGridMGRS/RedGridMGRS). Field Link adds zero-config proximity sync over Bluetooth and WiFi Direct -- your team appears on the map the moment they're in range.
 
 > **Available now on iOS.** Android version coming soon.
 
@@ -136,7 +136,7 @@ Full details in [PRIVACY.md](PRIVACY.md).
 ## Build from Source
 
 ```bash
-git clone https://github.com/RedGridTactical/RedGridLink.git
+git clone https://github.com/RedGridMGRS/RedGridLink.git
 cd RedGridLink
 flutter pub get
 flutter pub run build_runner build --delete-conflicting-outputs
@@ -177,8 +177,8 @@ Full roadmap with feature checklists: [ROADMAP.md](ROADMAP.md)
 
 Red Grid Link is built in the open. We welcome bug reports, feature requests, and pull requests.
 
-- **Report a bug:** [Open an issue](https://github.com/RedGridTactical/RedGridLink/issues/new)
-- **Request a feature:** [Start a discussion](https://github.com/RedGridTactical/RedGridLink/discussions)
+- **Report a bug:** [Open an issue](https://github.com/RedGridMGRS/RedGridLink/issues/new)
+- **Request a feature:** [Start a discussion](https://github.com/RedGridMGRS/RedGridLink/discussions)
 - **Submit a PR:** Fork, branch, and open a pull request
 
 See the [Roadmap](ROADMAP.md) for planned features and where help is needed.
@@ -187,7 +187,7 @@ See the [Roadmap](ROADMAP.md) for planned features and where help is needed.
 
 ## Related Projects
 
-- [Red Grid MGRS](https://github.com/RedGridTactical/RedGridMGRS) -- solo MGRS navigator (React Native / Expo)
+- [Red Grid MGRS](https://github.com/RedGridMGRS/RedGridMGRS) -- solo MGRS navigator (React Native / Expo)
 
 ---
 

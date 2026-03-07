@@ -108,12 +108,14 @@ MGRS,tactical,navigation,offline,team,sync,BLE,military,grid,SAR,hunting,backcou
 
 ## What's New (v1.2.1)
 Red Grid Link v1.2.1 -- reliability and navigation update:
-- Fixed Field Link session creation after Bluetooth enable
+- Fixed Field Link session creation: resolved iOS Bluetooth adapter state detection that prevented session start even with Bluetooth enabled
+- Field Link service initialization fix: transport state listeners now properly wired at startup
 - Persistent waypoint list: save, rename, and manage multiple waypoints
 - Relative bearing arrow: arrow now points the direction to turn, not just compass bearing
-- Demo mode for screenshots (Washington DC coordinates)
-- BLE transport debug logging for connection troubleshooting
 - Resection and Dead Reckoning tools now integrate with waypoint system
+- New app icon: updated network-star design with corner brackets
+- BLE transport debug logging for connection troubleshooting
+- Demo mode for screenshots (Washington DC coordinates)
 - 783 tests passing, 0 warnings
 
 ## What's New (v1.2)
@@ -156,10 +158,10 @@ Red Grid Link v1.0 -- initial release:
 - No server communication required for any feature
 
 ## Privacy URL
-https://github.com/RedGridTactical/RedGridLink/blob/master/PRIVACY.md
+https://github.com/RedGridMGRS/RedGridLink/blob/master/PRIVACY.md
 
 ## Support URL
-https://github.com/RedGridTactical/RedGridLink/issues
+https://github.com/RedGridMGRS/RedGridLink/issues
 
 ## Age Rating
 4+ / Everyone

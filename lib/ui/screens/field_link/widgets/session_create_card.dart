@@ -66,8 +66,15 @@ class _SessionCreateCardState extends ConsumerState<SessionCreateCard> {
     setState(() => _isCreating = true);
 
     // Pre-flight check: verify Bluetooth is on before attempting session creation.
+    //
+    // On iOS, FlutterBluePlus.adapterState initially emits `unknown` while
+    // CoreBluetooth's CBCentralManager initializes. We filter out `unknown`
+    // and wait for a definitive state (on/off) with a short timeout.
     try {
-      final adapterState = await FlutterBluePlus.adapterState.first;
+      final adapterState = await FlutterBluePlus.adapterState
+          .where((s) => s != BluetoothAdapterState.unknown)
+          .first
+          .timeout(const Duration(seconds: 4));
       if (adapterState != BluetoothAdapterState.on) {
         notifyError();
         if (mounted) {
@@ -78,7 +85,8 @@ class _SessionCreateCardState extends ConsumerState<SessionCreateCard> {
       }
     } catch (e) {
       debugPrint('[FieldLink] BT state check failed: $e');
-      // Proceed and let the transport handle the error with better context.
+      // On timeout or error, proceed and let the transport layer handle
+      // the error with better context and its own retry logic.
     }
 
     tapHeavy();
