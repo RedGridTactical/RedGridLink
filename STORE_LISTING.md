@@ -78,6 +78,7 @@ BUILT FOR THE FIELD:
 - Glove-friendly UI with 44px+ minimum touch targets
 - 3-tap maximum to any primary action
 - Haptic feedback on key interactions
+- Accelerometer-based step detection for hands-free pace counting
 - Landscape and portrait support
 - Background location updates with battery drain projection
 
@@ -105,15 +106,17 @@ MGRS,tactical,navigation,offline,team,sync,BLE,military,grid,SAR,hunting,backcou
 Red Grid Link v1.2 -- field hardening release:
 - GPS Kalman filter for smoother, more accurate position tracking
 - Peer HUD overlay: see distance and bearing to teammates on the map
+- Step detector for accelerometer-based pace counting
 - Ultra Expedition battery mode (<2%/hr for extended operations)
 - Auto-reconnect with exponential backoff when peers go out of range
 - Session history: review past sessions and team activity
+- Offline map download UI with progress and region management
 - Help & Getting Started guide accessible from Settings
 - About screen with full disclaimers and Terms of Use
 - Text contrast improvements across all themes (WCAG 4.5:1)
 - Crash reporting (Sentry, privacy-safe -- no location data sent)
 - Localization framework (English + Spanish)
-- Offline map download UI with progress and region management
+- Bug fixes and stability improvements from QA testing
 - 783 tests passing, 0 warnings
 
 ## What's New (v1.0)

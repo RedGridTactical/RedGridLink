@@ -1,6 +1,6 @@
 # Red Grid Link — Product Roadmap
 
-## V1.0 — Foundation Release (Current)
+## V1.0 — Foundation Release
 
 **Status: Complete**
 
@@ -24,16 +24,17 @@ Core offline MGRS navigation and proximity coordination platform.
 
 ---
 
-## V1.1 — Field Hardening
+## V1.1 — Field Hardening (Current)
 
-**Status: Complete**
+**Status: Complete** — App v1.2.0
 
 Real-world testing feedback and reliability improvements.
 
 - [x] Field Link connection stability (exponential backoff reconnect, max 5 retries)
 - [x] Battery optimization (Ultra Expedition mode: 60s BLE, <2%/hr)
 - [x] GPS accuracy filtering (1D Kalman filter for lat/lon smoothing)
-- [x] Offline map cache management (storage quota, per-region delete, auto-cleanup)
+- [x] Step detector for accelerometer-based pace counting (sensors_plus)
+- [x] Offline map download UI with progress and region management
 - [x] Haptic feedback for proximity alerts and sync events
 - [x] Peer distance/bearing HUD overlay on map view
 - [x] Session history persistence (Drift table, DAO, schema v2 migration)
@@ -44,6 +45,7 @@ Real-world testing feedback and reliability improvements.
 - [x] About screen (full app info, disclaimers, Terms/Privacy/Licenses)
 - [x] Terms of Use / EULA screen (8 sections)
 - [x] Settings screen UX overhaul (nav rows for Help/About, updated map text)
+- [x] Bug fixes and stability improvements from QA testing
 
 ---
 

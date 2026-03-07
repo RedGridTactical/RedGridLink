@@ -36,7 +36,7 @@ Built on the MGRS engine from [Red Grid Tactical](https://github.com/RedGridTact
 ## Features
 
 ### MGRS-Native Navigation
-Live Military Grid Reference System coordinates with 1-meter precision. MGRS grid overlay on offline maps from GZD down to 100m resolution. Bearing, distance, dead reckoning, resection, pace count, declination, and coordinate conversion tools. NATO phonetic voice readout for hands-free grid calls.
+Live Military Grid Reference System coordinates with 1-meter precision. GPS Kalman filter for smooth, accurate position tracking. MGRS grid overlay on offline maps from GZD down to 100m resolution. Bearing, distance, dead reckoning, resection, pace count (with accelerometer step detection), declination, and coordinate conversion tools. NATO phonetic voice readout for hands-free grid calls.
 
 ### Field Link -- Team Sync Without Infrastructure
 Zero-config proximity sync over BLE + WiFi Direct (Android) / AWDL (iOS). Devices within range automatically discover each other and share encrypted position and marker data. No internet required. No pairing codes. No servers.
@@ -150,7 +150,7 @@ Full roadmap with feature checklists: [ROADMAP.md](ROADMAP.md)
 | Version | Target | Theme | Highlights |
 |---------|--------|-------|------------|
 | **V1.0** | **Complete** | Foundation | MGRS nav, Field Link (BLE+WiFi Direct), 11 tools, AAR PDF, offline maps, 4 themes, IAP |
-| **V1.1** | **Complete** | Field Hardening | Kalman filter, Peer HUD, Ultra Expedition, auto-reconnect, Sentry, l10n, Help/About |
+| **V1.1** | **Complete** | Field Hardening | Kalman filter, step detector, Peer HUD, Ultra Expedition, auto-reconnect, map downloads, Sentry, l10n, Help/About |
 | **V1.2** | Q3 2026 | Team Features | Team roles, waypoint sharing, route planning, boundary alerts, shared annotations |
 | **V2.0** | Q4 2026 | Intelligence | Elevation profiles, line-of-sight, weather overlay, terrain analysis, contour lines |
 | **V2.1** | Q1 2027 | Advanced Nav | Track recording, GPX import/export, navigate-to-waypoint, coordinate formats |
