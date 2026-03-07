@@ -28,8 +28,12 @@ class TileSources {
 
   static const String osm = 'osm';
   static const String topo = 'topo';
+  static const String offline = 'offline';
 
   static const List<String> all = [osm, topo];
+
+  /// All sources including offline (only shown when offline regions exist).
+  static const List<String> allWithOffline = [osm, topo, offline];
 
   static String labelFor(String id) {
     switch (id) {
@@ -37,6 +41,8 @@ class TileSources {
         return 'OSM';
       case topo:
         return 'TOPO';
+      case offline:
+        return 'OFF';
       default:
         return id.toUpperCase();
     }
@@ -289,6 +295,92 @@ class TileManager {
     await _mapRepository.deleteRegion(regionId);
   }
 
+  // ---------------------------------------------------------------------------
+  // Cache management
+  // ---------------------------------------------------------------------------
+
+  /// Get the total size of all downloaded MBTiles files in bytes.
+  Future<int> getCacheSize() async {
+    if (_mapRepository == null) return 0;
+    final regions = await _mapRepository.getDownloadedRegions();
+    int totalBytes = 0;
+    for (final region in regions) {
+      if (region.filePath != null) {
+        final file = File(region.filePath!);
+        if (await file.exists()) {
+          totalBytes += await file.length();
+        }
+      }
+    }
+    return totalBytes;
+  }
+
+  /// Get per-region size breakdown.
+  ///
+  /// Returns a list of `(regionId, regionName, sizeBytes)` records
+  /// sorted by size descending.
+  Future<List<({String id, String name, int sizeBytes})>>
+      getRegionSizes() async {
+    if (_mapRepository == null) return [];
+    final regions = await _mapRepository.getDownloadedRegions();
+    final results = <({String id, String name, int sizeBytes})>[];
+
+    for (final region in regions) {
+      int size = 0;
+      if (region.filePath != null) {
+        final file = File(region.filePath!);
+        if (await file.exists()) {
+          size = await file.length();
+        }
+      }
+      results.add((id: region.id, name: region.name, sizeBytes: size));
+    }
+
+    // Sort largest first.
+    results.sort((a, b) => b.sizeBytes.compareTo(a.sizeBytes));
+    return results;
+  }
+
+  /// Auto-cleanup: delete the oldest regions until total cache size
+  /// is under [maxBytes].
+  ///
+  /// Returns the number of regions deleted.
+  Future<int> autoCleanup(int maxBytes) async {
+    if (_mapRepository == null) return 0;
+
+    int totalSize = await getCacheSize();
+    if (totalSize <= maxBytes) return 0;
+
+    // Get all downloaded regions, sorted by downloadedAt ascending (oldest first).
+    final regions = await _mapRepository.getDownloadedRegions();
+    regions.sort((a, b) {
+      final aTime = a.downloadedAt ?? DateTime(2000);
+      final bTime = b.downloadedAt ?? DateTime(2000);
+      return aTime.compareTo(bTime);
+    });
+
+    int deletedCount = 0;
+
+    for (final region in regions) {
+      if (totalSize <= maxBytes) break;
+
+      int regionSize = 0;
+      if (region.filePath != null) {
+        final file = File(region.filePath!);
+        if (await file.exists()) {
+          regionSize = await file.length();
+          await file.delete();
+        }
+      }
+
+      await _mapRepository.deleteRegion(region.id);
+      totalSize -= regionSize;
+      deletedCount++;
+    }
+
+    return deletedCount;
+  }
+
   /// Get the path to the tiles storage directory.
   Future<String> getTilesDirectory() async {
     final dir = await getApplicationDocumentsDirectory();
@@ -356,7 +448,6 @@ class TileManager {
   /// region and zoom range.
   ///
   /// Useful for showing the user an estimated download size before starting.
-  @visibleForTesting
   int estimateTileCount(MapBounds bounds, int minZoom, int maxZoom) {
     return _getTileCoordinates(bounds, minZoom, maxZoom).length;
   }

@@ -50,3 +50,30 @@ void selectionTick() {
     HapticFeedback.selectionClick();
   } catch (_) {}
 }
+
+// ---------------------------------------------------------------------------
+// Proximity & Field Link alerts
+// ---------------------------------------------------------------------------
+
+/// Gentle pulse — new peer connected nearby.
+void notifyPeerNearby() {
+  try {
+    HapticFeedback.lightImpact();
+  } catch (_) {}
+}
+
+/// Double pulse — peer went ghost (disconnected).
+Future<void> notifyPeerDisconnect() async {
+  try {
+    HapticFeedback.mediumImpact();
+    await Future<void>.delayed(const Duration(milliseconds: 150));
+    HapticFeedback.mediumImpact();
+  } catch (_) {}
+}
+
+/// Strong pulse — boundary or distance proximity alert.
+void notifyProximityAlert() {
+  try {
+    HapticFeedback.heavyImpact();
+  } catch (_) {}
+}

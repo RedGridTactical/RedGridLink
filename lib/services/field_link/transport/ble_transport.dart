@@ -690,26 +690,25 @@ class BleTransport implements TransportService {
   // Peripheral advertising stub
   // ---------------------------------------------------------------------------
 
-  // TODO(Phase 7): Implement GATT server / peripheral advertising via
-  // native platform channel.  flutter_blue_plus does not support the
-  // peripheral role.  For MVP, discovery works when at least one device
-  // acts as a scanner and the other already has the service advertised
-  // at the OS level (e.g., via a companion native module).
+  // NOTE: GATT server / peripheral advertising requires native platform
+  // channels. flutter_blue_plus does not support the peripheral role.
+  // For MVP, discovery works when at least one device acts as a scanner
+  // and the other already has the service advertised at the OS level
+  // (e.g., via a companion native module).
 
   /// Start advertising the Field Link service.
   ///
-  /// This is a no-op stub.  Native advertising will be implemented in
-  /// Phase 7 via platform channels on Android (BLE Advertiser API) and
-  /// iOS (CBPeripheralManager).
+  /// This is a no-op stub. Native advertising requires platform channels
+  /// on Android (BLE Advertiser API) and iOS (CBPeripheralManager).
   Future<void> startAdvertising(String sessionId) async {
     _activeSessionId = sessionId;
-    // TODO(Phase 7): platform channel to native GATT server
+    // Native GATT server advertising — future enhancement
   }
 
   /// Stop advertising.
   Future<void> stopAdvertising() async {
     _activeSessionId = null;
-    // TODO(Phase 7): platform channel to native GATT server
+    // Native GATT server advertising — future enhancement
   }
 
   // ---------------------------------------------------------------------------

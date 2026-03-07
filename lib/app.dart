@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:red_grid_link/l10n/app_localizations.dart';
 
 import 'core/theme/app_theme.dart';
 import 'providers/settings_provider.dart';
@@ -24,6 +26,13 @@ class RedGridLinkApp extends ConsumerWidget {
       title: 'Red Grid Link',
       debugShowCheckedModeBanner: false,
       theme: buildTheme(colors),
+      localizationsDelegates: const [
+        AppLocalizations.delegate,
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
+      supportedLocales: AppLocalizations.supportedLocales,
       home: hasCompletedOnboarding
           ? const HomeScreen()
           : const OnboardingScreen(),

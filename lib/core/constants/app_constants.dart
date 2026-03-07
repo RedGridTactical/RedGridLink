@@ -3,7 +3,7 @@ class AppConstants {
   AppConstants._();
 
   static const String appName = 'Red Grid Link';
-  static const String appVersion = '1.0.0';
+  static const String appVersion = '1.2.0';
 
   // Device limits
   static const int maxDevices = 8;

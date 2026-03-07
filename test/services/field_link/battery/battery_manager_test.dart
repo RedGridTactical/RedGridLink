@@ -28,6 +28,13 @@ void main() {
       expect(active.currentMode, BatteryMode.active);
       active.dispose();
     });
+
+    test('can be created with ultraExpedition mode', () {
+      final ultra =
+          BatteryManager(initialMode: BatteryMode.ultraExpedition);
+      expect(ultra.currentMode, BatteryMode.ultraExpedition);
+      ultra.dispose();
+    });
   });
 
   // -------------------------------------------------------------------------
@@ -52,6 +59,14 @@ void main() {
       manager.setMode(BatteryMode.active);
     });
 
+    test('emits ultraExpedition on mode change', () async {
+      expectLater(
+        manager.modeStream,
+        emits(BatteryMode.ultraExpedition),
+      );
+      manager.setMode(BatteryMode.ultraExpedition);
+    });
+
     test('does not emit when mode unchanged', () async {
       // Set to expedition (already the default).
       manager.setMode(BatteryMode.expedition);
@@ -64,6 +79,15 @@ void main() {
   // recommendedIntervalMs
   // -------------------------------------------------------------------------
   group('recommendedIntervalMs', () {
+    test('ultraExpedition mode returns 60s interval', () {
+      manager.setMode(BatteryMode.ultraExpedition);
+      expect(
+        manager.recommendedIntervalMs,
+        SyncConstants.ultraExpeditionIntervalMs,
+      );
+      expect(manager.recommendedIntervalMs, 60000);
+    });
+
     test('expedition mode returns 30s interval', () {
       manager.setMode(BatteryMode.expedition);
       expect(

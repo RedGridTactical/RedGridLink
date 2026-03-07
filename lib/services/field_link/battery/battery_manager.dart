@@ -5,7 +5,11 @@ import 'package:red_grid_link/core/constants/sync_constants.dart';
 
 /// Battery mode for sync power management.
 enum BatteryMode {
-  /// BLE only, 30-second updates, lowest power consumption.
+  /// BLE only, 60-second updates, minimal power (<2%/hr).
+  /// Scan 1s / pause 59s. WiFi Direct suspended.
+  ultraExpedition,
+
+  /// BLE only, 30-second updates, low power (<3%/hr).
   expedition,
 
   /// BLE + P2P, 5-15 second updates, higher power consumption.
@@ -19,7 +23,8 @@ enum BatteryMode {
 /// - Recommended sync intervals based on the current mode.
 /// - Battery drain projection estimating remaining session time.
 ///
-/// **Expedition Mode**: BLE only, 30 s updates, lowest power.
+/// **Ultra Expedition Mode**: BLE only, 60 s updates, minimal power.
+/// **Expedition Mode**: BLE only, 30 s updates, low power.
 /// **Active Mode**: BLE + P2P, 5-15 s updates, higher power.
 class BatteryManager {
   /// Platform channel for native battery level queries.
@@ -71,6 +76,8 @@ class BatteryManager {
   /// current mode.
   int get recommendedIntervalMs {
     switch (_currentMode) {
+      case BatteryMode.ultraExpedition:
+        return SyncConstants.ultraExpeditionIntervalMs; // 60s
       case BatteryMode.expedition:
         return SyncConstants.expeditionIntervalMs; // 30s
       case BatteryMode.active:

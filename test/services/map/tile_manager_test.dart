@@ -12,13 +12,28 @@ void main() {
       expect(TileSources.all, contains(TileSources.topo));
     });
 
+    test('all does not contain offline', () {
+      expect(TileSources.all, isNot(contains(TileSources.offline)));
+    });
+
+    test('allWithOffline contains osm, topo, and offline', () {
+      expect(TileSources.allWithOffline, contains(TileSources.osm));
+      expect(TileSources.allWithOffline, contains(TileSources.topo));
+      expect(TileSources.allWithOffline, contains(TileSources.offline));
+    });
+
     test('labelFor returns correct labels', () {
       expect(TileSources.labelFor(TileSources.osm), equals('OSM'));
       expect(TileSources.labelFor(TileSources.topo), equals('TOPO'));
+      expect(TileSources.labelFor(TileSources.offline), equals('OFF'));
     });
 
     test('labelFor unknown returns uppercased id', () {
       expect(TileSources.labelFor('custom'), equals('CUSTOM'));
+    });
+
+    test('offline source id is offline', () {
+      expect(TileSources.offline, equals('offline'));
     });
   });
 

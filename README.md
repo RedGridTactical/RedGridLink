@@ -10,7 +10,7 @@
 [![MGRS Native](https://img.shields.io/badge/MGRS-Native-CC0000)]()
 [![AES-256](https://img.shields.io/badge/Encryption-AES--256--GCM-8B0000)]()
 [![Flutter](https://img.shields.io/badge/Built%20with-Flutter-CC0000?logo=flutter)]()
-[![Tests](https://img.shields.io/badge/Tests-646%20Passing-brightgreen)]()
+[![Tests](https://img.shields.io/badge/Tests-749%20Passing-brightgreen)]()
 [![Platform](https://img.shields.io/badge/Platform-iOS%20%7C%20Android-8B0000)]()
 [![PRs Welcome](https://img.shields.io/badge/PRs-Welcome-CC0000)](https://github.com/RedGridTactical/RedGridLink/pulls)
 [![Buy Me a Coffee](https://img.shields.io/badge/Buy%20Me%20a%20Coffee-Support-FFDD00?logo=buymeacoffee&logoColor=black)](https://buymeacoffee.com/redgridtac0)
@@ -59,8 +59,8 @@ One engine, four presentation layers. Terminology, icons, and quick actions adap
 - **Hunting** -- stand locations, game sightings, property boundaries
 - **Training** -- exercise objectives, rally points, phase lines
 
-### 8 Tactical Tools
-Dead Reckoning, Resection, Pace Count, Bearing/Back Azimuth, Coordinate Converter, Range Estimation, Slope Calculator, ETA/Speed Calculator.
+### 11 Tactical Tools
+Dead Reckoning, Resection, Pace Count, Bearing/Back Azimuth, Coordinate Converter (MGRS/Lat-Lon/DMS/UTM), Range Estimation, Slope Calculator, ETA/Speed Calculator, Magnetic Declination, Celestial Navigation, MGRS Precision Reference.
 
 ### After-Action Reports
 One-tap PDF export: map snapshot, mission timeline, track data, timestamps, team roster, markers, and session log. Share via AirDrop, file share, or any local transfer.
@@ -73,7 +73,7 @@ Red Light (night vision, free), NVG Green (Pro), Day White (Pro), Blue Force (Pr
 ## How It Works
 
 ### Solo Mode
-Open Red Grid Link and your MGRS position appears on the offline map. Navigate using bearing, distance, and dead reckoning tools -- identical to Red Grid Tactical but with a full map view and 8 tactical tools.
+Open Red Grid Link and your MGRS position appears on the offline map. Navigate using bearing, distance, and dead reckoning tools -- identical to Red Grid Tactical but with a full map view and 11 tactical tools.
 
 ### Field Link (Team Mode)
 1. **Start a session** -- tap one button to begin broadcasting over BLE
@@ -93,7 +93,7 @@ No accounts. No servers. No cell service. No configuration. It just works.
 |---------|:----:|:---:|:--------:|:----:|
 | MGRS Navigation | Yes | Yes | Yes | Yes |
 | All Operational Modes | Yes | Yes | Yes | Yes |
-| 8 Tactical Tools | Yes | Yes | Yes | Yes |
+| 11 Tactical Tools | Yes | Yes | Yes | Yes |
 | Field Link (2 devices) | Yes | Yes | Yes | Yes |
 | All Themes | -- | Yes | Yes | Yes |
 | Unlimited Map Downloads | -- | Yes | Yes | Yes |
@@ -147,7 +147,7 @@ Full roadmap with feature checklists: [ROADMAP.md](ROADMAP.md)
 
 | Version | Target | Theme | Highlights |
 |---------|--------|-------|------------|
-| **V1.0** | **Now** | Foundation | MGRS nav, Field Link (BLE+WiFi Direct), 8 tools, AAR PDF, offline maps, 4 themes, IAP |
+| **V1.0** | **Now** | Foundation | MGRS nav, Field Link (BLE+WiFi Direct), 11 tools, AAR PDF, offline maps, 4 themes, IAP |
 | **V1.1** | Q2 2026 | Field Hardening | Connection stability, battery optimization, GPS filtering, haptics, localization |
 | **V1.2** | Q3 2026 | Team Features | Team roles, waypoint sharing, route planning, boundary alerts, shared annotations |
 | **V2.0** | Q4 2026 | Intelligence | Elevation profiles, line-of-sight, weather overlay, terrain analysis, contour lines |

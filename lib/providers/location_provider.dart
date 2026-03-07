@@ -74,6 +74,20 @@ final currentPositionProvider = Provider<Position?>((ref) {
 });
 
 // ---------------------------------------------------------------------------
+// Location initialization
+// ---------------------------------------------------------------------------
+
+/// Initializes the [LocationService] (requests permission and starts GPS).
+///
+/// Watch this provider from [HomeScreen] to trigger initialization once
+/// the user has passed onboarding. The stream will begin emitting after
+/// this completes successfully.
+final locationInitProvider = FutureProvider<void>((ref) async {
+  final service = ref.watch(locationServiceProvider);
+  await service.initialize();
+});
+
+// ---------------------------------------------------------------------------
 // Permission status
 // ---------------------------------------------------------------------------
 

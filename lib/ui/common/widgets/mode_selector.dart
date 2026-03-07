@@ -5,6 +5,7 @@ import '../../../core/constants/app_constants.dart';
 import '../../../core/theme/tactical_colors.dart';
 import '../../../core/theme/tactical_text_styles.dart';
 import '../../../core/utils/haptics.dart';
+import '../../../data/models/entitlement.dart';
 import '../../../data/models/operational_mode.dart';
 import '../../../providers/settings_provider.dart';
 import '../../../providers/theme_provider.dart';
@@ -20,8 +21,12 @@ class ModeSelector extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final colors = ref.watch(currentThemeProvider);
     final currentMode = ref.watch(operationalModeProvider);
-    final entitlement = ref.watch(entitlementProvider);
-    final bool isPro = entitlement == 'pro' || entitlement == 'team';
+    final entitlementName = ref.watch(entitlementProvider);
+    final entitlement = Entitlement.values.firstWhere(
+      (e) => e.name == entitlementName,
+      orElse: () => Entitlement.free,
+    );
+    final bool isPro = entitlement.allModes;
 
     return SizedBox(
       height: AppConstants.minTouchTarget,

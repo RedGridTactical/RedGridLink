@@ -5,6 +5,7 @@ import 'package:red_grid_link/core/utils/mgrs.dart';
 import 'package:red_grid_link/data/models/position.dart';
 import 'package:red_grid_link/data/models/track_point.dart';
 import 'package:red_grid_link/data/repositories/track_repository.dart';
+import 'package:red_grid_link/services/location/kalman_filter.dart';
 import 'package:red_grid_link/services/location/permission_handler_service.dart';
 
 /// Main location service providing GPS stream, permission handling,
@@ -33,6 +34,12 @@ class LocationService {
 
   /// The most recently received position.
   Position? _lastPosition;
+
+  /// Kalman filter for GPS smoothing.
+  final GpsKalmanFilter _kalmanFilter = GpsKalmanFilter();
+
+  /// Whether GPS smoothing via Kalman filter is enabled.
+  bool _smoothingEnabled = true;
 
   /// GPS accuracy level.
   geo.LocationAccuracy _accuracy = geo.LocationAccuracy.best;
@@ -175,6 +182,17 @@ class LocationService {
     }
   }
 
+  /// Enable or disable Kalman filter GPS smoothing.
+  void setSmoothing(bool enabled) {
+    _smoothingEnabled = enabled;
+    if (!enabled) {
+      _kalmanFilter.reset();
+    }
+  }
+
+  /// Whether GPS smoothing is currently enabled.
+  bool get isSmoothingEnabled => _smoothingEnabled;
+
   /// Set the minimum distance filter in meters.
   void setDistanceFilter(int meters) {
     _distanceFilter = meters;
@@ -281,14 +299,30 @@ class LocationService {
   }
 
   /// Convert a geolocator position to our application [Position] model
-  /// with MGRS fields populated.
+  /// with MGRS fields populated and optional Kalman smoothing.
   Position _convertPosition(geo.Position geoPos) {
-    final mgrsRaw = toMGRS(geoPos.latitude, geoPos.longitude);
+    double lat = geoPos.latitude;
+    double lon = geoPos.longitude;
+
+    // Apply Kalman filter smoothing if enabled.
+    if (_smoothingEnabled) {
+      final smoothed = _kalmanFilter.process(
+        lat,
+        lon,
+        geoPos.accuracy,
+        speedMps: geoPos.speed,
+        timestamp: geoPos.timestamp,
+      );
+      lat = smoothed.lat;
+      lon = smoothed.lon;
+    }
+
+    final mgrsRaw = toMGRS(lat, lon);
     final mgrsFormatted = formatMGRS(mgrsRaw);
 
     return Position(
-      lat: geoPos.latitude,
-      lon: geoPos.longitude,
+      lat: lat,
+      lon: lon,
       altitude: geoPos.altitude,
       speed: geoPos.speed,
       heading: geoPos.heading,

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/theme/tactical_colors.dart';
+import '../../../../data/models/entitlement.dart';
 import '../../../../providers/settings_provider.dart';
 import '../../../../providers/theme_provider.dart';
 import '../../../common/widgets/section_header.dart';
@@ -19,8 +20,12 @@ class ThemeSelector extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final colors = ref.watch(currentThemeProvider);
     final currentThemeId = ref.watch(themeIdProvider);
-    final entitlement = ref.watch(entitlementProvider);
-    final bool isPro = entitlement == 'pro' || entitlement == 'team';
+    final entitlementName = ref.watch(entitlementProvider);
+    final entitlement = Entitlement.values.firstWhere(
+      (e) => e.name == entitlementName,
+      orElse: () => Entitlement.free,
+    );
+    final bool isPro = entitlement.allThemes;
 
     final themes = tacticalThemes.values.toList();
 

@@ -349,8 +349,8 @@ class IosP2pTransport implements TransportService {
     // does not maintain a persistent set of discovered peers — it
     // only emits events.
     //
-    // TODO(Phase 7): Consider emitting a "lost" event type or a
-    // separate stream.
+    // Future: Consider emitting a "lost" event type or a
+    // separate stream for peer disappearance.
   }
 
   void _handleInviteReceived(Map<dynamic, dynamic> data) {
@@ -358,7 +358,7 @@ class IosP2pTransport implements TransportService {
     if (peerId == null) return;
 
     // Auto-accept incoming invitations.
-    // TODO(Phase 7): Add authentication check before accepting.
+    // Future: Add authentication check before accepting invitations.
     _channel.invokeMethod<void>('acceptInvite', {
       'peerId': peerId,
     }).catchError((_) {

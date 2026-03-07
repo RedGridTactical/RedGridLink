@@ -23,6 +23,7 @@ import 'package:latlong2/latlong.dart';
 
 import 'package:red_grid_link/core/constants/map_constants.dart';
 import 'package:red_grid_link/core/theme/tactical_colors.dart';
+import 'package:red_grid_link/data/models/map_region.dart';
 import 'package:red_grid_link/providers/field_link_provider.dart';
 import 'package:red_grid_link/providers/map_provider.dart';
 import 'package:red_grid_link/services/map/mgrs_grid_overlay.dart';
@@ -60,6 +61,24 @@ class _MapScreenState extends ConsumerState<MapScreen> {
     final drawingMode = ref.watch(drawingModeProvider);
     final drawingPoints = ref.watch(drawingPointsProvider);
     final drawingColorIndex = ref.watch(drawingColorIndexProvider);
+    final offlineRegionId = ref.watch(activeOfflineRegionIdProvider);
+
+    // When offline source selected, auto-select first downloaded region
+    if (mapSource == TileSources.offline && offlineRegionId == null) {
+      final downloaded = ref.read(downloadedRegionsProvider).maybeWhen(
+            data: (regions) => regions,
+            orElse: () => <MapRegion>[],
+          );
+      if (downloaded.isNotEmpty) {
+        // Schedule the state update after build
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (mounted) {
+            ref.read(activeOfflineRegionIdProvider.notifier).state =
+                downloaded.first.id;
+          }
+        });
+      }
+    }
 
     return Scaffold(
       backgroundColor: colors.bg,
@@ -87,8 +106,8 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                   : null,
             ),
             children: [
-              // Tile layer
-              tileManager.getOnlineTileLayer(mapSource),
+              // Tile layer (online or offline)
+              _buildTileLayer(mapSource, tileManager, offlineRegionId),
 
               // MGRS grid overlay
               if (showGrid) MgrsGridOverlay(colors: colors),
@@ -188,6 +207,50 @@ class _MapScreenState extends ConsumerState<MapScreen> {
         ],
       ),
     );
+  }
+
+  /// Build the appropriate tile layer based on the current source.
+  ///
+  /// Returns an online [TileLayer] for OSM/TOPO sources, or an offline
+  /// MBTiles-backed tile layer when the offline source is selected and
+  /// a downloaded region is available.
+  Widget _buildTileLayer(
+    String mapSource,
+    TileManager tileManager,
+    String? offlineRegionId,
+  ) {
+    if (mapSource == TileSources.offline && offlineRegionId != null) {
+      // Look up the region to get its file path
+      final regions = ref.read(downloadedRegionsProvider).maybeWhen(
+            data: (r) => r,
+            orElse: () => <MapRegion>[],
+          );
+
+      final region = regions.cast<MapRegion?>().firstWhere(
+            (r) => r!.id == offlineRegionId,
+            orElse: () => null,
+          );
+
+      if (region != null && region.filePath != null) {
+        return FutureBuilder<TileProvider?>(
+          future: tileManager.loadMBTilesProvider(region.filePath!),
+          builder: (context, snapshot) {
+            if (snapshot.hasData && snapshot.data != null) {
+              return TileLayer(
+                tileProvider: snapshot.data!,
+                maxZoom: region.maxZoom.toDouble(),
+                minZoom: region.minZoom.toDouble(),
+              );
+            }
+            // Fallback to online while loading
+            return tileManager.getOnlineTileLayer(TileSources.osm);
+          },
+        );
+      }
+    }
+
+    // Online tile layer (OSM or TOPO)
+    return tileManager.getOnlineTileLayer(mapSource);
   }
 
   /// Handle map camera position changes.

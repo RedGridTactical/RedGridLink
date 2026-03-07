@@ -3341,6 +3341,404 @@ class MapRegionsCompanion extends UpdateCompanion<MapRegion> {
   }
 }
 
+class $SessionHistoryEntriesTable extends SessionHistoryEntries
+    with TableInfo<$SessionHistoryEntriesTable, SessionHistoryEntry> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $SessionHistoryEntriesTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
+      'id', aliasedName, false,
+      type: DriftSqlType.string,
+      requiredDuringInsert: false,
+      clientDefault: () => const Uuid().v4());
+  static const VerificationMeta _nameMeta = const VerificationMeta('name');
+  @override
+  late final GeneratedColumn<String> name = GeneratedColumn<String>(
+      'name', aliasedName, false,
+      type: DriftSqlType.string, requiredDuringInsert: true);
+  static const VerificationMeta _modeMeta = const VerificationMeta('mode');
+  @override
+  late final GeneratedColumn<String> mode = GeneratedColumn<String>(
+      'mode', aliasedName, false,
+      type: DriftSqlType.string,
+      requiredDuringInsert: false,
+      defaultValue: const Constant('sar'));
+  static const VerificationMeta _startTimeMeta =
+      const VerificationMeta('startTime');
+  @override
+  late final GeneratedColumn<int> startTime = GeneratedColumn<int>(
+      'start_time', aliasedName, false,
+      type: DriftSqlType.int, requiredDuringInsert: true);
+  static const VerificationMeta _endTimeMeta =
+      const VerificationMeta('endTime');
+  @override
+  late final GeneratedColumn<int> endTime = GeneratedColumn<int>(
+      'end_time', aliasedName, true,
+      type: DriftSqlType.int, requiredDuringInsert: false);
+  static const VerificationMeta _peerCountMeta =
+      const VerificationMeta('peerCount');
+  @override
+  late final GeneratedColumn<int> peerCount = GeneratedColumn<int>(
+      'peer_count', aliasedName, false,
+      type: DriftSqlType.int,
+      requiredDuringInsert: false,
+      defaultValue: const Constant(0));
+  static const VerificationMeta _markerCountMeta =
+      const VerificationMeta('markerCount');
+  @override
+  late final GeneratedColumn<int> markerCount = GeneratedColumn<int>(
+      'marker_count', aliasedName, false,
+      type: DriftSqlType.int,
+      requiredDuringInsert: false,
+      defaultValue: const Constant(0));
+  @override
+  List<GeneratedColumn> get $columns =>
+      [id, name, mode, startTime, endTime, peerCount, markerCount];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'session_history_entries';
+  @override
+  VerificationContext validateIntegrity(
+      Insertable<SessionHistoryEntry> instance,
+      {bool isInserting = false}) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('name')) {
+      context.handle(
+          _nameMeta, name.isAcceptableOrUnknown(data['name']!, _nameMeta));
+    } else if (isInserting) {
+      context.missing(_nameMeta);
+    }
+    if (data.containsKey('mode')) {
+      context.handle(
+          _modeMeta, mode.isAcceptableOrUnknown(data['mode']!, _modeMeta));
+    }
+    if (data.containsKey('start_time')) {
+      context.handle(_startTimeMeta,
+          startTime.isAcceptableOrUnknown(data['start_time']!, _startTimeMeta));
+    } else if (isInserting) {
+      context.missing(_startTimeMeta);
+    }
+    if (data.containsKey('end_time')) {
+      context.handle(_endTimeMeta,
+          endTime.isAcceptableOrUnknown(data['end_time']!, _endTimeMeta));
+    }
+    if (data.containsKey('peer_count')) {
+      context.handle(_peerCountMeta,
+          peerCount.isAcceptableOrUnknown(data['peer_count']!, _peerCountMeta));
+    }
+    if (data.containsKey('marker_count')) {
+      context.handle(
+          _markerCountMeta,
+          markerCount.isAcceptableOrUnknown(
+              data['marker_count']!, _markerCountMeta));
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  SessionHistoryEntry map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return SessionHistoryEntry(
+      id: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}id'])!,
+      name: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}name'])!,
+      mode: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}mode'])!,
+      startTime: attachedDatabase.typeMapping
+          .read(DriftSqlType.int, data['${effectivePrefix}start_time'])!,
+      endTime: attachedDatabase.typeMapping
+          .read(DriftSqlType.int, data['${effectivePrefix}end_time']),
+      peerCount: attachedDatabase.typeMapping
+          .read(DriftSqlType.int, data['${effectivePrefix}peer_count'])!,
+      markerCount: attachedDatabase.typeMapping
+          .read(DriftSqlType.int, data['${effectivePrefix}marker_count'])!,
+    );
+  }
+
+  @override
+  $SessionHistoryEntriesTable createAlias(String alias) {
+    return $SessionHistoryEntriesTable(attachedDatabase, alias);
+  }
+}
+
+class SessionHistoryEntry extends DataClass
+    implements Insertable<SessionHistoryEntry> {
+  /// Unique session history entry ID (UUID v4).
+  final String id;
+
+  /// Human-readable session name.
+  final String name;
+
+  /// Operational mode used during the session (sar, backcountry, etc.).
+  final String mode;
+
+  /// When the session started (epoch ms).
+  final int startTime;
+
+  /// When the session ended (epoch ms). Null if still in progress.
+  final int? endTime;
+
+  /// Number of peers that participated in the session.
+  final int peerCount;
+
+  /// Number of markers placed during the session.
+  final int markerCount;
+  const SessionHistoryEntry(
+      {required this.id,
+      required this.name,
+      required this.mode,
+      required this.startTime,
+      this.endTime,
+      required this.peerCount,
+      required this.markerCount});
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<String>(id);
+    map['name'] = Variable<String>(name);
+    map['mode'] = Variable<String>(mode);
+    map['start_time'] = Variable<int>(startTime);
+    if (!nullToAbsent || endTime != null) {
+      map['end_time'] = Variable<int>(endTime);
+    }
+    map['peer_count'] = Variable<int>(peerCount);
+    map['marker_count'] = Variable<int>(markerCount);
+    return map;
+  }
+
+  SessionHistoryEntriesCompanion toCompanion(bool nullToAbsent) {
+    return SessionHistoryEntriesCompanion(
+      id: Value(id),
+      name: Value(name),
+      mode: Value(mode),
+      startTime: Value(startTime),
+      endTime: endTime == null && nullToAbsent
+          ? const Value.absent()
+          : Value(endTime),
+      peerCount: Value(peerCount),
+      markerCount: Value(markerCount),
+    );
+  }
+
+  factory SessionHistoryEntry.fromJson(Map<String, dynamic> json,
+      {ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return SessionHistoryEntry(
+      id: serializer.fromJson<String>(json['id']),
+      name: serializer.fromJson<String>(json['name']),
+      mode: serializer.fromJson<String>(json['mode']),
+      startTime: serializer.fromJson<int>(json['startTime']),
+      endTime: serializer.fromJson<int?>(json['endTime']),
+      peerCount: serializer.fromJson<int>(json['peerCount']),
+      markerCount: serializer.fromJson<int>(json['markerCount']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<String>(id),
+      'name': serializer.toJson<String>(name),
+      'mode': serializer.toJson<String>(mode),
+      'startTime': serializer.toJson<int>(startTime),
+      'endTime': serializer.toJson<int?>(endTime),
+      'peerCount': serializer.toJson<int>(peerCount),
+      'markerCount': serializer.toJson<int>(markerCount),
+    };
+  }
+
+  SessionHistoryEntry copyWith(
+          {String? id,
+          String? name,
+          String? mode,
+          int? startTime,
+          Value<int?> endTime = const Value.absent(),
+          int? peerCount,
+          int? markerCount}) =>
+      SessionHistoryEntry(
+        id: id ?? this.id,
+        name: name ?? this.name,
+        mode: mode ?? this.mode,
+        startTime: startTime ?? this.startTime,
+        endTime: endTime.present ? endTime.value : this.endTime,
+        peerCount: peerCount ?? this.peerCount,
+        markerCount: markerCount ?? this.markerCount,
+      );
+  SessionHistoryEntry copyWithCompanion(SessionHistoryEntriesCompanion data) {
+    return SessionHistoryEntry(
+      id: data.id.present ? data.id.value : this.id,
+      name: data.name.present ? data.name.value : this.name,
+      mode: data.mode.present ? data.mode.value : this.mode,
+      startTime: data.startTime.present ? data.startTime.value : this.startTime,
+      endTime: data.endTime.present ? data.endTime.value : this.endTime,
+      peerCount: data.peerCount.present ? data.peerCount.value : this.peerCount,
+      markerCount:
+          data.markerCount.present ? data.markerCount.value : this.markerCount,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('SessionHistoryEntry(')
+          ..write('id: $id, ')
+          ..write('name: $name, ')
+          ..write('mode: $mode, ')
+          ..write('startTime: $startTime, ')
+          ..write('endTime: $endTime, ')
+          ..write('peerCount: $peerCount, ')
+          ..write('markerCount: $markerCount')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode =>
+      Object.hash(id, name, mode, startTime, endTime, peerCount, markerCount);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is SessionHistoryEntry &&
+          other.id == this.id &&
+          other.name == this.name &&
+          other.mode == this.mode &&
+          other.startTime == this.startTime &&
+          other.endTime == this.endTime &&
+          other.peerCount == this.peerCount &&
+          other.markerCount == this.markerCount);
+}
+
+class SessionHistoryEntriesCompanion
+    extends UpdateCompanion<SessionHistoryEntry> {
+  final Value<String> id;
+  final Value<String> name;
+  final Value<String> mode;
+  final Value<int> startTime;
+  final Value<int?> endTime;
+  final Value<int> peerCount;
+  final Value<int> markerCount;
+  final Value<int> rowid;
+  const SessionHistoryEntriesCompanion({
+    this.id = const Value.absent(),
+    this.name = const Value.absent(),
+    this.mode = const Value.absent(),
+    this.startTime = const Value.absent(),
+    this.endTime = const Value.absent(),
+    this.peerCount = const Value.absent(),
+    this.markerCount = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  SessionHistoryEntriesCompanion.insert({
+    this.id = const Value.absent(),
+    required String name,
+    this.mode = const Value.absent(),
+    required int startTime,
+    this.endTime = const Value.absent(),
+    this.peerCount = const Value.absent(),
+    this.markerCount = const Value.absent(),
+    this.rowid = const Value.absent(),
+  })  : name = Value(name),
+        startTime = Value(startTime);
+  static Insertable<SessionHistoryEntry> custom({
+    Expression<String>? id,
+    Expression<String>? name,
+    Expression<String>? mode,
+    Expression<int>? startTime,
+    Expression<int>? endTime,
+    Expression<int>? peerCount,
+    Expression<int>? markerCount,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (name != null) 'name': name,
+      if (mode != null) 'mode': mode,
+      if (startTime != null) 'start_time': startTime,
+      if (endTime != null) 'end_time': endTime,
+      if (peerCount != null) 'peer_count': peerCount,
+      if (markerCount != null) 'marker_count': markerCount,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  SessionHistoryEntriesCompanion copyWith(
+      {Value<String>? id,
+      Value<String>? name,
+      Value<String>? mode,
+      Value<int>? startTime,
+      Value<int?>? endTime,
+      Value<int>? peerCount,
+      Value<int>? markerCount,
+      Value<int>? rowid}) {
+    return SessionHistoryEntriesCompanion(
+      id: id ?? this.id,
+      name: name ?? this.name,
+      mode: mode ?? this.mode,
+      startTime: startTime ?? this.startTime,
+      endTime: endTime ?? this.endTime,
+      peerCount: peerCount ?? this.peerCount,
+      markerCount: markerCount ?? this.markerCount,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<String>(id.value);
+    }
+    if (name.present) {
+      map['name'] = Variable<String>(name.value);
+    }
+    if (mode.present) {
+      map['mode'] = Variable<String>(mode.value);
+    }
+    if (startTime.present) {
+      map['start_time'] = Variable<int>(startTime.value);
+    }
+    if (endTime.present) {
+      map['end_time'] = Variable<int>(endTime.value);
+    }
+    if (peerCount.present) {
+      map['peer_count'] = Variable<int>(peerCount.value);
+    }
+    if (markerCount.present) {
+      map['marker_count'] = Variable<int>(markerCount.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('SessionHistoryEntriesCompanion(')
+          ..write('id: $id, ')
+          ..write('name: $name, ')
+          ..write('mode: $mode, ')
+          ..write('startTime: $startTime, ')
+          ..write('endTime: $endTime, ')
+          ..write('peerCount: $peerCount, ')
+          ..write('markerCount: $markerCount, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$AppDatabase extends GeneratedDatabase {
   _$AppDatabase(QueryExecutor e) : super(e);
   $AppDatabaseManager get managers => $AppDatabaseManager(this);
@@ -3350,6 +3748,8 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   late final $TracksTable tracks = $TracksTable(this);
   late final $AnnotationsTable annotations = $AnnotationsTable(this);
   late final $MapRegionsTable mapRegions = $MapRegionsTable(this);
+  late final $SessionHistoryEntriesTable sessionHistoryEntries =
+      $SessionHistoryEntriesTable(this);
   late final SessionsDao sessionsDao = SessionsDao(this as AppDatabase);
   late final PeersDao peersDao = PeersDao(this as AppDatabase);
   late final MarkersDao markersDao = MarkersDao(this as AppDatabase);
@@ -3357,12 +3757,21 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   late final AnnotationsDao annotationsDao =
       AnnotationsDao(this as AppDatabase);
   late final MapRegionsDao mapRegionsDao = MapRegionsDao(this as AppDatabase);
+  late final SessionHistoryDao sessionHistoryDao =
+      SessionHistoryDao(this as AppDatabase);
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
   @override
-  List<DatabaseSchemaEntity> get allSchemaEntities =>
-      [sessions, peers, markers, tracks, annotations, mapRegions];
+  List<DatabaseSchemaEntity> get allSchemaEntities => [
+        sessions,
+        peers,
+        markers,
+        tracks,
+        annotations,
+        mapRegions,
+        sessionHistoryEntries
+      ];
   @override
   DriftDatabaseOptions get options =>
       const DriftDatabaseOptions(storeDateTimeAsText: true);
@@ -4664,6 +5073,167 @@ class $$MapRegionsTableOrderingComposer
           ColumnOrderings(column, joinBuilders: joinBuilders));
 }
 
+typedef $$SessionHistoryEntriesTableCreateCompanionBuilder
+    = SessionHistoryEntriesCompanion Function({
+  Value<String> id,
+  required String name,
+  Value<String> mode,
+  required int startTime,
+  Value<int?> endTime,
+  Value<int> peerCount,
+  Value<int> markerCount,
+  Value<int> rowid,
+});
+typedef $$SessionHistoryEntriesTableUpdateCompanionBuilder
+    = SessionHistoryEntriesCompanion Function({
+  Value<String> id,
+  Value<String> name,
+  Value<String> mode,
+  Value<int> startTime,
+  Value<int?> endTime,
+  Value<int> peerCount,
+  Value<int> markerCount,
+  Value<int> rowid,
+});
+
+class $$SessionHistoryEntriesTableTableManager extends RootTableManager<
+    _$AppDatabase,
+    $SessionHistoryEntriesTable,
+    SessionHistoryEntry,
+    $$SessionHistoryEntriesTableFilterComposer,
+    $$SessionHistoryEntriesTableOrderingComposer,
+    $$SessionHistoryEntriesTableCreateCompanionBuilder,
+    $$SessionHistoryEntriesTableUpdateCompanionBuilder> {
+  $$SessionHistoryEntriesTableTableManager(
+      _$AppDatabase db, $SessionHistoryEntriesTable table)
+      : super(TableManagerState(
+          db: db,
+          table: table,
+          filteringComposer: $$SessionHistoryEntriesTableFilterComposer(
+              ComposerState(db, table)),
+          orderingComposer: $$SessionHistoryEntriesTableOrderingComposer(
+              ComposerState(db, table)),
+          updateCompanionCallback: ({
+            Value<String> id = const Value.absent(),
+            Value<String> name = const Value.absent(),
+            Value<String> mode = const Value.absent(),
+            Value<int> startTime = const Value.absent(),
+            Value<int?> endTime = const Value.absent(),
+            Value<int> peerCount = const Value.absent(),
+            Value<int> markerCount = const Value.absent(),
+            Value<int> rowid = const Value.absent(),
+          }) =>
+              SessionHistoryEntriesCompanion(
+            id: id,
+            name: name,
+            mode: mode,
+            startTime: startTime,
+            endTime: endTime,
+            peerCount: peerCount,
+            markerCount: markerCount,
+            rowid: rowid,
+          ),
+          createCompanionCallback: ({
+            Value<String> id = const Value.absent(),
+            required String name,
+            Value<String> mode = const Value.absent(),
+            required int startTime,
+            Value<int?> endTime = const Value.absent(),
+            Value<int> peerCount = const Value.absent(),
+            Value<int> markerCount = const Value.absent(),
+            Value<int> rowid = const Value.absent(),
+          }) =>
+              SessionHistoryEntriesCompanion.insert(
+            id: id,
+            name: name,
+            mode: mode,
+            startTime: startTime,
+            endTime: endTime,
+            peerCount: peerCount,
+            markerCount: markerCount,
+            rowid: rowid,
+          ),
+        ));
+}
+
+class $$SessionHistoryEntriesTableFilterComposer
+    extends FilterComposer<_$AppDatabase, $SessionHistoryEntriesTable> {
+  $$SessionHistoryEntriesTableFilterComposer(super.$state);
+  ColumnFilters<String> get id => $state.composableBuilder(
+      column: $state.table.id,
+      builder: (column, joinBuilders) =>
+          ColumnFilters(column, joinBuilders: joinBuilders));
+
+  ColumnFilters<String> get name => $state.composableBuilder(
+      column: $state.table.name,
+      builder: (column, joinBuilders) =>
+          ColumnFilters(column, joinBuilders: joinBuilders));
+
+  ColumnFilters<String> get mode => $state.composableBuilder(
+      column: $state.table.mode,
+      builder: (column, joinBuilders) =>
+          ColumnFilters(column, joinBuilders: joinBuilders));
+
+  ColumnFilters<int> get startTime => $state.composableBuilder(
+      column: $state.table.startTime,
+      builder: (column, joinBuilders) =>
+          ColumnFilters(column, joinBuilders: joinBuilders));
+
+  ColumnFilters<int> get endTime => $state.composableBuilder(
+      column: $state.table.endTime,
+      builder: (column, joinBuilders) =>
+          ColumnFilters(column, joinBuilders: joinBuilders));
+
+  ColumnFilters<int> get peerCount => $state.composableBuilder(
+      column: $state.table.peerCount,
+      builder: (column, joinBuilders) =>
+          ColumnFilters(column, joinBuilders: joinBuilders));
+
+  ColumnFilters<int> get markerCount => $state.composableBuilder(
+      column: $state.table.markerCount,
+      builder: (column, joinBuilders) =>
+          ColumnFilters(column, joinBuilders: joinBuilders));
+}
+
+class $$SessionHistoryEntriesTableOrderingComposer
+    extends OrderingComposer<_$AppDatabase, $SessionHistoryEntriesTable> {
+  $$SessionHistoryEntriesTableOrderingComposer(super.$state);
+  ColumnOrderings<String> get id => $state.composableBuilder(
+      column: $state.table.id,
+      builder: (column, joinBuilders) =>
+          ColumnOrderings(column, joinBuilders: joinBuilders));
+
+  ColumnOrderings<String> get name => $state.composableBuilder(
+      column: $state.table.name,
+      builder: (column, joinBuilders) =>
+          ColumnOrderings(column, joinBuilders: joinBuilders));
+
+  ColumnOrderings<String> get mode => $state.composableBuilder(
+      column: $state.table.mode,
+      builder: (column, joinBuilders) =>
+          ColumnOrderings(column, joinBuilders: joinBuilders));
+
+  ColumnOrderings<int> get startTime => $state.composableBuilder(
+      column: $state.table.startTime,
+      builder: (column, joinBuilders) =>
+          ColumnOrderings(column, joinBuilders: joinBuilders));
+
+  ColumnOrderings<int> get endTime => $state.composableBuilder(
+      column: $state.table.endTime,
+      builder: (column, joinBuilders) =>
+          ColumnOrderings(column, joinBuilders: joinBuilders));
+
+  ColumnOrderings<int> get peerCount => $state.composableBuilder(
+      column: $state.table.peerCount,
+      builder: (column, joinBuilders) =>
+          ColumnOrderings(column, joinBuilders: joinBuilders));
+
+  ColumnOrderings<int> get markerCount => $state.composableBuilder(
+      column: $state.table.markerCount,
+      builder: (column, joinBuilders) =>
+          ColumnOrderings(column, joinBuilders: joinBuilders));
+}
+
 class $AppDatabaseManager {
   final _$AppDatabase _db;
   $AppDatabaseManager(this._db);
@@ -4679,4 +5249,6 @@ class $AppDatabaseManager {
       $$AnnotationsTableTableManager(_db, _db.annotations);
   $$MapRegionsTableTableManager get mapRegions =>
       $$MapRegionsTableTableManager(_db, _db.mapRegions);
+  $$SessionHistoryEntriesTableTableManager get sessionHistoryEntries =>
+      $$SessionHistoryEntriesTableTableManager(_db, _db.sessionHistoryEntries);
 }

@@ -3,6 +3,7 @@ class SyncConstants {
   SyncConstants._();
 
   // Heartbeat intervals (milliseconds)
+  static const int ultraExpeditionIntervalMs = 60000; // 60s - minimal power
   static const int expeditionIntervalMs = 30000; // 30s - BLE only
   static const int normalIntervalMs = 15000;     // 15s
   static const int activeIntervalMs = 5000;      // 5s

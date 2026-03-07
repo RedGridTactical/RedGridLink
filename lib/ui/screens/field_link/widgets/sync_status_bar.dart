@@ -70,6 +70,13 @@ class SyncStatusBar extends ConsumerWidget {
               color: colors.accent,
               isPulsing: true,
               colors: colors,
+            )
+          else if (status == FieldLinkStatus.reconnecting)
+            StatusChip(
+              label: 'Retry',
+              color: const Color(0xFFFF8800),
+              isPulsing: true,
+              colors: colors,
             ),
         ],
       ),
@@ -95,6 +102,8 @@ class _ConnectionChip extends StatelessWidget {
         return const Color(0xFF00CC00);
       case FieldLinkStatus.discovering:
         return const Color(0xFFCCCC00);
+      case FieldLinkStatus.reconnecting:
+        return const Color(0xFFFF8800);
       case FieldLinkStatus.error:
         return const Color(0xFFCC0000);
       case FieldLinkStatus.idle:
@@ -108,6 +117,8 @@ class _ConnectionChip extends StatelessWidget {
         return '$peerCount Connected';
       case FieldLinkStatus.discovering:
         return 'Scanning';
+      case FieldLinkStatus.reconnecting:
+        return 'Reconnecting';
       case FieldLinkStatus.error:
         return 'Error';
       case FieldLinkStatus.idle:
@@ -182,7 +193,24 @@ class _BatteryModeChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final bool isExpedition = mode == BatteryMode.expedition;
+    final String label;
+    final Color iconColor;
+    final IconData icon;
+
+    switch (mode) {
+      case BatteryMode.ultraExpedition:
+        label = 'ULTRA EXP';
+        iconColor = const Color(0xFF0088CC);
+        icon = Icons.battery_full;
+      case BatteryMode.expedition:
+        label = 'EXPEDITION';
+        iconColor = const Color(0xFF00CC00);
+        icon = Icons.battery_saver;
+      case BatteryMode.active:
+        label = 'ACTIVE';
+        iconColor = const Color(0xFFCCCC00);
+        icon = Icons.bolt;
+    }
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
@@ -194,18 +222,9 @@ class _BatteryModeChip extends StatelessWidget {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(
-            isExpedition ? Icons.battery_saver : Icons.bolt,
-            size: 14,
-            color: isExpedition
-                ? const Color(0xFF00CC00)
-                : const Color(0xFFCCCC00),
-          ),
+          Icon(icon, size: 14, color: iconColor),
           const SizedBox(width: 4),
-          Text(
-            isExpedition ? 'EXPEDITION' : 'ACTIVE',
-            style: TacticalTextStyles.label(colors),
-          ),
+          Text(label, style: TacticalTextStyles.label(colors)),
         ],
       ),
     );

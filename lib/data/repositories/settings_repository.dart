@@ -80,8 +80,23 @@ class SettingsRepository {
 
   // --- Entitlement ---
 
-  /// User entitlement tier: free, pro, or team.
+  /// User entitlement tier: free, pro, proLink, or team.
   String get entitlement => _prefs.getString(_kEntitlement) ?? 'free';
   Future<bool> setEntitlement(String value) =>
       _prefs.setString(_kEntitlement, value);
+
+  // --- IAP Metadata ---
+
+  static const _kIapActiveProductId = 'iap_active_product_id';
+  static const _kIapPurchaseTimestamp = 'iap_purchase_timestamp';
+
+  /// Active IAP product ID (e.g., 'pro_monthly', 'lifetime').
+  String? get iapActiveProductId => _prefs.getString(_kIapActiveProductId);
+  Future<bool> setIapActiveProductId(String value) =>
+      _prefs.setString(_kIapActiveProductId, value);
+
+  /// Timestamp (milliseconds since epoch) of the last purchase.
+  int? get iapPurchaseTimestamp => _prefs.getInt(_kIapPurchaseTimestamp);
+  Future<bool> setIapPurchaseTimestamp(int value) =>
+      _prefs.setInt(_kIapPurchaseTimestamp, value);
 }

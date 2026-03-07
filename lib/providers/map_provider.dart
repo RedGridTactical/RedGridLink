@@ -36,9 +36,17 @@ final mapControllerServiceProvider = Provider<MapControllerService>((ref) {
 // UI state
 // -----------------------------------------------------------------------------
 
-/// Active tile source: 'osm' or 'topo'.
+/// Active tile source: 'osm', 'topo', or 'offline'.
 final mapSourceProvider = StateProvider<String>((ref) {
   return TileSources.osm;
+});
+
+/// Currently selected offline region ID for rendering.
+///
+/// When non-null, the map uses this region's MBTiles file for tiles.
+/// Automatically set to the first downloaded region when source is 'offline'.
+final activeOfflineRegionIdProvider = StateProvider<String?>((ref) {
+  return null;
 });
 
 /// Whether the MGRS grid overlay is visible.

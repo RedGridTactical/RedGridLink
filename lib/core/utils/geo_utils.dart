@@ -51,6 +51,52 @@ String formatCoordinate(double deg, bool isLat) {
   return "$hemisphere $degrees\u00B0 $minutes' ${seconds.toStringAsFixed(1)}\"";
 }
 
+/// Parse a DMS (degrees, minutes, seconds) string to decimal degrees.
+///
+/// Accepts various formats:
+///   - `N 38° 53' 51.7"`
+///   - `38 53 51.7`
+///   - `38° 53' 51.7" N`
+///   - `S 33° 52' 7.7"`
+///
+/// A leading or trailing S or W makes the result negative.
+/// Returns null if the string cannot be parsed.
+double? parseDMS(String dms) {
+  if (dms.trim().isEmpty) return null;
+
+  // Detect hemisphere
+  final upper = dms.toUpperCase().trim();
+  final bool isNegative = upper.startsWith('S') ||
+      upper.startsWith('W') ||
+      upper.endsWith('S') ||
+      upper.endsWith('W');
+
+  // Strip hemisphere letters and symbols, leaving only numbers and separators
+  final cleaned = dms
+      .replaceAll(RegExp(r'[NSEW]', caseSensitive: false), '')
+      .replaceAll(RegExp('[°\u00B0\u2032\u2033\'"]'), ' ')
+      .trim();
+
+  final parts =
+      cleaned.split(RegExp(r'[\s,]+'))
+          .where((s) => s.isNotEmpty)
+          .toList();
+
+  if (parts.isEmpty || parts.length > 3) return null;
+
+  final d = double.tryParse(parts[0]);
+  if (d == null) return null;
+
+  final m = parts.length > 1 ? double.tryParse(parts[1]) : 0.0;
+  final s = parts.length > 2 ? double.tryParse(parts[2]) : 0.0;
+  if (m == null || s == null) return null;
+
+  double result = d.abs() + m / 60 + s / 3600;
+  if (isNegative || d < 0) result = -result.abs();
+
+  return result;
+}
+
 // ---------------------------------------------------------------------------
 // Compass direction
 // ---------------------------------------------------------------------------

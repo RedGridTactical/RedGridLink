@@ -129,7 +129,7 @@ class PurchaseHandler {
 
   /// Get the active product ID (the subscription product currently active).
   String? getActiveProductId() {
-    return _getStoredString('iap_active_product_id');
+    return _settingsRepository.iapActiveProductId;
   }
 
   // ---------------------------------------------------------------------------
@@ -195,40 +195,24 @@ class PurchaseHandler {
   // Internal storage helpers
   // ---------------------------------------------------------------------------
 
-  /// These use SharedPreferences via the settings repository's underlying
-  /// SharedPreferences instance. We store IAP metadata alongside settings
-  /// since it's simple key-value data that doesn't warrant a separate store.
-
+  /// Persist the active product ID via SharedPreferences.
   Future<void> _storeActiveProductId(String productId) async {
-    // Access SharedPreferences through the settings repository pattern.
-    // We store directly since SettingsRepository exposes setEntitlement
-    // but not arbitrary keys. We extend via a simple map.
-    _iapMetadata['iap_active_product_id'] = productId;
+    await _settingsRepository.setIapActiveProductId(productId);
   }
 
+  /// Persist the purchase timestamp via SharedPreferences.
   Future<void> _storePurchaseTimestamp() async {
-    _iapMetadata['iap_purchase_timestamp'] =
-        DateTime.now().millisecondsSinceEpoch.toString();
+    await _settingsRepository.setIapPurchaseTimestamp(
+      DateTime.now().millisecondsSinceEpoch,
+    );
   }
 
-  String? _getStoredString(String key) {
-    return _iapMetadata[key];
-  }
-
+  /// Retrieve the stored purchase timestamp.
   DateTime? _getStoredTimestamp() {
-    final raw = _iapMetadata['iap_purchase_timestamp'];
-    if (raw == null) return null;
-    final ms = int.tryParse(raw);
+    final ms = _settingsRepository.iapPurchaseTimestamp;
     if (ms == null) return null;
     return DateTime.fromMillisecondsSinceEpoch(ms);
   }
-
-  /// In-memory IAP metadata store.
-  ///
-  /// In production this should be backed by SharedPreferences.
-  /// Keeping it in-memory simplifies testing and avoids coupling
-  /// to SharedPreferences keys that don't exist in SettingsRepository.
-  final Map<String, String> _iapMetadata = {};
 
   /// Convert an entitlement name string to the enum.
   Entitlement _entitlementFromName(String name) {

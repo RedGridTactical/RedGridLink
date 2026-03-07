@@ -21,7 +21,11 @@ import 'widgets/quick_setup_page.dart';
 ///
 /// Marks onboarding complete on finish and navigates to [HomeScreen].
 class OnboardingScreen extends ConsumerStatefulWidget {
-  const OnboardingScreen({super.key});
+  const OnboardingScreen({super.key, this.readOnly = false});
+
+  /// When true, shows the guide in read-only mode (no permission
+  /// requests, no onboarding-complete flag). Used from Help screen.
+  final bool readOnly;
 
   @override
   ConsumerState<OnboardingScreen> createState() => _OnboardingScreenState();
@@ -73,6 +77,11 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
 
   Future<void> _finish() async {
     tapHeavy();
+    if (widget.readOnly) {
+      // In read-only mode, just navigate back.
+      if (mounted) Navigator.of(context).pop();
+      return;
+    }
     await ref.read(hasCompletedOnboardingProvider.notifier).complete();
     if (mounted) {
       Navigator.of(context).pushReplacement(

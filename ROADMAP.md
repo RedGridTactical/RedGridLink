@@ -13,32 +13,37 @@ Core offline MGRS navigation and proximity coordination platform.
 - AES-256-GCM encrypted communications with ECDH key exchange
 - Tiered session security: Open, PIN, QR code
 - Ghost markers with opacity decay for disconnected peers
-- 8 tactical tools (dead reckoning, resection, pace count, bearing, coordinate converter, range estimation, slope calculator, ETA/speed)
+- 11 tactical tools (dead reckoning, resection, pace count, bearing/back azimuth, coordinate converter, range estimation, slope calculator, ETA/speed, declination, celestial nav, MGRS precision ref)
 - MBTiles offline map downloads (USGS Topo + OpenTopo)
 - After-Action Report (AAR) PDF generation and export
 - 4 tactical themes: Red Light, NVG Green, Day White, Blue Force
+- Mode-specific UI labels adapt to operational context
 - In-app subscriptions: Free / Pro / Pro+Link / Team / Lifetime
 - Android foreground service for background sync
-- 646 tests, 0 warnings
+- 783 tests, 0 warnings
 
 ---
 
 ## V1.1 — Field Hardening
 
-**Target: Q2 2026**
+**Status: Complete**
 
 Real-world testing feedback and reliability improvements.
 
-- [ ] Field Link connection stability improvements (reconnect logic, retry backoff)
-- [ ] Battery optimization for extended BLE sessions (target <3%/hr in Expedition Mode)
-- [ ] GPS accuracy filtering (Kalman filter for position smoothing)
-- [ ] Offline map cache management (storage quota, auto-cleanup)
-- [ ] Haptic feedback patterns for proximity alerts and sync events
-- [ ] Peer distance/bearing HUD overlay on map view
-- [ ] Session history persistence (resume interrupted sessions)
-- [ ] Crash reporting integration (Sentry or equivalent, privacy-respecting)
-- [ ] Accessibility audit (screen reader support, high contrast mode)
-- [ ] Localization framework (English, Spanish initial)
+- [x] Field Link connection stability (exponential backoff reconnect, max 5 retries)
+- [x] Battery optimization (Ultra Expedition mode: 60s BLE, <2%/hr)
+- [x] GPS accuracy filtering (1D Kalman filter for lat/lon smoothing)
+- [x] Offline map cache management (storage quota, per-region delete, auto-cleanup)
+- [x] Haptic feedback for proximity alerts and sync events
+- [x] Peer distance/bearing HUD overlay on map view
+- [x] Session history persistence (Drift table, DAO, schema v2 migration)
+- [x] Crash reporting (Sentry, release-mode only, location data stripped)
+- [x] Accessibility + contrast audit (WCAG 4.5:1 all themes, text contrast fixes)
+- [x] Localization framework (ARB-based l10n, English + Spanish)
+- [x] Help & Guide screen (quick start, FAQ, replay onboarding)
+- [x] About screen (full app info, disclaimers, Terms/Privacy/Licenses)
+- [x] Terms of Use / EULA screen (8 sections)
+- [x] Settings screen UX overhaul (nav rows for Help/About, updated map text)
 
 ---
 

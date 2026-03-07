@@ -207,6 +207,23 @@ String formatDistance(double meters) {
   return '${(meters / 1000).toStringAsFixed(1)}km';
 }
 
+/// Convert WGS84 lat/lon to a UTM coordinate record.
+///
+/// Returns zone number, zone letter, easting, and northing.
+/// Useful for the Coordinate Converter tool.
+({int zoneNum, String? zoneLetter, int easting, int northing}) latLonToUTM(
+    double lat, double lon) {
+  return _latLonToUTM(lat, lon);
+}
+
+/// Format a UTM coordinate as a human-readable string.
+///
+/// Example: "17S 630000 3880000"
+String formatUTM(double lat, double lon) {
+  final utm = _latLonToUTM(lat, lon);
+  return '${utm.zoneNum}${utm.zoneLetter ?? ''} ${utm.easting} ${utm.northing}';
+}
+
 /// Parse an MGRS coordinate string to WGS84 lat/lon.
 ///
 /// [mgrs] MGRS string (with or without spaces).

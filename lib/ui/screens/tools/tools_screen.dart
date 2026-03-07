@@ -4,14 +4,18 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/theme/tactical_colors.dart';
 import '../../../core/theme/tactical_text_styles.dart';
 import '../../../core/utils/haptics.dart';
+import '../../../providers/mode_provider.dart';
 import '../../../providers/theme_provider.dart';
 import '../../common/widgets/tactical_card.dart';
 import 'widgets/back_azimuth_tool.dart';
+import 'widgets/coordinate_converter_tool.dart';
 import 'widgets/dead_reckoning_tool.dart';
 import 'widgets/declination_tool.dart';
 import 'widgets/pace_count_tool.dart';
 import 'widgets/precision_reference_tool.dart';
+import 'widgets/range_estimation_tool.dart';
 import 'widgets/resection_tool.dart';
+import 'widgets/slope_calculator_tool.dart';
 import 'widgets/solar_bearing_tool.dart';
 import 'widgets/tds_tool.dart';
 
@@ -30,7 +34,7 @@ class _ToolDef {
   });
 }
 
-/// 2x4 grid of tactical navigation tools.
+/// Grid of 11 tactical navigation tools.
 ///
 /// Each card opens the corresponding tool as a full-screen page.
 /// All cards meet the 44px minimum touch target.
@@ -81,6 +85,24 @@ class ToolsScreen extends ConsumerWidget {
       builder: (colors) => BackAzimuthTool(colors: colors),
     ),
     _ToolDef(
+      label: 'COORD\nCONVERT',
+      icon: Icons.sync_alt,
+      description: 'MGRS / Lat-Lon / DMS / UTM',
+      builder: (colors) => CoordinateConverterTool(colors: colors),
+    ),
+    _ToolDef(
+      label: 'RANGE\nESTIMATE',
+      icon: Icons.straighten,
+      description: 'Mil-relation range estimation',
+      builder: (colors) => RangeEstimationTool(colors: colors),
+    ),
+    _ToolDef(
+      label: 'SLOPE\nCALC',
+      icon: Icons.trending_up,
+      description: 'Slope percentage and angle',
+      builder: (colors) => SlopeCalculatorTool(colors: colors),
+    ),
+    _ToolDef(
       label: 'PRECISION\nREF',
       icon: Icons.grid_on,
       description: 'MGRS precision level reference',
@@ -91,6 +113,7 @@ class ToolsScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final colors = ref.watch(currentThemeProvider);
+    final mode = ref.watch(currentModeProvider);
 
     return Scaffold(
       backgroundColor: colors.bg,
@@ -109,7 +132,7 @@ class ToolsScreen extends ConsumerWidget {
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16),
               child: Text(
-                'Land navigation calculators and references',
+                mode.toolsSubtitle,
                 style: TacticalTextStyles.caption(colors),
               ),
             ),

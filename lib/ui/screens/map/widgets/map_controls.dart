@@ -6,6 +6,7 @@
 //   - Re-center on GPS position
 //   - Toggle MGRS grid overlay
 //   - Toggle map tile source (OSM / Topo)
+//   - Download maps for offline use
 //
 // All buttons are 44px minimum size for glove-friendly touch targets.
 
@@ -15,6 +16,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:red_grid_link/core/theme/tactical_colors.dart';
 import 'package:red_grid_link/providers/map_provider.dart';
 import 'package:red_grid_link/services/map/tile_manager.dart';
+
+import 'map_download_sheet.dart';
 
 class MapControls extends ConsumerWidget {
   final TacticalColorScheme colors;
@@ -86,19 +89,40 @@ class MapControls extends ConsumerWidget {
           ),
           const SizedBox(height: 6),
 
-          // Toggle map source
+          // Toggle map source (cycles: OSM → TOPO → OFFLINE if regions exist)
           _ControlButton(
             icon: Icons.layers,
             colors: colors,
             label: TileSources.labelFor(mapSource),
+            isActive: mapSource == TileSources.offline,
             onPressed: () {
               final current = ref.read(mapSourceProvider);
-              final next = current == TileSources.osm
-                  ? TileSources.topo
-                  : TileSources.osm;
+              final hasOffline = ref.read(downloadedRegionsProvider).maybeWhen(
+                    data: (regions) => regions.isNotEmpty,
+                    orElse: () => false,
+                  );
+              final String next;
+              if (current == TileSources.osm) {
+                next = TileSources.topo;
+              } else if (current == TileSources.topo && hasOffline) {
+                next = TileSources.offline;
+              } else {
+                next = TileSources.osm;
+              }
               ref.read(mapSourceProvider.notifier).state = next;
             },
             tooltip: 'Switch map source',
+          ),
+          const SizedBox(height: 14),
+
+          // Download offline maps
+          _ControlButton(
+            icon: Icons.download,
+            colors: colors,
+            onPressed: () {
+              showMapDownloadSheet(context);
+            },
+            tooltip: 'Download maps for offline use',
           ),
         ],
       ),

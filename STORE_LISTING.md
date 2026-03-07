@@ -28,7 +28,9 @@ Field Link is what sets Red Grid Link apart. Devices within proximity automatica
 - Time-decay visualization: full opacity fades to outline over 30 minutes
 - Velocity vectors project teammate movement direction at disconnect
 - Snap-to-live animation on reconnect
-- Expedition Mode: <4% battery per 8-hour session (BLE-only, 30-second updates)
+- Expedition Mode: <3% battery per hour (BLE-only, 30-second updates)
+- Ultra Expedition Mode: <2% battery per hour (BLE-only, 60-second updates)
+- Auto-reconnect with exponential backoff on disconnect
 
 MGRS-NATIVE NAVIGATION:
 Built on the proven MGRS engine from Red Grid Tactical -- the same coordinate system used by NATO forces worldwide.
@@ -38,15 +40,18 @@ Built on the proven MGRS engine from Red Grid Tactical -- the same coordinate sy
 - Magnetic declination (WMM model)
 - NATO phonetic voice readout for hands-free grid calls
 
-8 TACTICAL TOOLS:
+11 TACTICAL TOOLS:
 - Dead Reckoning plotter
 - Two-point Resection
 - Pace Count tracker
 - Bearing calculator with back azimuth
-- Coordinate Converter (MGRS, lat/lon, UTM)
-- Range Estimation
-- Slope Calculator
+- Coordinate Converter (MGRS, lat/lon, DMS, UTM)
+- Range Estimation (mil-relation formula)
+- Slope Calculator (percentage and angle)
 - ETA / Speed Calculator
+- Magnetic Declination converter
+- Celestial Navigation (sun/moon bearing reference)
+- MGRS Precision Reference
 
 OFFLINE MAP SYSTEM:
 - Downloadable map packs from USGS Topo (public domain) and OpenTopoMap
@@ -96,6 +101,21 @@ PRICING:
 ## Keywords (iOS, max 100 chars)
 MGRS,tactical,navigation,offline,team,sync,BLE,military,grid,SAR,hunting,backcountry,map
 
+## What's New (v1.2)
+Red Grid Link v1.2 -- field hardening release:
+- GPS Kalman filter for smoother, more accurate position tracking
+- Peer HUD overlay: see distance and bearing to teammates on the map
+- Ultra Expedition battery mode (<2%/hr for extended operations)
+- Auto-reconnect with exponential backoff when peers go out of range
+- Session history: review past sessions and team activity
+- Help & Getting Started guide accessible from Settings
+- About screen with full disclaimers and Terms of Use
+- Text contrast improvements across all themes (WCAG 4.5:1)
+- Crash reporting (Sentry, privacy-safe -- no location data sent)
+- Localization framework (English + Spanish)
+- Offline map download UI with progress and region management
+- 783 tests passing, 0 warnings
+
 ## What's New (v1.0)
 Red Grid Link v1.0 -- initial release:
 - Live MGRS navigation with 1-meter precision
@@ -105,7 +125,7 @@ Red Grid Link v1.0 -- initial release:
 - Ghost markers with time-decay visualization
 - 4 operational modes (SAR, Backcountry, Hunting, Training)
 - 4 tactical display themes
-- 8 tactical land navigation tools
+- 11 tactical land navigation tools
 - After-Action Report PDF export
 - NATO phonetic voice readout
 

@@ -50,6 +50,9 @@ final iapServiceProvider = Provider<IAPService>((ref) {
 
 /// Async provider that loads available products from the store.
 ///
+/// Also checks for lapsed subscriptions on startup so expired
+/// entitlements are revoked before the UI renders.
+///
 /// Usage:
 /// ```dart
 /// final productsAsync = ref.watch(productsProvider);
@@ -62,6 +65,11 @@ final iapServiceProvider = Provider<IAPService>((ref) {
 final productsProvider =
     FutureProvider<List<ProductDetails>>((ref) async {
   final service = ref.watch(iapServiceProvider);
+  final handler = ref.watch(purchaseHandlerProvider);
+
+  // Check for lapsed subscriptions on startup.
+  await handler.checkAndUpdateExpiry();
+
   await service.initialize();
   return service.products;
 });

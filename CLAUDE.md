@@ -16,7 +16,7 @@ flutter pub get
 # Run code generation (Drift)
 flutter pub run build_runner build --delete-conflicting-outputs
 
-# Run tests (667 tests)
+# Run tests (749 tests)
 flutter test
 
 # Run app
@@ -74,7 +74,7 @@ lib/
         ├── map/              # flutter_map + MGRS overlay + peer/ghost/marker layers
         ├── grid/             # Solo MGRS display + wayfinder
         ├── field_link/       # Session management, peer list, ghost list
-        ├── tools/            # 8 tactical tools
+        ├── tools/            # 11 tactical tools
         ├── report/           # AAR preview + PDF export
         ├── settings/         # Theme, calibration, mode, subscriptions
         └── onboarding/       # Disclaimer, permissions, quick start
@@ -127,7 +127,7 @@ ios/Runner/
 ## Testing
 
 ```bash
-# All tests (667 tests)
+# All tests (783 tests)
 flutter test
 
 # Specific test file
@@ -145,12 +145,14 @@ Test coverage areas:
 - Data models: Ghost, CRDT properties (37 tests)
 - Sync engine: Delta encoding, conflict resolution, sync lifecycle (58 tests)
 - Ghost manager: Opacity decay, velocity projection (28 tests)
-- Battery manager: Mode switching, drain projection (16 tests)
+- Battery manager: Mode switching, drain projection, ultra expedition (19 tests)
 - AAR service: Compilation, PDF generation (47 tests)
 - IAP service: Purchase flow, entitlement handling (56 tests)
 - Repositories: Settings CRUD (21 tests)
 - Providers: All settings notifiers (28 tests)
 - Step detector: Accelerometer step detection, debounce, orientation (21 tests)
+- Location: Kalman filter smoothing (12 tests)
+- Tools: Coordinate converter, range estimation, slope calculator (36 tests)
 - Widgets: TacticalButton, HomeScreen, OnboardingScreen (27 tests)
 - App widget: Root app rendering (1 test)
 
@@ -185,3 +187,11 @@ See the full plan at `.claude/plans/zazzy-zooming-duckling.md`.
 | 6: AAR + IAP + Export | Complete |
 | 7: Polish + Integration Testing | Complete |
 | V1.0: Rename + Security + Maps + IAP | Complete |
+| V1.1-P1: IAP Fix + GPS Init | Complete |
+| V1.1-P2: 3 Missing Tools (11 total) | Complete |
+| V1.1-P3: Operational Modes Wiring | Complete |
+| V1.1-P4: Store Listing Updates | Complete |
+| V1.1-P5: Offline Map Download UI | Complete |
+| V1.1-P6: Field Hardening (Kalman, HUD, Sentry, l10n) | Complete |
+| V1.1-P7: Tester Feedback (Help, About, Terms, Contrast) | Complete |
+| V1.1-P8: QA/QC Pass | In Progress |

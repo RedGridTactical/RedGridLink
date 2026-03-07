@@ -265,6 +265,49 @@ double dateToJD(DateTime date) {
   return date.millisecondsSinceEpoch / 86400000 + 2440587.5;
 }
 
+// --- RANGE ESTIMATION ---
+
+/// Estimate range to target using the mil-relation formula.
+///
+/// Military mil-relation: Range = objectSize × 1000 / angularSize
+/// One mil subtends 1 metre at 1000 metres distance.
+///
+/// [objectSizeMeters]: known height/width of target in metres.
+/// [angularSizeMils]: apparent size through optics in mils.
+/// Returns estimated range in metres, or null for invalid inputs.
+double? estimateRange(
+    {required double objectSizeMeters, required double angularSizeMils}) {
+  if (angularSizeMils <= 0 || !angularSizeMils.isFinite) return null;
+  if (objectSizeMeters <= 0 || !objectSizeMeters.isFinite) return null;
+  return objectSizeMeters * 1000 / angularSizeMils;
+}
+
+// --- SLOPE CALCULATOR ---
+
+/// Calculate slope as a percentage.
+///
+/// [horizontalDist]: horizontal distance in metres.
+/// [elevationChange]: vertical change in metres (positive = uphill).
+/// Returns slope percentage, or null for invalid inputs.
+double? slopePercent(
+    {required double horizontalDist, required double elevationChange}) {
+  if (horizontalDist <= 0 || !horizontalDist.isFinite) return null;
+  if (!elevationChange.isFinite) return null;
+  return (elevationChange / horizontalDist) * 100;
+}
+
+/// Calculate slope angle in degrees.
+///
+/// [horizontalDist]: horizontal distance in metres.
+/// [elevationChange]: vertical change in metres.
+/// Returns angle in degrees (0-90), or null for invalid inputs.
+double? slopeAngle(
+    {required double horizontalDist, required double elevationChange}) {
+  if (horizontalDist <= 0 || !horizontalDist.isFinite) return null;
+  if (!elevationChange.isFinite) return null;
+  return atan2(elevationChange.abs(), horizontalDist) * rad;
+}
+
 // --- MGRS PRECISION ---
 
 /// Labels describing MGRS grid precision levels.

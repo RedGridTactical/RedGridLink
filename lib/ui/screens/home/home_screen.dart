@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/utils/haptics.dart';
+import '../../../providers/location_provider.dart';
 import '../../../providers/theme_provider.dart';
 import '../field_link/field_link_screen.dart';
 import '../grid/grid_screen.dart';
@@ -26,6 +27,10 @@ class HomeScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final colors = ref.watch(currentThemeProvider);
     final activeTab = ref.watch(activeTabProvider);
+
+    // Trigger GPS initialization when HomeScreen loads (after onboarding).
+    // This starts the location stream so Grid/Map tabs receive position data.
+    ref.watch(locationInitProvider);
 
     // Build tab screens. MapScreen takes colors directly; the others
     // watch currentThemeProvider internally.

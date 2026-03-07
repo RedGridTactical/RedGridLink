@@ -28,6 +28,9 @@ enum FieldLinkStatus {
   /// Session active, at least one peer connected.
   connected,
 
+  /// Attempting to reconnect after a disconnect.
+  reconnecting,
+
   /// Error state — requires re-initialization.
   error,
 }
@@ -55,6 +58,18 @@ class FieldLinkService {
   StreamSubscription<TransportState>? _transportStateSub;
   StreamSubscription<CrdtState>? _syncStateSub;
   Timer? _batteryPollTimer;
+  Timer? _reconnectTimer;
+
+  /// Current reconnect attempt count.
+  int _reconnectAttempts = 0;
+
+  /// Maximum reconnect attempts before marking peers as ghost.
+  static const int _maxReconnectAttempts = 5;
+
+  /// Reconnect backoff intervals in milliseconds: 2s, 4s, 8s, 16s, 30s.
+  static const List<int> _reconnectIntervalsMs = [
+    2000, 4000, 8000, 16000, 30000,
+  ];
 
   final StreamController<Session?> _sessionController =
       StreamController<Session?>.broadcast();
@@ -213,6 +228,11 @@ class FieldLinkService {
 
     final sessionId = _activeSession!.id;
 
+    // Cancel any reconnect attempts.
+    _reconnectTimer?.cancel();
+    _reconnectTimer = null;
+    _reconnectAttempts = 0;
+
     // Stop sub-services in order.
     await _syncEngine.stop();
     await _transport.disconnectAll();
@@ -358,6 +378,8 @@ class FieldLinkService {
   Future<void> dispose() async {
     await _transportStateSub?.cancel();
     await _syncStateSub?.cancel();
+    _reconnectTimer?.cancel();
+    _reconnectTimer = null;
     _stopBatteryPolling();
     _syncEngine.dispose();
     _ghostManager.dispose();
@@ -372,10 +394,14 @@ class FieldLinkService {
   // Internal
   // ---------------------------------------------------------------------------
 
-  /// Handle transport state transitions.
+  /// Handle transport state transitions with reconnect logic.
   void _onTransportState(TransportState state) {
     switch (state) {
       case TransportState.connected:
+        // Connection established — reset reconnect state.
+        _reconnectAttempts = 0;
+        _reconnectTimer?.cancel();
+        _reconnectTimer = null;
         _setStatus(FieldLinkStatus.connected);
         break;
       case TransportState.discovering:
@@ -384,18 +410,57 @@ class FieldLinkService {
         }
         break;
       case TransportState.disconnected:
-        // If we had connected peers, they disconnected.
+        // If we had connected peers, attempt to reconnect.
         if (_activeSession != null) {
-          _setStatus(FieldLinkStatus.discovering);
+          _attemptReconnect();
         }
         break;
       case TransportState.error:
-        _setStatus(FieldLinkStatus.error);
+        // On error, also attempt reconnect if session is active.
+        if (_activeSession != null) {
+          _attemptReconnect();
+        } else {
+          _setStatus(FieldLinkStatus.error);
+        }
         break;
       case TransportState.idle:
       case TransportState.connecting:
         break;
     }
+  }
+
+  /// Attempt to reconnect with exponential backoff.
+  void _attemptReconnect() {
+    if (_reconnectAttempts >= _maxReconnectAttempts) {
+      // Max attempts exceeded — stop trying and report.
+      _setStatus(FieldLinkStatus.discovering);
+      _reconnectAttempts = 0;
+      return;
+    }
+
+    _setStatus(FieldLinkStatus.reconnecting);
+
+    final intervalIndex = _reconnectAttempts.clamp(
+      0,
+      _reconnectIntervalsMs.length - 1,
+    );
+    final delayMs = _reconnectIntervalsMs[intervalIndex];
+
+    _reconnectTimer?.cancel();
+    _reconnectTimer = Timer(Duration(milliseconds: delayMs), () async {
+      if (_activeSession == null) return;
+
+      _reconnectAttempts++;
+
+      try {
+        // Restart discovery on the transport.
+        await _transport.startDiscovery(_activeSession!.id);
+        _setStatus(FieldLinkStatus.discovering);
+      } on Exception {
+        // Discovery restart failed — try again.
+        _attemptReconnect();
+      }
+    });
   }
 
   /// Handle CRDT state changes from the sync engine.

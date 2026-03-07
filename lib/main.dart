@@ -1,6 +1,8 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:sentry_flutter/sentry_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:red_grid_link/app.dart';
@@ -98,6 +100,56 @@ void main() async {
   // ---------------------------------------------------------------------------
   final tileManager = TileManager(mapRepository: mapRepo);
 
+  // ---------------------------------------------------------------------------
+  // Sentry crash reporting (release mode only)
+  // ---------------------------------------------------------------------------
+  const sentryDsn = String.fromEnvironment('SENTRY_DSN');
+
+  if (kReleaseMode && sentryDsn.isNotEmpty) {
+    await SentryFlutter.init(
+      (options) {
+        options.dsn = sentryDsn;
+        options.tracesSampleRate = 0.2;
+        // Privacy: do not send PII or location data.
+        options.sendDefaultPii = false;
+        options.beforeSend = _stripLocationData;
+      },
+      appRunner: () => _launchApp(
+        settingsRepo: settingsRepo,
+        trackRepo: trackRepo,
+        sessionRepo: sessionRepo,
+        peerRepo: peerRepo,
+        markerRepo: markerRepo,
+        annotationRepo: annotationRepo,
+        fieldLinkService: fieldLinkService,
+        tileManager: tileManager,
+      ),
+    );
+  } else {
+    _launchApp(
+      settingsRepo: settingsRepo,
+      trackRepo: trackRepo,
+      sessionRepo: sessionRepo,
+      peerRepo: peerRepo,
+      markerRepo: markerRepo,
+      annotationRepo: annotationRepo,
+      fieldLinkService: fieldLinkService,
+      tileManager: tileManager,
+    );
+  }
+}
+
+/// Launch the app with all required provider overrides.
+void _launchApp({
+  required SettingsRepository settingsRepo,
+  required TrackRepository trackRepo,
+  required SessionRepository sessionRepo,
+  required PeerRepository peerRepo,
+  required MarkerRepository markerRepo,
+  required AnnotationRepository annotationRepo,
+  required FieldLinkService fieldLinkService,
+  required TileManager tileManager,
+}) {
   runApp(
     ProviderScope(
       overrides: [
@@ -113,4 +165,27 @@ void main() async {
       child: const RedGridLinkApp(),
     ),
   );
+}
+
+/// Strip location-related data from Sentry events for privacy.
+///
+/// Removes latitude/longitude from breadcrumb data to prevent
+/// accidental transmission of user GPS positions.
+SentryEvent? _stripLocationData(SentryEvent event, Hint hint) {
+  // Strip location-related breadcrumb data.
+  final cleanBreadcrumbs = event.breadcrumbs?.map((b) {
+    if (b.data != null) {
+      final data = Map<String, dynamic>.from(b.data!);
+      data.remove('lat');
+      data.remove('lon');
+      data.remove('latitude');
+      data.remove('longitude');
+      data.remove('position');
+      data.remove('mgrs');
+      return b.copyWith(data: data);
+    }
+    return b;
+  }).toList();
+
+  return event.copyWith(breadcrumbs: cleanBreadcrumbs);
 }

@@ -3,18 +3,19 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/constants/app_constants.dart';
 import '../../../core/theme/tactical_text_styles.dart';
-import '../../../data/models/operational_mode.dart';
 import '../../../providers/map_provider.dart';
-import '../../../providers/settings_provider.dart';
+import '../../../providers/mode_provider.dart';
 import '../../../providers/theme_provider.dart';
 import '../../../services/map/tile_manager.dart';
 import '../../common/widgets/mode_selector.dart';
 import '../../common/widgets/section_header.dart';
 import '../../common/widgets/tactical_card.dart';
+import 'widgets/about_screen.dart';
 import 'widgets/calibration_section.dart';
 import 'widgets/field_link_settings.dart';
 import 'widgets/subscription_section.dart';
 import 'widgets/theme_selector.dart';
+import '../help/help_screen.dart';
 
 /// Full settings screen.
 ///
@@ -26,7 +27,7 @@ class SettingsScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final colors = ref.watch(currentThemeProvider);
-    final operationalMode = ref.watch(operationalModeProvider);
+    final mode = ref.watch(currentModeProvider);
     final mapSource = ref.watch(mapSourceProvider);
     final showGrid = ref.watch(showMgrsGridProvider);
 
@@ -87,15 +88,23 @@ class SettingsScreen extends ConsumerWidget {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(
-                            'MODE',
-                            style: TacticalTextStyles.label(colors),
+                          Row(
+                            children: [
+                              Icon(mode.icon, size: 18, color: colors.accent),
+                              const SizedBox(width: 8),
+                              Text(
+                                'MODE',
+                                style: TacticalTextStyles.label(colors),
+                              ),
+                            ],
                           ),
                           const SizedBox(height: 8),
                           const ModeSelector(),
                           const SizedBox(height: 8),
                           Text(
-                            _modeDescription(operationalMode),
+                            '${mode.description}. '
+                            '${mode.markerLabel}s / ${mode.baseLabel} / '
+                            '${mode.rallyPointLabel}.',
                             style: TacticalTextStyles.dim(colors),
                           ),
                         ],
@@ -163,7 +172,8 @@ class SettingsScreen extends ConsumerWidget {
                           ),
                           const SizedBox(height: 8),
                           Text(
-                            'Offline map downloads coming soon.',
+                            'Use the download button on the map to save '
+                            'tiles for offline use.',
                             style: TacticalTextStyles.dim(colors),
                           ),
                         ],
@@ -172,54 +182,42 @@ class SettingsScreen extends ConsumerWidget {
 
                     const SizedBox(height: 20),
 
-                    // ── ABOUT ──────────────────────────────────────────
-                    SectionHeader(title: 'About', colors: colors),
+                    // ── HELP & ABOUT ─────────────────────────────────
+                    SectionHeader(title: 'Help & About', colors: colors),
                     const SizedBox(height: 12),
                     TacticalCard(
                       colors: colors,
-                      padding: const EdgeInsets.all(12),
+                      padding: const EdgeInsets.all(4),
                       child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          _InfoRow(
-                            label: 'VERSION',
-                            value: AppConstants.appVersion,
+                          _NavRow(
+                            icon: Icons.help_outline,
+                            label: 'HELP & GETTING STARTED',
+                            subtitle: 'Guides, FAQ, and quick start',
                             colors: colors,
-                          ),
-                          const SizedBox(height: 8),
-                          _InfoRow(
-                            label: 'BUILD',
-                            value: 'Phase 5 - Flutter',
-                            colors: colors,
-                          ),
-                          const SizedBox(height: 12),
-                          GestureDetector(
-                            onTap: () => _showLicenses(context),
-                            child: Container(
-                              constraints: const BoxConstraints(
-                                minHeight: AppConstants.minTouchTarget,
-                              ),
-                              alignment: Alignment.centerLeft,
-                              child: Text(
-                                'VIEW LICENSES',
-                                style: TacticalTextStyles.body(colors).copyWith(
-                                  color: colors.accent,
-                                ),
+                            onTap: () => Navigator.of(context).push(
+                              MaterialPageRoute<void>(
+                                builder: (_) => const HelpScreen(),
                               ),
                             ),
                           ),
-                          const SizedBox(height: 8),
-                          Divider(color: colors.border2),
-                          const SizedBox(height: 8),
-                          Text(
-                            AppConstants.rangeDisclaimer,
-                            style: TacticalTextStyles.dim(colors),
+                          Divider(
+                            color: colors.border2,
+                            height: 1,
+                            indent: 12,
+                            endIndent: 12,
                           ),
-                          const SizedBox(height: 4),
-                          Text(
-                            'This app is a coordination tool, not a safety '
-                            'device. Always carry proper navigation equipment.',
-                            style: TacticalTextStyles.dim(colors),
+                          _NavRow(
+                            icon: Icons.info_outline,
+                            label: 'ABOUT RED GRID LINK',
+                            subtitle:
+                                'v${AppConstants.appVersion} · Terms · Privacy',
+                            colors: colors,
+                            onTap: () => Navigator.of(context).push(
+                              MaterialPageRoute<void>(
+                                builder: (_) => const AboutScreen(),
+                              ),
+                            ),
                           ),
                         ],
                       ),
@@ -241,49 +239,60 @@ class SettingsScreen extends ConsumerWidget {
     );
   }
 
-  String _modeDescription(String modeId) {
-    final mode = OperationalMode.values.firstWhere(
-      (m) => m.id == modeId,
-      orElse: () => OperationalMode.sar,
-    );
-    return '${mode.description}. '
-        'Markers: ${mode.markerLabel}, '
-        'Base: ${mode.baseLabel}, '
-        'Rally: ${mode.rallyPointLabel}.';
-  }
-
-  void _showLicenses(BuildContext context) {
-    showLicensePage(
-      context: context,
-      applicationName: AppConstants.appName,
-      applicationVersion: AppConstants.appVersion,
-    );
-  }
 }
 
 // ---------------------------------------------------------------------------
 // Helper widgets
 // ---------------------------------------------------------------------------
 
-class _InfoRow extends StatelessWidget {
-  const _InfoRow({
+class _NavRow extends StatelessWidget {
+  const _NavRow({
+    required this.icon,
     required this.label,
-    required this.value,
+    required this.subtitle,
     required this.colors,
+    required this.onTap,
   });
 
+  final IconData icon;
   final String label;
-  final String value;
+  final String subtitle;
   final dynamic colors;
+  final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        Text(label, style: TacticalTextStyles.label(colors)),
-        Text(value, style: TacticalTextStyles.body(colors)),
-      ],
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        constraints: const BoxConstraints(
+          minHeight: AppConstants.minTouchTarget,
+        ),
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+        child: Row(
+          children: [
+            Icon(icon, size: 20, color: colors.accent),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    label,
+                    style: TacticalTextStyles.label(colors),
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    subtitle,
+                    style: TacticalTextStyles.dim(colors),
+                  ),
+                ],
+              ),
+            ),
+            Icon(Icons.chevron_right, size: 18, color: colors.text3),
+          ],
+        ),
+      ),
     );
   }
 }
