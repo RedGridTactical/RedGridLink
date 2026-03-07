@@ -50,10 +50,13 @@ final connectedPeersProvider = StreamProvider<List<Peer>>((ref) {
 
 /// The number of currently connected peers.
 ///
-/// Synchronous read derived from the transport layer.
+/// Derived from [connectedPeersProvider] (a [StreamProvider]) so that the
+/// count updates reactively when peers connect or disconnect. A synchronous
+/// read of `service.connectedPeerCount` would only capture the initial
+/// value and never update.
 final connectedPeerCountProvider = Provider<int>((ref) {
-  final service = ref.watch(fieldLinkServiceProvider);
-  return service.connectedPeerCount;
+  final peersAsync = ref.watch(connectedPeersProvider);
+  return peersAsync.valueOrNull?.length ?? 0;
 });
 
 // ---------------------------------------------------------------------------
@@ -93,10 +96,13 @@ final batteryProjectionProvider = Provider<String>((ref) {
 
 /// Current Field Link connection status.
 ///
-/// One of: idle, discovering, connected, or error.
+/// Derived from [fieldLinkStatusStreamProvider] so that it re-evaluates
+/// reactively whenever the service emits a new status. A plain read of
+/// `service.status` would only capture the value at first evaluation
+/// because the service reference itself never changes.
 final fieldLinkStatusProvider = Provider<FieldLinkStatus>((ref) {
-  final service = ref.watch(fieldLinkServiceProvider);
-  return service.status;
+  final statusAsync = ref.watch(fieldLinkStatusStreamProvider);
+  return statusAsync.valueOrNull ?? FieldLinkStatus.idle;
 });
 
 /// Stream of Field Link status changes for reactive UI updates.
@@ -146,7 +152,12 @@ final localDeviceIdProvider = Provider<String>((ref) {
 // ---------------------------------------------------------------------------
 
 /// Whether a Field Link session is currently active.
+///
+/// Derived from [activeSessionProvider] (a [StreamProvider]) so that the
+/// value updates reactively when a session is created or left. Without
+/// this, the provider would read `service.isSessionActive` once and never
+/// re-evaluate because the service reference itself is a constant override.
 final isSessionActiveProvider = Provider<bool>((ref) {
-  final service = ref.watch(fieldLinkServiceProvider);
-  return service.isSessionActive;
+  final sessionAsync = ref.watch(activeSessionProvider);
+  return sessionAsync.valueOrNull != null;
 });
