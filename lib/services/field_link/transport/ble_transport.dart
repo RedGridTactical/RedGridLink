@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:math';
 import 'dart:typed_data';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter_blue_plus/flutter_blue_plus.dart';
 import 'package:red_grid_link/core/constants/ble_constants.dart';
 import 'package:red_grid_link/core/constants/sync_constants.dart';
@@ -140,7 +141,9 @@ class BleTransport implements TransportService {
     }
 
     // Ensure Bluetooth is available and turned on.
+    debugPrint('[BleTransport] initialize: checking adapter state...');
     final adapterState = await FlutterBluePlus.adapterState.first;
+    debugPrint('[BleTransport] adapter state: $adapterState');
     if (adapterState != BluetoothAdapterState.on) {
       _setState(TransportState.error);
       throw const TransportException(
@@ -149,6 +152,7 @@ class BleTransport implements TransportService {
     }
 
     _setState(TransportState.idle);
+    debugPrint('[BleTransport] initialized successfully');
   }
 
   @override
@@ -175,6 +179,7 @@ class BleTransport implements TransportService {
     await stopDiscovery();
 
     _setState(TransportState.discovering);
+    debugPrint('[BleTransport] startDiscovery: session=$sessionId');
 
     // Start a continuous scan filtered to our service UUID.
     // flutter_blue_plus emits results via scanResults stream.
@@ -717,6 +722,7 @@ class BleTransport implements TransportService {
 
   void _setState(TransportState newState) {
     if (_state == newState) return;
+    debugPrint('[BleTransport] state: $_state → $newState');
     _state = newState;
     if (!_stateController.isClosed) {
       _stateController.add(newState);

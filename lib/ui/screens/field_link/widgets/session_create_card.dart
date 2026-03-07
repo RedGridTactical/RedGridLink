@@ -76,8 +76,9 @@ class _SessionCreateCardState extends ConsumerState<SessionCreateCard> {
         setState(() => _isCreating = false);
         return;
       }
-    } catch (_) {
-      // If we can't check BT state, proceed and let the transport handle it.
+    } catch (e) {
+      debugPrint('[FieldLink] BT state check failed: $e');
+      // Proceed and let the transport handle the error with better context.
     }
 
     tapHeavy();

@@ -1,6 +1,10 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:red_grid_link/core/utils/mgrs.dart';
 import 'package:red_grid_link/data/models/position.dart';
+import 'package:red_grid_link/data/models/waypoint.dart';
 import 'package:red_grid_link/data/repositories/track_repository.dart';
+import 'package:red_grid_link/data/repositories/waypoint_repository.dart';
+import 'package:red_grid_link/providers/settings_provider.dart';
 import 'package:red_grid_link/services/location/compass_service.dart';
 import 'package:red_grid_link/services/location/location_service.dart';
 import 'package:red_grid_link/services/location/permission_handler_service.dart';
@@ -65,11 +69,38 @@ final positionStreamProvider = StreamProvider<Position>((ref) {
 // Current position (latest snapshot)
 // ---------------------------------------------------------------------------
 
+/// Fixed demo position: Washington Monument, Washington DC.
+///
+/// Used when demo mode is active to avoid displaying real GPS data
+/// (e.g., for screenshots).
+Position _buildDemoPosition() {
+  const lat = 38.8895;
+  const lon = -77.0353;
+  final mgrsRaw = toMGRS(lat, lon);
+  final mgrsFormatted = formatMGRS(mgrsRaw);
+
+  return Position(
+    lat: lat,
+    lon: lon,
+    altitude: 15.0,
+    speed: 0.0,
+    heading: 45.0,
+    accuracy: 3.0,
+    mgrsRaw: mgrsRaw,
+    mgrsFormatted: mgrsFormatted,
+    timestamp: DateTime.now(),
+  );
+}
+
 /// The most recent [Position] from the GPS stream, or null if no fix
 /// has been obtained yet.
 ///
-/// Derived from [positionStreamProvider] so it updates reactively.
+/// When demo mode is active, returns a fixed Washington DC position
+/// instead of real GPS data.
 final currentPositionProvider = Provider<Position?>((ref) {
+  final isDemo = ref.watch(demoModeProvider);
+  if (isDemo) return _buildDemoPosition();
+
   final asyncPosition = ref.watch(positionStreamProvider);
   return asyncPosition.whenData((p) => p).valueOrNull;
 });
@@ -111,6 +142,58 @@ final isTrackingProvider = Provider<bool>((ref) {
   final service = ref.watch(locationServiceProvider);
   return service.isTracking;
 });
+
+// ---------------------------------------------------------------------------
+// Waypoints (saved navigation points)
+// ---------------------------------------------------------------------------
+
+/// Provider for [WaypointRepository].
+///
+/// Must be overridden in the root [ProviderScope] with a concrete
+/// instance backed by an initialized [SharedPreferences].
+final waypointRepositoryProvider = Provider<WaypointRepository>((ref) {
+  throw UnimplementedError(
+    'waypointRepositoryProvider must be overridden in the root ProviderScope.',
+  );
+});
+
+/// Notifier managing the saved waypoints list and active waypoint selection.
+class WaypointListNotifier extends StateNotifier<List<Waypoint>> {
+  final WaypointRepository _repo;
+
+  WaypointListNotifier(this._repo) : super(_repo.getAll());
+
+  /// Add a new waypoint and refresh the list.
+  Future<void> add(Waypoint waypoint) async {
+    await _repo.add(waypoint);
+    state = _repo.getAll();
+  }
+
+  /// Remove a waypoint by ID.
+  Future<void> remove(String id) async {
+    await _repo.remove(id);
+    state = _repo.getAll();
+  }
+
+  /// Rename a waypoint.
+  Future<void> rename(String id, String newName) async {
+    await _repo.rename(id, newName);
+    state = _repo.getAll();
+  }
+}
+
+/// All saved waypoints, newest first.
+final waypointListProvider =
+    StateNotifierProvider<WaypointListNotifier, List<Waypoint>>((ref) {
+  final repo = ref.watch(waypointRepositoryProvider);
+  return WaypointListNotifier(repo);
+});
+
+/// The currently active waypoint for navigation (bearing/distance display).
+///
+/// This is an in-memory selection — the active waypoint is not persisted
+/// across app restarts. The saved list is persistent.
+final activeWaypointProvider = StateProvider<Waypoint?>((ref) => null);
 
 // ---------------------------------------------------------------------------
 // Compass heading (magnetometer-based)

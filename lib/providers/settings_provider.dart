@@ -208,6 +208,30 @@ final hasCompletedOnboardingProvider =
 });
 
 // ---------------------------------------------------------------------------
+// Demo Mode
+// ---------------------------------------------------------------------------
+
+/// Notifier for the demo mode toggle.
+class DemoModeNotifier extends StateNotifier<bool> {
+  final SettingsRepository _repo;
+
+  DemoModeNotifier(this._repo) : super(_repo.isDemoMode);
+
+  /// Toggle demo mode and persist to storage.
+  Future<void> set(bool value) async {
+    state = value;
+    await _repo.setDemoMode(value);
+  }
+}
+
+/// Whether demo mode is active (fake DC coordinates for screenshots).
+final demoModeProvider =
+    StateNotifierProvider<DemoModeNotifier, bool>((ref) {
+  final repo = ref.watch(settingsRepositoryProvider);
+  return DemoModeNotifier(repo);
+});
+
+// ---------------------------------------------------------------------------
 // Entitlement
 // ---------------------------------------------------------------------------
 

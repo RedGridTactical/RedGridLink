@@ -1,9 +1,11 @@
-![Red Grid Link](docs/images/banner.png)
+<p align="center">
+  <img src="docs/images/icon.png" alt="Red Grid Link" width="180" />
+</p>
 
-# Red Grid Link
+<h1 align="center">Red Grid Link</h1>
 
-[![Download on App Store](https://img.shields.io/badge/App%20Store-Coming%20Soon-8B0000?logo=apple)](https://github.com/RedGridTactical/RedGridLink/releases/latest)
-[![Get it on Google Play](https://img.shields.io/badge/Google%20Play-Coming%20Soon-CC0000?logo=googleplay)](https://github.com/RedGridTactical/RedGridLink/releases/latest)
+[![Download on App Store](https://img.shields.io/badge/App%20Store-Download-0D96F6?logo=apple&logoColor=white)](https://apps.apple.com/app/red-grid-link/id6760084718)
+[![Get it on Google Play](https://img.shields.io/badge/Google%20Play-Coming%20Soon-CC0000?logo=googleplay)](https://github.com/RedGridTactical/RedGridLink)
 [![License](https://img.shields.io/badge/License-MIT%20%2B%20Commons%20Clause-8B0000)](LICENSE)
 [![No Tracking](https://img.shields.io/badge/Tracking-None-CC0000)](PRIVACY.md)
 [![Offline First](https://img.shields.io/badge/Offline-First-8B0000)]()
@@ -11,13 +13,15 @@
 [![AES-256](https://img.shields.io/badge/Encryption-AES--256--GCM-8B0000)]()
 [![Flutter](https://img.shields.io/badge/Built%20with-Flutter-CC0000?logo=flutter)]()
 [![Tests](https://img.shields.io/badge/Tests-783%20Passing-brightgreen)]()
-[![Platform](https://img.shields.io/badge/Platform-iOS%20%7C%20Android-8B0000)]()
+[![Platform](https://img.shields.io/badge/Platform-iOS-8B0000)]()
 [![PRs Welcome](https://img.shields.io/badge/PRs-Welcome-CC0000)](https://github.com/RedGridTactical/RedGridLink/pulls)
 [![Buy Me a Coffee](https://img.shields.io/badge/Buy%20Me%20a%20Coffee-Support-FFDD00?logo=buymeacoffee&logoColor=black)](https://buymeacoffee.com/redgridtac0)
 
 **Offline MGRS navigation and proximity team coordination for small teams (2-8 people). No cell service needed.**
 
-Built on the MGRS engine from [Red Grid Tactical](https://github.com/RedGridTactical/RedGridMGRS). Field Link adds zero-config proximity sync over Bluetooth and WiFi Direct -- your team appears on the map the moment they're in range.
+Built on the MGRS engine from [Red Grid MGRS](https://github.com/RedGridTactical/RedGridMGRS). Field Link adds zero-config proximity sync over Bluetooth and WiFi Direct -- your team appears on the map the moment they're in range.
+
+> **Available now on iOS.** Android version coming soon.
 
 ---
 
@@ -75,7 +79,7 @@ Red Light (night vision, free), NVG Green (Pro), Day White (Pro), Blue Force (Pr
 ## How It Works
 
 ### Solo Mode
-Open Red Grid Link and your MGRS position appears on the offline map. Navigate using bearing, distance, and dead reckoning tools -- identical to Red Grid Tactical but with a full map view and 11 tactical tools.
+Open Red Grid Link and your MGRS position appears on the offline map. Navigate using bearing, distance, and dead reckoning tools -- identical to Red Grid MGRS but with a full map view and 11 tactical tools.
 
 ### Field Link (Team Mode)
 1. **Start a session** -- tap one button to begin broadcasting over BLE
@@ -139,7 +143,7 @@ flutter pub run build_runner build --delete-conflicting-outputs
 flutter run
 ```
 
-Requires Flutter SDK. All free features work from source. Pro features require a valid purchase through Apple or Google. Field Link requires Bluetooth and location permissions on physical devices.
+Requires Flutter SDK. Currently targeting iOS -- Android support is planned. All free features work from source. Pro features require a valid purchase through Apple. Field Link requires Bluetooth and location permissions on physical devices.
 
 ---
 
@@ -151,7 +155,8 @@ Full roadmap with feature checklists: [ROADMAP.md](ROADMAP.md)
 |---------|--------|-------|------------|
 | **V1.0** | **Complete** | Foundation | MGRS nav, Field Link (BLE+WiFi Direct), 11 tools, AAR PDF, offline maps, 4 themes, IAP |
 | **V1.1** | **Complete** | Field Hardening | Kalman filter, step detector, Peer HUD, Ultra Expedition, auto-reconnect, map downloads, Sentry, l10n, Help/About |
-| **V1.2** | Q3 2026 | Team Features | Team roles, waypoint sharing, route planning, boundary alerts, shared annotations |
+| **V1.2.1** | **Complete** | Reliability | Field Link session fix, waypoint persistence, relative bearing arrow, demo mode |
+| **V1.3** | Q3 2026 | Team Features | Team roles, waypoint sharing, route planning, boundary alerts, shared annotations |
 | **V2.0** | Q4 2026 | Intelligence | Elevation profiles, line-of-sight, weather overlay, terrain analysis, contour lines |
 | **V2.1** | Q1 2027 | Advanced Nav | Track recording, GPX import/export, navigate-to-waypoint, coordinate formats |
 | **V3.0** | Q2 2027 | Connected Ops | Cloud relay, web dashboard, mesh networking, session scheduling, API |
@@ -182,7 +187,7 @@ See the [Roadmap](ROADMAP.md) for planned features and where help is needed.
 
 ## Related Projects
 
-- [Red Grid Tactical](https://github.com/RedGridTactical/RedGridMGRS) -- solo MGRS navigator (React Native / Expo)
+- [Red Grid MGRS](https://github.com/RedGridTactical/RedGridMGRS) -- solo MGRS navigator (React Native / Expo)
 
 ---
 

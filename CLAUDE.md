@@ -195,3 +195,4 @@ See the full plan at `.claude/plans/zazzy-zooming-duckling.md`.
 | V1.1-P6: Field Hardening (Kalman, HUD, Sentry, l10n) | Complete |
 | V1.1-P7: Tester Feedback (Help, About, Terms, Contrast) | Complete |
 | V1.1-P8: QA/QC Pass | Complete |
+| V1.2.1: Reliability & Navigation (Field Link fix, Waypoints, Heading) | Complete |

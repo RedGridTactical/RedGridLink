@@ -5,6 +5,7 @@ import '../../../core/constants/app_constants.dart';
 import '../../../core/theme/tactical_text_styles.dart';
 import '../../../providers/map_provider.dart';
 import '../../../providers/mode_provider.dart';
+import '../../../providers/settings_provider.dart';
 import '../../../providers/theme_provider.dart';
 import '../../../services/map/tile_manager.dart';
 import '../../common/widgets/mode_selector.dart';
@@ -175,6 +176,48 @@ class SettingsScreen extends ConsumerWidget {
                             'Use the download button on the map to save '
                             'tiles for offline use.',
                             style: TacticalTextStyles.dim(colors),
+                          ),
+                        ],
+                      ),
+                    ),
+
+                    const SizedBox(height: 20),
+
+                    // ── DEVELOPER ──────────────────────────────────
+                    SectionHeader(title: 'Developer', colors: colors),
+                    const SizedBox(height: 12),
+                    TacticalCard(
+                      colors: colors,
+                      padding: const EdgeInsets.all(12),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  'DEMO MODE',
+                                  style: TacticalTextStyles.label(colors),
+                                ),
+                                const SizedBox(height: 2),
+                                Text(
+                                  'Uses Washington DC coordinates '
+                                  'instead of live GPS',
+                                  style: TacticalTextStyles.dim(colors),
+                                ),
+                              ],
+                            ),
+                          ),
+                          SizedBox(
+                            height: AppConstants.minTouchTarget,
+                            child: Switch(
+                              value: ref.watch(demoModeProvider),
+                              activeTrackColor: colors.accent,
+                              onChanged: (v) => ref
+                                  .read(demoModeProvider.notifier)
+                                  .set(v),
+                            ),
                           ),
                         ],
                       ),

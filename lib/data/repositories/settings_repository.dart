@@ -20,6 +20,7 @@ class SettingsRepository {
   static const _kDisplayName = 'settings_display_name';
   static const _kHasCompletedOnboarding = 'settings_has_completed_onboarding';
   static const _kEntitlement = 'settings_entitlement';
+  static const _kDemoMode = 'settings_demo_mode';
 
   // --- Theme ---
 
@@ -84,6 +85,13 @@ class SettingsRepository {
   String get entitlement => _prefs.getString(_kEntitlement) ?? 'free';
   Future<bool> setEntitlement(String value) =>
       _prefs.setString(_kEntitlement, value);
+
+  // --- Demo Mode ---
+
+  /// Whether demo mode is active (uses fake DC coordinates).
+  bool get isDemoMode => _prefs.getBool(_kDemoMode) ?? false;
+  Future<bool> setDemoMode(bool value) =>
+      _prefs.setBool(_kDemoMode, value);
 
   // --- IAP Metadata ---
 

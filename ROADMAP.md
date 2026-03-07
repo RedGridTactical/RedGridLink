@@ -1,5 +1,7 @@
 # Red Grid Link — Product Roadmap
 
+> **Platform:** iOS available on the App Store. Android version planned.
+
 ## V1.0 — Foundation Release
 
 **Status: Complete**
@@ -24,7 +26,7 @@ Core offline MGRS navigation and proximity coordination platform.
 
 ---
 
-## V1.1 — Field Hardening (Current)
+## V1.1 — Field Hardening
 
 **Status: Complete** — App v1.2.0
 
@@ -49,7 +51,23 @@ Real-world testing feedback and reliability improvements.
 
 ---
 
-## V1.2 — Team Features
+## V1.2.1 — Reliability & Navigation
+
+**Status: Complete** — App v1.2.1
+
+Bug fixes, waypoint persistence, and heading improvements.
+
+- [x] Fixed Field Link session creation (initialize() call was missing after construction)
+- [x] Persistent waypoint system: save, rename, delete multiple waypoints (SharedPreferences)
+- [x] Relative bearing arrow: arrow now shows direction to turn, not just compass bearing
+- [x] Demo mode: fake Washington DC coordinates for App Store screenshots
+- [x] BLE transport debug logging for connection troubleshooting
+- [x] Resection and Dead Reckoning tools integrated with new waypoint system
+- [x] Compass heading audit: verified tilt-compensated math, low-pass filter, 0/360 wrap
+
+---
+
+## V1.3 — Team Features
 
 **Target: Q3 2026**
 
@@ -182,6 +200,6 @@ These items are continuously improved across all versions:
 
 ## Contributing
 
-Red Grid Link is developed by Red Grid Tactical. Feature requests and bug reports can be submitted via GitHub Issues.
+Red Grid Link is developed by Red Grid. Feature requests and bug reports can be submitted via GitHub Issues.
 
 For partnership or integration inquiries: contact via GitHub.

@@ -6,6 +6,10 @@ Red Grid Link
 ## Subtitle (iOS, max 30 chars)
 Offline MGRS Nav & Team Sync
 
+## App Icon
+Source: `docs/images/icon_1024.png` (1024x1024)
+All iOS and Android sizes auto-generated in `ios/Runner/Assets.xcassets/AppIcon.appiconset/` and `android/app/src/main/res/mipmap-*/`.
+
 ## Category
 Navigation (primary), Utilities (secondary)
 
@@ -33,7 +37,7 @@ Field Link is what sets Red Grid Link apart. Devices within proximity automatica
 - Auto-reconnect with exponential backoff on disconnect
 
 MGRS-NATIVE NAVIGATION:
-Built on the proven MGRS engine from Red Grid Tactical -- the same coordinate system used by NATO forces worldwide.
+Built on the proven MGRS engine from Red Grid MGRS -- the same coordinate system used by NATO forces worldwide.
 - Live MGRS coordinates (4/6/8/10-digit precision)
 - MGRS grid overlay on offline maps (GZD to 100m resolution)
 - Bearing, distance, and dead reckoning tools
@@ -101,6 +105,16 @@ PRICING:
 
 ## Keywords (iOS, max 100 chars)
 MGRS,tactical,navigation,offline,team,sync,BLE,military,grid,SAR,hunting,backcountry,map
+
+## What's New (v1.2.1)
+Red Grid Link v1.2.1 -- reliability and navigation update:
+- Fixed Field Link session creation after Bluetooth enable
+- Persistent waypoint list: save, rename, and manage multiple waypoints
+- Relative bearing arrow: arrow now points the direction to turn, not just compass bearing
+- Demo mode for screenshots (Washington DC coordinates)
+- BLE transport debug logging for connection troubleshooting
+- Resection and Dead Reckoning tools now integrate with waypoint system
+- 783 tests passing, 0 warnings
 
 ## What's New (v1.2)
 Red Grid Link v1.2 -- field hardening release:

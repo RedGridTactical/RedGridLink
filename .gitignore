@@ -45,3 +45,6 @@ pubspec.lock
 # Claude
 .claude/settings.local.json
 cert_key.pem
+
+# MCP server logs
+.playwright-mcp/

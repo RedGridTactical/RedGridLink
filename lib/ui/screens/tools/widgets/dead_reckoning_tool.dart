@@ -4,15 +4,16 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/theme/tactical_colors.dart';
 import '../../../../core/theme/tactical_text_styles.dart';
+import '../../../../core/utils/crypto_utils.dart';
 import '../../../../core/utils/haptics.dart';
 import '../../../../core/utils/mgrs.dart';
 import '../../../../core/utils/tactical.dart';
+import '../../../../data/models/waypoint.dart';
 import '../../../../providers/location_provider.dart';
 import '../../../../providers/theme_provider.dart';
 import '../../../common/widgets/tactical_button.dart';
 import '../../../common/widgets/tactical_card.dart';
 import '../../../common/widgets/section_header.dart';
-import '../../grid/widgets/wayfinder_panel.dart';
 
 /// Dead reckoning calculator.
 ///
@@ -217,11 +218,14 @@ class _DeadReckoningToolState extends ConsumerState<DeadReckoningTool> {
                 colors: colors,
                 onPressed: () {
                   tapMedium();
-                  ref.read(waypointProvider.notifier).setWaypoint(
-                        _result!.lat,
-                        _result!.lon,
-                        _result!.mgrs,
-                        _result!.mgrsFormatted,
+                  ref.read(activeWaypointProvider.notifier).state = Waypoint(
+                        id: generateDeviceId(),
+                        name: 'Dead Reckoning',
+                        lat: _result!.lat,
+                        lon: _result!.lon,
+                        mgrs: _result!.mgrs,
+                        mgrsFormatted: _result!.mgrsFormatted,
+                        createdAt: DateTime.now(),
                       );
                   notifySuccess();
                   Navigator.of(context).pop();

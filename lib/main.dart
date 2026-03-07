@@ -15,6 +15,7 @@ import 'package:red_grid_link/data/repositories/peer_repository.dart';
 import 'package:red_grid_link/data/repositories/session_repository.dart';
 import 'package:red_grid_link/data/repositories/settings_repository.dart';
 import 'package:red_grid_link/data/repositories/track_repository.dart';
+import 'package:red_grid_link/data/repositories/waypoint_repository.dart';
 import 'package:red_grid_link/providers/aar_provider.dart';
 import 'package:red_grid_link/providers/field_link_provider.dart';
 import 'package:red_grid_link/providers/location_provider.dart';
@@ -62,6 +63,7 @@ void main() async {
   final markerRepo = MarkerRepository(db);
   final annotationRepo = AnnotationRepository(db);
   final mapRepo = MapRepository(db);
+  final waypointRepo = WaypointRepository(prefs);
 
   // ---------------------------------------------------------------------------
   // Stable device ID (persisted across launches)
@@ -95,6 +97,12 @@ void main() async {
     localDeviceId: deviceId,
   );
 
+  // Wire up transport/sync state stream listeners so the service can
+  // observe BLE state transitions and CRDT updates. Without this call,
+  // session creation silently fails because status changes are never
+  // propagated to the UI.
+  await fieldLinkService.initialize();
+
   // ---------------------------------------------------------------------------
   // Tile manager with database-backed region storage
   // ---------------------------------------------------------------------------
@@ -123,6 +131,7 @@ void main() async {
         annotationRepo: annotationRepo,
         fieldLinkService: fieldLinkService,
         tileManager: tileManager,
+        waypointRepo: waypointRepo,
       ),
     );
   } else {
@@ -135,6 +144,7 @@ void main() async {
       annotationRepo: annotationRepo,
       fieldLinkService: fieldLinkService,
       tileManager: tileManager,
+      waypointRepo: waypointRepo,
     );
   }
 }
@@ -149,6 +159,7 @@ void _launchApp({
   required AnnotationRepository annotationRepo,
   required FieldLinkService fieldLinkService,
   required TileManager tileManager,
+  required WaypointRepository waypointRepo,
 }) {
   runApp(
     ProviderScope(
@@ -161,6 +172,7 @@ void _launchApp({
         annotationRepositoryProvider.overrideWithValue(annotationRepo),
         fieldLinkServiceProvider.overrideWithValue(fieldLinkService),
         tileManagerProvider.overrideWithValue(tileManager),
+        waypointRepositoryProvider.overrideWithValue(waypointRepo),
       ],
       child: const RedGridLinkApp(),
     ),

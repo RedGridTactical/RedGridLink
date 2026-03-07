@@ -39,6 +39,7 @@ class GridScreen extends ConsumerWidget {
     final declination = ref.watch(declinationProvider);
     final compassHeading = ref.watch(compassHeadingProvider);
     final mode = ref.watch(currentModeProvider);
+    final isDemo = ref.watch(demoModeProvider);
 
     // Use compass heading when stationary (speed < 0.5 m/s) or GPS heading
     // is unavailable. GPS heading is only reliable while moving.
@@ -77,6 +78,30 @@ class GridScreen extends ConsumerWidget {
                       letterSpacing: 1,
                     ),
                   ),
+                  if (isDemo) ...[
+                    const SizedBox(width: 8),
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 6,
+                        vertical: 2,
+                      ),
+                      decoration: BoxDecoration(
+                        color: Colors.orange.withValues(alpha: 0.2),
+                        borderRadius: BorderRadius.circular(4),
+                        border: Border.all(
+                          color: Colors.orange.withValues(alpha: 0.5),
+                        ),
+                      ),
+                      child: Text(
+                        'DEMO',
+                        style: TacticalTextStyles.caption(colors).copyWith(
+                          color: Colors.orange,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 9,
+                        ),
+                      ),
+                    ),
+                  ],
                 ],
               ),
               const SizedBox(height: 12),
