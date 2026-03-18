@@ -28,7 +28,7 @@
 - [x] Pre-order: No
 
 ### App Privacy
-- [x] Privacy Policy URL: `https://github.com/RedGridMGRS/RedGridLink/blob/master/PRIVACY.md`
+- [x] Privacy Policy URL: `https://github.com/RedGridTactical/RedGridLink/blob/master/PRIVACY.md`
 - [ ] **Privacy Nutrition Labels** — fill out in ASC:
   - Data Types: **None collected** (select "Data Not Collected")
   - Location: Used but NOT collected/tracked (stays on device)
@@ -54,7 +54,7 @@
 - [x] **What's New**: v1.2.1 release notes in `store.config.json`
 - [x] **Keywords** (100 chars):
   `mgrs,tactical,navigation,offline,team,sync,BLE,military,grid,SAR,hunting,backcountry,map,GPS,compass`
-- [x] **Support URL**: `https://github.com/RedGridMGRS/RedGridLink/issues`
+- [x] **Support URL**: `https://github.com/RedGridTactical/RedGridLink/issues`
 - [x] **Marketing URL**: (optional — could use GitHub repo URL)
 
 ### Screenshots (REQUIRED — must be from real device or Simulator)

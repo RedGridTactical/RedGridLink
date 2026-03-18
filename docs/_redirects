@@ -1,0 +1,2 @@
+# Redirect www to apex
+https://www.redgridtactical.com/* https://redgridtactical.com/:splat 301

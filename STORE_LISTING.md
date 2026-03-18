@@ -107,8 +107,8 @@ PRICING:
 
 Subscriptions auto-renew unless cancelled at least 24 hours before the end of the current period. Payment will be charged to your Apple ID account at confirmation of purchase. Manage or cancel subscriptions in your device's Settings > Apple ID > Subscriptions.
 
-Terms of Use: https://redgridtactical.github.io/RedGridLink/terms.html
-Privacy Policy: https://redgridtactical.github.io/RedGridLink/privacy.html
+Terms of Use: https://redgridtactical.com/terms.html
+Privacy Policy: https://redgridtactical.com/privacy.html
 
 ## Promotional Text (iOS, max 170 chars)
 Lightweight ATAK alternative: encrypted Bluetooth team tracking + offline MGRS maps. No servers, no accounts. Built for SAR, hunting, and backcountry teams.
@@ -176,13 +176,13 @@ Red Grid Link v1.0 -- initial release:
 - No server communication required for any feature
 
 ## Privacy URL
-https://redgridtactical.github.io/RedGridLink/privacy.html
+https://redgridtactical.com/privacy.html
 
 ## Terms of Use (EULA) URL
-https://redgridtactical.github.io/RedGridLink/terms.html
+https://redgridtactical.com/terms.html
 
 ## Support URL
-https://github.com/RedGridMGRS/RedGridLink/issues
+https://github.com/RedGridTactical/RedGridLink/issues
 
 ## Age Rating
 4+ / Everyone

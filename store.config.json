@@ -9,8 +9,8 @@
         "promotionalText": "Lightweight ATAK alternative: encrypted Bluetooth team tracking + offline MGRS maps. No servers, no accounts. Built for SAR, hunting, and backcountry teams.",
         "keywords": ["ATAK", "blue force tracking", "team tracker", "offline map", "mgrs", "tactical", "military", "gps", "sar", "hunting", "mesh", "topo"],
         "releaseNotes": "Red Grid Link v1.2.1 -- reliability and navigation update:\n- Fixed Field Link session creation: resolved iOS Bluetooth adapter state detection\n- Persistent waypoint list: save, rename, and manage multiple waypoints\n- Relative bearing arrow: now points the direction to turn\n- New app icon design\n- Resection and Dead Reckoning tools integrate with waypoint system\n- BLE transport debug logging for connection troubleshooting\n- Bug fixes and stability improvements",
-        "privacyPolicyUrl": "https://github.com/RedGridMGRS/RedGridLink/blob/master/PRIVACY.md",
-        "supportUrl": "https://github.com/RedGridMGRS/RedGridLink/issues"
+        "privacyPolicyUrl": "https://github.com/RedGridTactical/RedGridLink/blob/master/PRIVACY.md",
+        "supportUrl": "https://github.com/RedGridTactical/RedGridLink/issues"
       }
     },
     "categories": ["NAVIGATION"],
@@ -72,7 +72,7 @@
     "releaseNotes": "Red Grid Link v1.2.1 -- reliability and navigation update:\n- Fixed Field Link session creation: resolved iOS Bluetooth adapter state detection\n- Persistent waypoint list: save, rename, and manage multiple waypoints\n- Relative bearing arrow: now points the direction to turn\n- New app icon design\n- Resection and Dead Reckoning tools integrate with waypoint system\n- BLE transport debug logging for connection troubleshooting\n- Bug fixes and stability improvements",
     "category": "NAVIGATION",
     "contentRating": "Everyone",
-    "privacyPolicyUrl": "https://github.com/RedGridMGRS/RedGridLink/blob/master/PRIVACY.md",
+    "privacyPolicyUrl": "https://github.com/RedGridTactical/RedGridLink/blob/master/PRIVACY.md",
     "pricing": {
       "basePlan": "free",
       "inAppPurchases": [

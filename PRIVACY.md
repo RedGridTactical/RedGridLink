@@ -136,5 +136,5 @@ Any changes to this policy will be reflected in the GitHub repository with an up
 
 ## Contact
 
-For questions: redgridtactical@gmail.com
-GitHub issues: https://github.com/RedGridMGRS/RedGridLink/issues
+For questions: support@redgridtactical.com
+GitHub issues: https://github.com/RedGridTactical/RedGridLink/issues

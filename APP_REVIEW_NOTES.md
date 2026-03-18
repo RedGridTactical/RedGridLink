@@ -55,7 +55,7 @@ No accounts, no analytics, no tracking, no ads, no third-party data SDKs. All da
 ## App Review Contact Information
 
 - **Name:** [Your name]
-- **Email:** redgridtactical@gmail.com
+- **Email:** support@redgridtactical.com
 - **Phone:** [Your phone number]
 
 ## Sign-In Required?

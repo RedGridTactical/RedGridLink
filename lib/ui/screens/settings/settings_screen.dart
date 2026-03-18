@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../../../core/constants/app_constants.dart';
 import '../../../core/theme/tactical_text_styles.dart';
@@ -225,8 +226,13 @@ class SettingsScreen extends ConsumerWidget {
 
                     const SizedBox(height: 20),
 
-                    // ── HELP & ABOUT ─────────────────────────────────
-                    SectionHeader(title: 'Help & About', colors: colors),
+                    // ── SUBSCRIPTION ───────────────────────────────────
+                    const SubscriptionSection(),
+
+                    const SizedBox(height: 20),
+
+                    // ── HELP & SUPPORT ───────────────────────────────
+                    SectionHeader(title: 'Help & Support', colors: colors),
                     const SizedBox(height: 12),
                     TacticalCard(
                       colors: colors,
@@ -251,6 +257,19 @@ class SettingsScreen extends ConsumerWidget {
                             endIndent: 12,
                           ),
                           _NavRow(
+                            icon: Icons.mail_outline,
+                            label: 'CONTACT SUPPORT',
+                            subtitle: 'support@redgridtactical.com',
+                            colors: colors,
+                            onTap: () => _launchSupportEmail(),
+                          ),
+                          Divider(
+                            color: colors.border2,
+                            height: 1,
+                            indent: 12,
+                            endIndent: 12,
+                          ),
+                          _NavRow(
                             icon: Icons.info_outline,
                             label: 'ABOUT RED GRID LINK',
                             subtitle:
@@ -266,11 +285,6 @@ class SettingsScreen extends ConsumerWidget {
                       ),
                     ),
 
-                    const SizedBox(height: 20),
-
-                    // ── SUBSCRIPTION ───────────────────────────────────
-                    const SubscriptionSection(),
-
                     const SizedBox(height: 32),
                   ],
                 ),
@@ -282,6 +296,18 @@ class SettingsScreen extends ConsumerWidget {
     );
   }
 
+  static Future<void> _launchSupportEmail() async {
+    final uri = Uri(
+      scheme: 'mailto',
+      path: 'support@redgridtactical.com',
+      queryParameters: {
+        'subject': 'Red Grid Link v${AppConstants.appVersion} — Support Request',
+      },
+    );
+    if (await canLaunchUrl(uri)) {
+      await launchUrl(uri);
+    }
+  }
 }
 
 // ---------------------------------------------------------------------------

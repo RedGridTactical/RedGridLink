@@ -105,7 +105,7 @@ No ads. No data collection. No account required for the free tier.
 - **Dev.to:** Publish a technical deep-dive article the same day — "Building Real-Time Team Sync Over Bluetooth with CRDTs" — and link to the PH launch.
 - **Reddit:** Post in r/FlutterDev (technical build story), r/SearchandRescue (use case), r/hiking (practical angle), r/privacy (zero-server architecture). Follow each sub's self-promotion rules.
 - **Hacker News:** Consider a Show HN post 1-2 days after PH launch to avoid splitting attention. Lead with the technical angle (BLE mesh + CRDTs).
-- **Landing page:** https://redgridtactical.github.io/RedGridLink/ — make sure the PH badge is embedded on launch day.
+- **Landing page:** https://redgridtactical.com/ — make sure the PH badge is embedded on launch day.
 - **GitHub:** https://github.com/RedGridTactical/RedGridLink — pin a "Featured on Product Hunt" note in the README.
 
 ### What NOT to Do
@@ -135,4 +135,4 @@ No ads. No data collection. No account required for the free tier.
 
 > What if your team tracking app had zero servers, zero accounts, and zero data collection? Red Grid Link syncs positions over encrypted Bluetooth — your location never touches the internet. Now live on Product Hunt.
 >
-> https://redgridtactical.github.io/RedGridLink/
+> https://redgridtactical.com/

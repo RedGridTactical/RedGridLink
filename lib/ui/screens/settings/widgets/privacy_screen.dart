@@ -121,7 +121,7 @@ class PrivacyScreen extends ConsumerWidget {
             _PolicySection(
               title: '10. Contact',
               body: 'If you have questions about this Privacy Policy, '
-                  'contact us at support@redgridlink.com.',
+                  'contact us at support@redgridtactical.com.',
               colors: colors,
             ),
             const SizedBox(height: 16),
