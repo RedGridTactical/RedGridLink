@@ -7,7 +7,6 @@ import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
 
 import '../../../../core/theme/tactical_colors.dart';
-import '../../../../core/theme/tactical_text_styles.dart';
 import '../../../../core/utils/haptics.dart';
 import '../../../../data/models/aar_data.dart';
 import '../../../../services/session/session_exporter.dart';

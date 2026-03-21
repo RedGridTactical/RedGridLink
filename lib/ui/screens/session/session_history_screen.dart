@@ -143,7 +143,7 @@ class _EmptyState extends StatelessWidget {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(Icons.history_toggle_off, size: 48, color: colors.dim),
+          Icon(Icons.history_toggle_off, size: 48, color: colors.text3),
           const SizedBox(height: 12),
           Text(
             'NO SESSIONS YET',
@@ -214,9 +214,9 @@ class _SessionTile extends ConsumerWidget {
 
     return Container(
       decoration: BoxDecoration(
-        color: colors.surface,
+        color: colors.card,
         borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: colors.dim.withValues(alpha: 0.3)),
+        border: Border.all(color: colors.text3.withValues(alpha: 0.3)),
       ),
       child: ListTile(
         contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
@@ -254,7 +254,7 @@ class _SessionTile extends ConsumerWidget {
         height: 20,
         child: CircularProgressIndicator(strokeWidth: 2),
       ),
-      error: (_, __) => Icon(Icons.error_outline, color: colors.dim, size: 20),
+      error: (_, __) => Icon(Icons.error_outline, color: colors.text3, size: 20),
       data: (aar) => SessionExportButton(aarData: aar, colors: colors),
     );
   }

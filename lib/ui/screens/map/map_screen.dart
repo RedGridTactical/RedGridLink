@@ -30,7 +30,6 @@ import 'package:red_grid_link/providers/field_link_provider.dart';
 import 'package:red_grid_link/providers/location_provider.dart';
 import 'package:red_grid_link/providers/map_provider.dart';
 import 'package:red_grid_link/providers/mode_provider.dart';
-import 'package:red_grid_link/providers/theme_provider.dart';
 import 'package:red_grid_link/providers/voice_callout_provider.dart';
 import 'package:red_grid_link/services/map/mgrs_grid_overlay.dart';
 import 'package:red_grid_link/services/map/tile_manager.dart';

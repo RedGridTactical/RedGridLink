@@ -4366,6 +4366,8 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   late final MapRegionsDao mapRegionsDao = MapRegionsDao(this as AppDatabase);
   late final SessionHistoryDao sessionHistoryDao =
       SessionHistoryDao(this as AppDatabase);
+  late final BoundaryEventDao boundaryEventDao =
+      BoundaryEventDao(this as AppDatabase);
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();

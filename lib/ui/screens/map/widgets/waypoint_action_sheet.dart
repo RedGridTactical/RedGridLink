@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:red_grid_link/core/constants/app_constants.dart';
-import 'package:red_grid_link/core/theme/tactical_colors.dart';
 import 'package:red_grid_link/core/theme/tactical_text_styles.dart';
 import 'package:red_grid_link/core/utils/crypto_utils.dart';
 import 'package:red_grid_link/core/utils/haptics.dart';
