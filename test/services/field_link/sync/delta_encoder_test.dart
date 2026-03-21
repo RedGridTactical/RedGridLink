@@ -121,6 +121,36 @@ void main() {
       expect(DeltaEncoder.isWithinSizeLimit(payload), isTrue);
     });
 
+    test('includes role when provided', () {
+      final pos = makePosition();
+      final payload = encoder.encodePosition('abc', pos, 1, role: 'medic');
+
+      expect(payload.data['role'], 'medic');
+    });
+
+    test('includes callsign when provided and non-empty', () {
+      final pos = makePosition();
+      final payload =
+          encoder.encodePosition('abc', pos, 1, callsign: 'Alpha');
+
+      expect(payload.data['cs'], 'Alpha');
+    });
+
+    test('omits callsign when empty', () {
+      final pos = makePosition();
+      final payload = encoder.encodePosition('abc', pos, 1, callsign: '');
+
+      expect(payload.data.containsKey('cs'), isFalse);
+    });
+
+    test('omits role and callsign when null', () {
+      final pos = makePosition();
+      final payload = encoder.encodePosition('abc', pos, 1);
+
+      expect(payload.data.containsKey('role'), isFalse);
+      expect(payload.data.containsKey('cs'), isFalse);
+    });
+
     test('coordinates are rounded to 6 decimal places', () {
       final pos = makePosition(
         lat: 35.1234567890,
@@ -273,6 +303,37 @@ void main() {
       final marker = makeMarker();
       final payload = encoder.encodeMarker('node-a', marker, 1);
       expect(DeltaEncoder.isWithinBulkSizeLimit(payload), isTrue);
+    });
+  });
+
+  // -------------------------------------------------------------------------
+  // extractRole / extractCallsign
+  // -------------------------------------------------------------------------
+  group('extractRole and extractCallsign', () {
+    test('extractRole returns role from position data', () {
+      final pos = makePosition();
+      final payload =
+          encoder.encodePosition('abc', pos, 1, role: 'lead');
+      expect(DeltaEncoder.extractRole(payload.data), 'lead');
+    });
+
+    test('extractRole returns null when absent', () {
+      final pos = makePosition();
+      final payload = encoder.encodePosition('abc', pos, 1);
+      expect(DeltaEncoder.extractRole(payload.data), isNull);
+    });
+
+    test('extractCallsign returns callsign from position data', () {
+      final pos = makePosition();
+      final payload =
+          encoder.encodePosition('abc', pos, 1, callsign: 'Bravo');
+      expect(DeltaEncoder.extractCallsign(payload.data), 'Bravo');
+    });
+
+    test('extractCallsign returns null when absent', () {
+      final pos = makePosition();
+      final payload = encoder.encodePosition('abc', pos, 1);
+      expect(DeltaEncoder.extractCallsign(payload.data), isNull);
     });
   });
 

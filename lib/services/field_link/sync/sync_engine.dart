@@ -229,6 +229,26 @@ class SyncEngine {
     _emitState();
   }
 
+  /// Broadcast a control message payload to all connected peers.
+  ///
+  /// Used by [FieldLinkService] to send role assignments, callsign
+  /// updates, and other control events.
+  Future<void> broadcastControl(Map<String, dynamic> data) async {
+    if (!_isRunning) return;
+
+    final payload = _encoder.encodeControl(
+      _localDeviceId,
+      data['evt'] as String? ?? 'control',
+      data,
+      _state.sequenceCounter.countFor(_localDeviceId),
+    );
+    try {
+      await _transport.broadcast(payload.toBytes());
+    } catch (_) {
+      // Best-effort broadcast.
+    }
+  }
+
   /// Update the heartbeat interval (e.g., when battery mode changes).
   void updateHeartbeatInterval(int intervalMs) {
     if (!_isRunning) return;

@@ -4,6 +4,7 @@ import 'package:red_grid_link/data/models/ghost.dart';
 import 'package:red_grid_link/data/models/marker.dart' as model;
 import 'package:red_grid_link/data/models/peer.dart';
 import 'package:red_grid_link/data/models/session.dart';
+import 'package:red_grid_link/data/models/team_role.dart';
 import 'package:red_grid_link/services/field_link/battery/battery_manager.dart';
 import 'package:red_grid_link/services/field_link/field_link_service.dart';
 
@@ -135,6 +136,23 @@ final syncedMarkersProvider = StreamProvider<List<model.Marker>>((ref) {
 final syncedAnnotationsProvider = StreamProvider<List<Annotation>>((ref) {
   final service = ref.watch(fieldLinkServiceProvider);
   return service.annotationsStream;
+});
+
+// ---------------------------------------------------------------------------
+// Role state
+// ---------------------------------------------------------------------------
+
+/// The local device's current team role in the active session.
+///
+/// Defaults to [TeamRole.scout] when no service is available.
+final localRoleProvider = Provider<TeamRole>((ref) {
+  final service = ref.watch(fieldLinkServiceProvider);
+  return service.roleManager.localRole;
+});
+
+/// Whether the local device is the session lead.
+final isLeadProvider = Provider<bool>((ref) {
+  return ref.watch(localRoleProvider).isLead;
 });
 
 // ---------------------------------------------------------------------------

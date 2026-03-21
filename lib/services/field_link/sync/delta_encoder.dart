@@ -28,8 +28,10 @@ class DeltaEncoder {
   SyncPayload encodePosition(
     String senderId,
     Position position,
-    int sequenceNum,
-  ) {
+    int sequenceNum, {
+    String? role,
+    String? callsign,
+  }) {
     final data = <String, dynamic>{
       'lat': _round6(position.lat),
       'lon': _round6(position.lon),
@@ -41,6 +43,8 @@ class DeltaEncoder {
     if (position.altitude != null) data['alt'] = _round1(position.altitude!);
     if (position.accuracy != null) data['acc'] = _round1(position.accuracy!);
     if (position.mgrsRaw.isNotEmpty) data['mgrs'] = position.mgrsRaw;
+    if (role != null) data['role'] = role;
+    if (callsign != null && callsign.isNotEmpty) data['cs'] = callsign;
 
     return SyncPayload(
       type: SyncPayloadType.position,
@@ -160,6 +164,20 @@ class DeltaEncoder {
           data: payload.data,
         );
     }
+  }
+
+  /// Extract the optional role string from a position payload's data map.
+  ///
+  /// Returns `null` if the payload does not contain a role field.
+  static String? extractRole(Map<String, dynamic> data) {
+    return data['role'] as String?;
+  }
+
+  /// Extract the optional callsign from a position payload's data map.
+  ///
+  /// Returns `null` if the payload does not contain a callsign field.
+  static String? extractCallsign(Map<String, dynamic> data) {
+    return data['cs'] as String?;
   }
 
   // ---------------------------------------------------------------------------

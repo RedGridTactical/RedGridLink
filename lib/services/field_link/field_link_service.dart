@@ -11,8 +11,10 @@ import 'package:red_grid_link/data/models/session.dart';
 import 'package:red_grid_link/data/models/session_config.dart';
 import 'package:red_grid_link/data/repositories/peer_repository.dart';
 import 'package:red_grid_link/data/repositories/session_repository.dart';
+import 'package:red_grid_link/data/models/team_role.dart';
 import 'package:red_grid_link/services/field_link/battery/battery_manager.dart';
 import 'package:red_grid_link/services/field_link/ghost/ghost_manager.dart';
+import 'package:red_grid_link/services/field_link/role_manager.dart';
 import 'package:red_grid_link/services/field_link/sync/crdt/crdt_state.dart';
 import 'package:red_grid_link/services/field_link/sync/sync_engine.dart';
 import 'package:red_grid_link/services/field_link/transport/transport_service.dart';
@@ -53,6 +55,7 @@ class FieldLinkService {
   final SessionRepository _sessionRepository;
   final PeerRepository _peerRepository;
   final String _localDeviceId;
+  late final RoleManager _roleManager;
 
   Session? _activeSession;
   StreamSubscription<TransportState>? _transportStateSub;
@@ -94,7 +97,9 @@ class FieldLinkService {
         _batteryManager = batteryManager,
         _sessionRepository = sessionRepository,
         _peerRepository = peerRepository,
-        _localDeviceId = localDeviceId;
+        _localDeviceId = localDeviceId {
+    _roleManager = RoleManager(localDeviceId: localDeviceId);
+  }
 
   // ---------------------------------------------------------------------------
   // Session lifecycle
@@ -145,6 +150,7 @@ class FieldLinkService {
 
     await _sessionRepository.createSession(session);
     _activeSession = session;
+    _roleManager.initializeAsCreator();
     _emitSession();
 
     // Determine sync config from mode.
@@ -204,6 +210,7 @@ class FieldLinkService {
     }
 
     _activeSession = session.copyWith(isActive: true);
+    _roleManager.initializeAsJoiner();
     _emitSession();
 
     final config = _configForMode(session.operationalMode);
@@ -245,6 +252,7 @@ class FieldLinkService {
     // Deactivate session.
     await _sessionRepository.deactivateAll();
 
+    _roleManager.reset();
     _activeSession = null;
     _emitSession();
     _setStatus(FieldLinkStatus.idle);
@@ -293,6 +301,47 @@ class FieldLinkService {
 
   /// The local device ID for this Field Link instance.
   String get localDeviceId => _localDeviceId;
+
+  /// The role manager for this session.
+  RoleManager get roleManager => _roleManager;
+
+  // ---------------------------------------------------------------------------
+  // Role management
+  // ---------------------------------------------------------------------------
+
+  /// Assign a role to a peer and broadcast the change.
+  ///
+  /// Only the session lead can assign roles. No-op if not lead.
+  void assignRole(String peerId, TeamRole role) {
+    if (!_roleManager.isLead) return;
+    _roleManager.assignRole(peerId, role);
+    final payload = _roleManager.encodeRoleAssignment(peerId, role);
+    if (payload != null) {
+      _syncEngine.broadcastControl(payload);
+    }
+  }
+
+  /// Promote a peer to lead, transferring the lead role.
+  ///
+  /// The local device is demoted to scout. No-op if not lead.
+  void promotePeerToLead(String peerId) {
+    if (!_roleManager.isLead) return;
+    _roleManager.promotePeerToLead(peerId);
+    final payload = _roleManager.encodeRoleAssignment(
+      peerId,
+      TeamRole.lead,
+    );
+    if (payload != null) {
+      _syncEngine.broadcastControl(payload);
+    }
+  }
+
+  /// Set the local device's callsign and broadcast to peers.
+  void setCallsign(String value) {
+    _roleManager.setCallsign(value);
+    final payload = _roleManager.encodeCallsignUpdate();
+    _syncEngine.broadcastControl(payload);
+  }
 
   // ---------------------------------------------------------------------------
   // Data sync
