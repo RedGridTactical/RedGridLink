@@ -9,6 +9,7 @@ import '../../../providers/mode_provider.dart';
 import '../../../providers/theme_provider.dart';
 import '../../common/dialogs/confirm_dialog.dart';
 import '../../common/widgets/tactical_button.dart';
+import '../session/session_history_screen.dart';
 import 'widgets/ghost_list.dart';
 import 'widgets/peer_list.dart';
 import 'widgets/session_create_card.dart';
@@ -112,19 +113,36 @@ class FieldLinkScreen extends ConsumerWidget {
   }
 }
 
-/// View when no active session -- shows Create and Join cards.
-class _NoSessionView extends StatelessWidget {
+/// View when no active session -- shows Create and Join cards,
+/// plus a link to the session history screen.
+class _NoSessionView extends ConsumerWidget {
   @override
-  Widget build(BuildContext context) {
-    return const SingleChildScrollView(
-      physics: BouncingScrollPhysics(),
-      padding: EdgeInsets.symmetric(horizontal: 16),
+  Widget build(BuildContext context, WidgetRef ref) {
+    final colors = ref.watch(currentThemeProvider);
+
+    return SingleChildScrollView(
+      physics: const BouncingScrollPhysics(),
+      padding: const EdgeInsets.symmetric(horizontal: 16),
       child: Column(
         children: [
-          SessionCreateCard(),
-          SizedBox(height: 12),
-          SessionJoinCard(),
-          SizedBox(height: 24),
+          const SessionCreateCard(),
+          const SizedBox(height: 12),
+          const SessionJoinCard(),
+          const SizedBox(height: 16),
+          TacticalButton(
+            label: 'Session History',
+            icon: Icons.history,
+            colors: colors,
+            onPressed: () {
+              tapLight();
+              Navigator.of(context).push(
+                MaterialPageRoute<void>(
+                  builder: (_) => const SessionHistoryScreen(),
+                ),
+              );
+            },
+          ),
+          const SizedBox(height: 24),
         ],
       ),
     );

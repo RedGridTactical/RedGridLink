@@ -4,8 +4,10 @@ import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 
 import 'package:red_grid_link/core/constants/app_constants.dart';
+import 'package:red_grid_link/core/utils/mgrs.dart' as mgrs_util;
 import 'package:red_grid_link/data/models/aar_data.dart';
 import 'package:red_grid_link/data/models/operational_mode.dart';
+import 'package:red_grid_link/data/models/track_point.dart';
 import 'package:red_grid_link/services/aar/aar_service.dart';
 
 /// Generates a tactical-styled PDF report from [AarData].
@@ -61,6 +63,18 @@ class PdfGenerator {
     // Track summary
     if (aar.trackPoints.isNotEmpty) {
       pdf.addPage(_buildTrackPage(aar, mono, monoBold));
+    }
+
+    // Per-member track summary (only if track points have peer IDs)
+    final hasPeerTracks =
+        aar.trackPoints.any((tp) => tp.peerId != null && tp.peerId!.isNotEmpty);
+    if (hasPeerTracks && aar.peers.isNotEmpty) {
+      pdf.addPage(_buildPerMemberTrackPage(aar, mono, monoBold));
+    }
+
+    // Boundary events (only if boundary was set)
+    if (aar.boundary != null || aar.boundaryEvents.isNotEmpty) {
+      pdf.addPage(_buildBoundaryEventsPage(aar, mono, monoBold));
     }
 
     return pdf.save();
@@ -188,16 +202,18 @@ class PdfGenerator {
                           ),
                           pw.SizedBox(width: 8),
                           pw.Text(
-                            p.displayName.toUpperCase(),
+                            p.callsign.isNotEmpty
+                                ? p.callsign.toUpperCase()
+                                : p.displayName.toUpperCase(),
                             style: pw.TextStyle(
-                              font: mono,
+                              font: monoBold,
                               fontSize: 11,
                               color: _textColor,
                             ),
                           ),
                           pw.SizedBox(width: 12),
                           pw.Text(
-                            '(${p.deviceType.name.toUpperCase()})',
+                            '[${p.role.displayName.toUpperCase()}]',
                             style: pw.TextStyle(
                               font: mono,
                               fontSize: 9,
@@ -376,7 +392,7 @@ class PdfGenerator {
   }
 
   pw.Widget _buildParticipantTable(AarData aar, pw.Font mono, pw.Font monoBold) {
-    final headers = ['CALLSIGN', 'DEVICE', 'LAST SEEN', 'MARKERS'];
+    final headers = ['CALLSIGN', 'ROLE', 'DEVICE', 'CONN DURATION', 'MARKERS'];
 
     return pw.TableHelper.fromTextArray(
       border: pw.TableBorder.all(color: _borderColor, width: 0.5),
@@ -396,10 +412,19 @@ class PdfGenerator {
             .where((m) => m.createdBy == p.id || m.createdBy == p.displayName)
             .length;
 
+        // Connection duration: time between session start and peer's last seen
+        final connDuration = p.lastSeen.difference(aar.startTime);
+        final connStr = connDuration.isNegative
+            ? '-'
+            : AarService.formatDuration(connDuration);
+
         return [
-          p.displayName.toUpperCase(),
+          p.callsign.isNotEmpty
+              ? p.callsign.toUpperCase()
+              : p.displayName.toUpperCase(),
+          p.role.displayName.toUpperCase(),
           p.deviceType.name.toUpperCase(),
-          AarService.formatTacticalTimestamp(p.lastSeen),
+          connStr,
           markersPlaced.toString(),
         ];
       }).toList(),
@@ -692,6 +717,218 @@ class PdfGenerator {
                   monoBold,
                 ),
               ],
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  // ---------------------------------------------------------------------------
+  // Per-member track summary page
+  // ---------------------------------------------------------------------------
+
+  pw.Page _buildPerMemberTrackPage(
+      AarData aar, pw.Font mono, pw.Font monoBold) {
+    // Group track points by peerId
+    final tracksByPeer = <String, List<TrackPoint>>{};
+    for (final tp in aar.trackPoints) {
+      final pid = tp.peerId;
+      if (pid != null && pid.isNotEmpty) {
+        tracksByPeer.putIfAbsent(pid, () => []).add(tp);
+      }
+    }
+
+    return pw.Page(
+      pageFormat: PdfPageFormat.letter,
+      margin: const pw.EdgeInsets.all(40),
+      build: (context) {
+        return pw.Container(
+          decoration: pw.BoxDecoration(
+            color: _bgColor,
+            border: pw.Border.all(color: _borderColor, width: 1),
+          ),
+          padding: const pw.EdgeInsets.all(30),
+          child: pw.Column(
+            crossAxisAlignment: pw.CrossAxisAlignment.start,
+            children: [
+              _pageHeader('PER-MEMBER TRACK SUMMARY', mono, monoBold),
+              pw.SizedBox(height: 16),
+
+              if (tracksByPeer.isEmpty)
+                pw.Text(
+                  'No per-member track data available',
+                  style:
+                      pw.TextStyle(font: mono, fontSize: 10, color: _dimColor),
+                )
+              else
+                pw.TableHelper.fromTextArray(
+                  border:
+                      pw.TableBorder.all(color: _borderColor, width: 0.5),
+                  headerStyle: pw.TextStyle(
+                    font: monoBold,
+                    fontSize: 9,
+                    color: _accentColor,
+                  ),
+                  headerDecoration: const pw.BoxDecoration(color: _headerBg),
+                  cellStyle:
+                      pw.TextStyle(font: mono, fontSize: 9, color: _textColor),
+                  cellDecoration: (index, data, rowNum) => pw.BoxDecoration(
+                      color: rowNum.isOdd ? _headerBg : _bgColor),
+                  cellPadding: const pw.EdgeInsets.symmetric(
+                      horizontal: 6, vertical: 4),
+                  headers: [
+                    'CALLSIGN',
+                    'DISTANCE',
+                    'TRACK POINTS',
+                    'TIME ACTIVE',
+                    'AVG SPEED',
+                  ],
+                  data: tracksByPeer.entries.map((entry) {
+                    final peerId = entry.key;
+                    final points = entry.value;
+
+                    // Resolve callsign from peers list
+                    final peer = aar.peers.where((p) => p.id == peerId);
+                    final callsign = peer.isNotEmpty
+                        ? (peer.first.callsign.isNotEmpty
+                            ? peer.first.callsign.toUpperCase()
+                            : peer.first.displayName.toUpperCase())
+                        : peerId.substring(0, 8).toUpperCase();
+
+                    // Distance
+                    final distance =
+                        AarService.calculateTotalDistance(points);
+
+                    // Time active (first to last track point)
+                    final sorted = List<TrackPoint>.from(points)
+                      ..sort(
+                          (a, b) => a.timestamp.compareTo(b.timestamp));
+                    final timeActive = sorted.length >= 2
+                        ? sorted.last.timestamp
+                            .difference(sorted.first.timestamp)
+                        : Duration.zero;
+
+                    // Avg speed
+                    final speeds = points
+                        .where(
+                            (tp) => tp.speed != null && tp.speed! > 0)
+                        .map((tp) => tp.speed!)
+                        .toList();
+                    final avgSpeed = speeds.isNotEmpty
+                        ? speeds.reduce((a, b) => a + b) / speeds.length
+                        : 0.0;
+
+                    return [
+                      callsign,
+                      AarService.formatDistance(distance),
+                      points.length.toString(),
+                      AarService.formatDuration(timeActive),
+                      '${avgSpeed.toStringAsFixed(1)} m/s',
+                    ];
+                  }).toList(),
+                ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  // ---------------------------------------------------------------------------
+  // Boundary events page
+  // ---------------------------------------------------------------------------
+
+  pw.Page _buildBoundaryEventsPage(
+      AarData aar, pw.Font mono, pw.Font monoBold) {
+    return pw.Page(
+      pageFormat: PdfPageFormat.letter,
+      margin: const pw.EdgeInsets.all(40),
+      build: (context) {
+        return pw.Container(
+          decoration: pw.BoxDecoration(
+            color: _bgColor,
+            border: pw.Border.all(color: _borderColor, width: 1),
+          ),
+          padding: const pw.EdgeInsets.all(30),
+          child: pw.Column(
+            crossAxisAlignment: pw.CrossAxisAlignment.start,
+            children: [
+              _pageHeader('BOUNDARY EVENTS', mono, monoBold),
+              pw.SizedBox(height: 16),
+
+              // Boundary info
+              if (aar.boundary != null) ...[
+                _labelValue(
+                  'BOUNDARY',
+                  aar.boundary!.label?.toUpperCase() ?? 'ACTIVE BOUNDARY',
+                  mono,
+                  monoBold,
+                ),
+                pw.SizedBox(height: 4),
+                _labelValue(
+                  'BOUNDARY POINTS',
+                  aar.boundary!.points.length.toString(),
+                  mono,
+                  monoBold,
+                ),
+                pw.SizedBox(height: 16),
+                pw.Divider(color: _borderColor, thickness: 1),
+                pw.SizedBox(height: 12),
+              ],
+
+              // Exit events table
+              pw.Text(
+                'BOUNDARY EXIT LOG',
+                style: pw.TextStyle(
+                  font: monoBold,
+                  fontSize: 11,
+                  color: _accentColor,
+                  letterSpacing: 2,
+                ),
+              ),
+              pw.SizedBox(height: 10),
+
+              if (aar.boundaryEvents.isEmpty)
+                pw.Text(
+                  'No boundary exit events recorded',
+                  style:
+                      pw.TextStyle(font: mono, fontSize: 10, color: _dimColor),
+                )
+              else
+                pw.TableHelper.fromTextArray(
+                  border:
+                      pw.TableBorder.all(color: _borderColor, width: 0.5),
+                  headerStyle: pw.TextStyle(
+                    font: monoBold,
+                    fontSize: 9,
+                    color: _accentColor,
+                  ),
+                  headerDecoration: const pw.BoxDecoration(color: _headerBg),
+                  cellStyle:
+                      pw.TextStyle(font: mono, fontSize: 9, color: _textColor),
+                  cellDecoration: (index, data, rowNum) => pw.BoxDecoration(
+                      color: rowNum.isOdd ? _headerBg : _bgColor),
+                  cellPadding: const pw.EdgeInsets.symmetric(
+                      horizontal: 6, vertical: 4),
+                  headers: ['#', 'CALLSIGN', 'TIME', 'POSITION (MGRS)'],
+                  data: aar.boundaryEvents.asMap().entries.map((entry) {
+                    final i = entry.key;
+                    final evt = entry.value;
+
+                    // Convert lat/lon to MGRS
+                    final mgrs = mgrs_util.formatMGRS(
+                      mgrs_util.toMGRS(evt.lat, evt.lon),
+                    );
+
+                    return [
+                      '${i + 1}',
+                      evt.callsign.toUpperCase(),
+                      AarService.formatTacticalTimestamp(evt.timestamp),
+                      mgrs,
+                    ];
+                  }).toList(),
+                ),
             ],
           ),
         );

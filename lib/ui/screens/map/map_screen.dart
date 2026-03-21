@@ -31,6 +31,7 @@ import 'package:red_grid_link/providers/location_provider.dart';
 import 'package:red_grid_link/providers/map_provider.dart';
 import 'package:red_grid_link/providers/mode_provider.dart';
 import 'package:red_grid_link/providers/theme_provider.dart';
+import 'package:red_grid_link/providers/voice_callout_provider.dart';
 import 'package:red_grid_link/services/map/mgrs_grid_overlay.dart';
 import 'package:red_grid_link/services/map/tile_manager.dart';
 import 'layers/annotation_layer.dart';
@@ -60,6 +61,24 @@ class _MapScreenState extends ConsumerState<MapScreen> {
     // Listen for boundary exit events and show alert SnackBars.
     // Uses addPostFrameCallback to ensure context is ready for SnackBar.
     WidgetsBinding.instance.addPostFrameCallback((_) {
+      // Listen for peer position changes and trigger voice callouts.
+      ref.listenManual(connectedPeersProvider, (previous, next) {
+        next.whenData((peers) {
+          final voiceEnabled = ref.read(voiceCalloutEnabledProvider);
+          if (!voiceEnabled) return;
+          final voiceService = ref.read(voiceCalloutServiceProvider);
+          for (final peer in peers) {
+            if (peer.position != null && peer.callsign.isNotEmpty) {
+              voiceService.enqueueIfChanged(
+                peer.id,
+                peer.callsign,
+                peer.position!.mgrsRaw,
+              );
+            }
+          }
+        });
+      });
+
       ref.listenManual(boundaryEventStreamProvider, (previous, next) {
         next.whenData((event) {
           if (!mounted) return;

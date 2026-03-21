@@ -8,6 +8,7 @@ class TrackPoint {
   final double? heading;
   final DateTime timestamp;
   final double? accuracy;
+  final String? peerId;
 
   const TrackPoint({
     required this.lat,
@@ -17,6 +18,7 @@ class TrackPoint {
     this.heading,
     required this.timestamp,
     this.accuracy,
+    this.peerId,
   });
 
   Map<String, dynamic> toJson() => {
@@ -27,6 +29,7 @@ class TrackPoint {
     'hdg': heading,
     'ts': timestamp.millisecondsSinceEpoch,
     'acc': accuracy,
+    if (peerId != null) 'pid': peerId,
   };
 
   factory TrackPoint.fromJson(Map<String, dynamic> json) => TrackPoint(
@@ -37,5 +40,6 @@ class TrackPoint {
     heading: (json['hdg'] as num?)?.toDouble(),
     timestamp: DateTime.fromMillisecondsSinceEpoch(json['ts'] as int),
     accuracy: (json['acc'] as num?)?.toDouble(),
+    peerId: json['pid'] as String?,
   );
 }

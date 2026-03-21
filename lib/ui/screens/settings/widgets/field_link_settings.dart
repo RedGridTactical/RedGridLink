@@ -7,6 +7,7 @@ import '../../../../core/theme/tactical_text_styles.dart';
 import '../../../../core/utils/haptics.dart';
 import '../../../../providers/settings_provider.dart';
 import '../../../../providers/theme_provider.dart';
+import '../../../../providers/voice_callout_provider.dart';
 import '../../../common/widgets/section_header.dart';
 import '../../../common/widgets/tactical_card.dart';
 
@@ -140,6 +141,46 @@ class _FieldLinkSettingsState extends ConsumerState<FieldLinkSettings> {
                 colors: colors,
                 onChanged: (v) =>
                     ref.read(updateIntervalProvider.notifier).set(v),
+              ),
+            ],
+          ),
+        ),
+
+        const SizedBox(height: 8),
+
+        // --- Voice Callouts ---
+        TacticalCard(
+          colors: colors,
+          padding: const EdgeInsets.all(12),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'VOICE CALLOUTS',
+                      style: TacticalTextStyles.label(colors),
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      'NATO phonetic position updates',
+                      style: TacticalTextStyles.dim(colors),
+                    ),
+                  ],
+                ),
+              ),
+              SizedBox(
+                height: AppConstants.minTouchTarget,
+                child: Switch(
+                  value: ref.watch(voiceCalloutEnabledProvider),
+                  activeTrackColor: colors.accent,
+                  onChanged: (v) {
+                    ref.read(voiceCalloutEnabledProvider.notifier).state = v;
+                    ref.read(voiceCalloutServiceProvider).setEnabled(v);
+                  },
+                ),
               ),
             ],
           ),

@@ -1,4 +1,5 @@
 import 'package:red_grid_link/data/models/annotation.dart';
+import 'package:red_grid_link/data/models/boundary_event.dart';
 import 'package:red_grid_link/data/models/marker.dart';
 import 'package:red_grid_link/data/models/operational_mode.dart';
 import 'package:red_grid_link/data/models/peer.dart';
@@ -17,6 +18,8 @@ class AarData {
   final List<TrackPoint> trackPoints;
   final List<Annotation> annotations;
   final String? notes;
+  final Annotation? boundary;
+  final List<BoundaryEvent> boundaryEvents;
 
   const AarData({
     required this.sessionId,
@@ -29,6 +32,8 @@ class AarData {
     this.trackPoints = const [],
     this.annotations = const [],
     this.notes,
+    this.boundary,
+    this.boundaryEvents = const [],
   });
 
   /// Duration of the session
@@ -54,6 +59,8 @@ class AarData {
     'track': trackPoints.map((t) => t.toJson()).toList(),
     'annotations': annotations.map((a) => a.toJson()).toList(),
     'notes': notes,
+    if (boundary != null) 'boundary': boundary!.toJson(),
+    'boundaryEvents': boundaryEvents.map((e) => e.toJson()).toList(),
   };
 
   factory AarData.fromJson(Map<String, dynamic> json) => AarData(
@@ -82,5 +89,41 @@ class AarData {
             .toList() ??
         const [],
     notes: json['notes'] as String?,
+    boundary: json['boundary'] != null
+        ? Annotation.fromJson(json['boundary'] as Map<String, dynamic>)
+        : null,
+    boundaryEvents: (json['boundaryEvents'] as List<dynamic>?)
+            ?.map((e) => BoundaryEvent.fromJson(e as Map<String, dynamic>))
+            .toList() ??
+        const [],
   );
+
+  AarData copyWith({
+    String? sessionId,
+    String? sessionName,
+    OperationalMode? operationalMode,
+    DateTime? startTime,
+    DateTime? endTime,
+    List<Peer>? peers,
+    List<Marker>? markers,
+    List<TrackPoint>? trackPoints,
+    List<Annotation>? annotations,
+    String? notes,
+    Annotation? boundary,
+    List<BoundaryEvent>? boundaryEvents,
+  }) =>
+      AarData(
+        sessionId: sessionId ?? this.sessionId,
+        sessionName: sessionName ?? this.sessionName,
+        operationalMode: operationalMode ?? this.operationalMode,
+        startTime: startTime ?? this.startTime,
+        endTime: endTime ?? this.endTime,
+        peers: peers ?? this.peers,
+        markers: markers ?? this.markers,
+        trackPoints: trackPoints ?? this.trackPoints,
+        annotations: annotations ?? this.annotations,
+        notes: notes ?? this.notes,
+        boundary: boundary ?? this.boundary,
+        boundaryEvents: boundaryEvents ?? this.boundaryEvents,
+      );
 }
