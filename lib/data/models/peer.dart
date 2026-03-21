@@ -1,4 +1,5 @@
 import 'package:red_grid_link/data/models/position.dart';
+import 'package:red_grid_link/data/models/team_role.dart';
 
 /// Device type for a peer
 enum DeviceType {
@@ -38,6 +39,9 @@ class Peer {
   final bool isConnected;
   final int? batteryLevel;
   final SyncMode syncMode;
+  final TeamRole role;
+  final String callsign;
+  final String? customRoleLabel;
 
   const Peer({
     required this.id,
@@ -48,6 +52,9 @@ class Peer {
     this.isConnected = true,
     this.batteryLevel,
     this.syncMode = SyncMode.expedition,
+    this.role = TeamRole.scout,
+    this.callsign = '',
+    this.customRoleLabel,
   });
 
   Map<String, dynamic> toJson() => {
@@ -59,6 +66,9 @@ class Peer {
     'conn': isConnected,
     'batt': batteryLevel,
     'sync': syncMode.name,
+    'role': role.toShortString(),
+    'cs': callsign,
+    if (customRoleLabel != null) 'crl': customRoleLabel,
   };
 
   factory Peer.fromJson(Map<String, dynamic> json) => Peer(
@@ -72,6 +82,9 @@ class Peer {
     isConnected: json['conn'] as bool? ?? false,
     batteryLevel: json['batt'] as int?,
     syncMode: SyncMode.fromString(json['sync'] as String? ?? 'expedition'),
+    role: TeamRole.fromString(json['role'] as String? ?? 'scout'),
+    callsign: json['cs'] as String? ?? '',
+    customRoleLabel: json['crl'] as String?,
   );
 
   Peer copyWith({
@@ -82,6 +95,9 @@ class Peer {
     bool? isConnected,
     int? batteryLevel,
     SyncMode? syncMode,
+    TeamRole? role,
+    String? callsign,
+    String? customRoleLabel,
   }) =>
       Peer(
         id: id,
@@ -92,5 +108,8 @@ class Peer {
         isConnected: isConnected ?? this.isConnected,
         batteryLevel: batteryLevel ?? this.batteryLevel,
         syncMode: syncMode ?? this.syncMode,
+        role: role ?? this.role,
+        callsign: callsign ?? this.callsign,
+        customRoleLabel: customRoleLabel ?? this.customRoleLabel,
       );
 }
