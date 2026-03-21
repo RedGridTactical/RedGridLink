@@ -136,4 +136,75 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get mgrsReference => 'MGRS-Referenz';
+
+  @override
+  String get teamRoster => 'TEAM';
+
+  @override
+  String get roleLead => 'Leiter';
+
+  @override
+  String get roleScout => 'Späher';
+
+  @override
+  String get roleMedic => 'Sanitäter';
+
+  @override
+  String get roleComms => 'Funk';
+
+  @override
+  String get roleCustom => 'Eigene';
+
+  @override
+  String get changeRole => 'ROLLE ÄNDERN';
+
+  @override
+  String get promoteToLead => 'ZUM LEITER BEFÖRDERN';
+
+  @override
+  String get saveToMyWaypoints => 'IN MEINEN PUNKTEN SPEICHERN';
+
+  @override
+  String get shareWithTeam => 'MIT TEAM TEILEN';
+
+  @override
+  String get setBoundary => 'GRENZE SETZEN';
+
+  @override
+  String get boundaryAlert => 'GRENZALARM';
+
+  @override
+  String get youLeftBoundary => 'Du hast die Teamgrenze verlassen';
+
+  @override
+  String peerLeftBoundary(String callsign) {
+    return '$callsign hat die Grenze verlassen';
+  }
+
+  @override
+  String get voiceCallouts => 'Sprachansagen';
+
+  @override
+  String get voiceCalloutsSubtitle => 'NATO-Positionsmeldungen';
+
+  @override
+  String get exportSession => 'SESSION EXPORTIEREN';
+
+  @override
+  String get importSession => 'SESSION IMPORTIEREN';
+
+  @override
+  String get sessionHistory => 'SITZUNGSVERLAUF';
+
+  @override
+  String get deleteAnnotation => 'Anmerkung löschen?';
+
+  @override
+  String get waypointName => 'Punktname';
+
+  @override
+  String get undo => 'RÜCKGÄNGIG';
+
+  @override
+  String get done => 'FERTIG';
 }

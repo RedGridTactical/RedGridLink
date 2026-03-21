@@ -136,4 +136,75 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get mgrsReference => 'Справка MGRS';
+
+  @override
+  String get teamRoster => 'СОСТАВ';
+
+  @override
+  String get roleLead => 'Лидер';
+
+  @override
+  String get roleScout => 'Разведчик';
+
+  @override
+  String get roleMedic => 'Медик';
+
+  @override
+  String get roleComms => 'Связист';
+
+  @override
+  String get roleCustom => 'Своя роль';
+
+  @override
+  String get changeRole => 'СМЕНИТЬ РОЛЬ';
+
+  @override
+  String get promoteToLead => 'НАЗНАЧИТЬ ЛИДЕРОМ';
+
+  @override
+  String get saveToMyWaypoints => 'СОХРАНИТЬ В ТОЧКИ';
+
+  @override
+  String get shareWithTeam => 'ПОДЕЛИТЬСЯ С КОМАНДОЙ';
+
+  @override
+  String get setBoundary => 'УСТАНОВИТЬ ГРАНИЦУ';
+
+  @override
+  String get boundaryAlert => 'ТРЕВОГА ГРАНИЦЫ';
+
+  @override
+  String get youLeftBoundary => 'Вы покинули границу команды';
+
+  @override
+  String peerLeftBoundary(String callsign) {
+    return '$callsign покинул границу';
+  }
+
+  @override
+  String get voiceCallouts => 'Голосовые оповещения';
+
+  @override
+  String get voiceCalloutsSubtitle => 'Позиции по фонетическому алфавиту НАТО';
+
+  @override
+  String get exportSession => 'ЭКСПОРТ СЕССИИ';
+
+  @override
+  String get importSession => 'ИМПОРТ СЕССИИ';
+
+  @override
+  String get sessionHistory => 'ИСТОРИЯ СЕССИЙ';
+
+  @override
+  String get deleteAnnotation => 'Удалить аннотацию?';
+
+  @override
+  String get waypointName => 'Название точки';
+
+  @override
+  String get undo => 'ОТМЕНИТЬ';
+
+  @override
+  String get done => 'ГОТОВО';
 }

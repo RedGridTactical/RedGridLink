@@ -136,4 +136,75 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get mgrsReference => 'MGRS参照';
+
+  @override
+  String get teamRoster => 'チーム名簿';
+
+  @override
+  String get roleLead => 'リーダー';
+
+  @override
+  String get roleScout => '偵察';
+
+  @override
+  String get roleMedic => '衛生兵';
+
+  @override
+  String get roleComms => '通信';
+
+  @override
+  String get roleCustom => 'カスタム';
+
+  @override
+  String get changeRole => '役割変更';
+
+  @override
+  String get promoteToLead => 'リーダーに昇格';
+
+  @override
+  String get saveToMyWaypoints => 'マイポイントに保存';
+
+  @override
+  String get shareWithTeam => 'チームと共有';
+
+  @override
+  String get setBoundary => '境界設定';
+
+  @override
+  String get boundaryAlert => '境界アラート';
+
+  @override
+  String get youLeftBoundary => 'チーム境界を離れました';
+
+  @override
+  String peerLeftBoundary(String callsign) {
+    return '$callsignが境界を離れました';
+  }
+
+  @override
+  String get voiceCallouts => '音声コールアウト';
+
+  @override
+  String get voiceCalloutsSubtitle => 'NATO音声位置通知';
+
+  @override
+  String get exportSession => 'セッション出力';
+
+  @override
+  String get importSession => 'セッション取込';
+
+  @override
+  String get sessionHistory => 'セッション履歴';
+
+  @override
+  String get deleteAnnotation => '注釈を削除しますか？';
+
+  @override
+  String get waypointName => 'ポイント名';
+
+  @override
+  String get undo => '元に戻す';
+
+  @override
+  String get done => '完了';
 }

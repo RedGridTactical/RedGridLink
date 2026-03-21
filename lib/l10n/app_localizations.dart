@@ -416,6 +416,144 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'MGRS Reference'**
   String get mgrsReference;
+
+  /// Team roster sheet title
+  ///
+  /// In en, this message translates to:
+  /// **'TEAM ROSTER'**
+  String get teamRoster;
+
+  /// Lead team role
+  ///
+  /// In en, this message translates to:
+  /// **'Lead'**
+  String get roleLead;
+
+  /// Scout team role
+  ///
+  /// In en, this message translates to:
+  /// **'Scout'**
+  String get roleScout;
+
+  /// Medic team role
+  ///
+  /// In en, this message translates to:
+  /// **'Medic'**
+  String get roleMedic;
+
+  /// Comms team role
+  ///
+  /// In en, this message translates to:
+  /// **'Comms'**
+  String get roleComms;
+
+  /// Custom team role
+  ///
+  /// In en, this message translates to:
+  /// **'Custom'**
+  String get roleCustom;
+
+  /// Change role button
+  ///
+  /// In en, this message translates to:
+  /// **'CHANGE ROLE'**
+  String get changeRole;
+
+  /// Promote peer to lead button
+  ///
+  /// In en, this message translates to:
+  /// **'PROMOTE TO LEAD'**
+  String get promoteToLead;
+
+  /// Save waypoint locally button
+  ///
+  /// In en, this message translates to:
+  /// **'SAVE TO MY WAYPOINTS'**
+  String get saveToMyWaypoints;
+
+  /// Share waypoint with team button
+  ///
+  /// In en, this message translates to:
+  /// **'SHARE WITH TEAM'**
+  String get shareWithTeam;
+
+  /// Set team boundary button
+  ///
+  /// In en, this message translates to:
+  /// **'SET BOUNDARY'**
+  String get setBoundary;
+
+  /// Boundary alert title
+  ///
+  /// In en, this message translates to:
+  /// **'BOUNDARY ALERT'**
+  String get boundaryAlert;
+
+  /// Alert when local user exits boundary
+  ///
+  /// In en, this message translates to:
+  /// **'You left the team boundary'**
+  String get youLeftBoundary;
+
+  /// Alert when peer exits boundary
+  ///
+  /// In en, this message translates to:
+  /// **'{callsign} left the boundary'**
+  String peerLeftBoundary(String callsign);
+
+  /// Voice callout toggle label
+  ///
+  /// In en, this message translates to:
+  /// **'Voice Callouts'**
+  String get voiceCallouts;
+
+  /// Voice callout toggle subtitle
+  ///
+  /// In en, this message translates to:
+  /// **'NATO phonetic position updates'**
+  String get voiceCalloutsSubtitle;
+
+  /// Export session button
+  ///
+  /// In en, this message translates to:
+  /// **'EXPORT SESSION'**
+  String get exportSession;
+
+  /// Import session button
+  ///
+  /// In en, this message translates to:
+  /// **'IMPORT SESSION'**
+  String get importSession;
+
+  /// Session history screen title
+  ///
+  /// In en, this message translates to:
+  /// **'SESSION HISTORY'**
+  String get sessionHistory;
+
+  /// Delete annotation confirmation
+  ///
+  /// In en, this message translates to:
+  /// **'Delete annotation?'**
+  String get deleteAnnotation;
+
+  /// Waypoint name input label
+  ///
+  /// In en, this message translates to:
+  /// **'Waypoint Name'**
+  String get waypointName;
+
+  /// Undo button
+  ///
+  /// In en, this message translates to:
+  /// **'UNDO'**
+  String get undo;
+
+  /// Done button
+  ///
+  /// In en, this message translates to:
+  /// **'DONE'**
+  String get done;
 }
 
 class _AppLocalizationsDelegate

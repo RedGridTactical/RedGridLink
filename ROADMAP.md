@@ -69,18 +69,19 @@ Bug fixes, waypoint persistence, and heading improvements.
 
 ## V1.3 — Team Features
 
-**Target: Q3 2026**
+**Status: Complete** — App v1.3.0
 
 Enhanced team coordination for larger groups.
 
-- [ ] Team roles: Lead (session admin, can promote others), Scout, Medic, Comms + custom roles (custom callsign + icon)
-- [ ] Waypoint sharing: "Save to My Waypoints" (personal, persistent) or "Share with Team" (synced via CRDT, session-scoped)
-- [ ] Shared annotations layer: tap-to-place polyline/polygon drawing, visible to all peers
-- [ ] Team boundary alerts: Lead draws polygon geofence, both Lead and boundary-crosser notified (single boundary per session)
-- [ ] Enhanced AAR: per-member tracks, role labels, boundary overlay in PDF export (interactive replay deferred to V2.1)
-- [ ] Custom map marker categories (hazard, rally point, objective, cache)
-- [ ] Voice callout queue (NATO phonetic auto-announce on position updates)
-- [ ] Export/import session data (JSON backup/restore)
+- [x] Team roles: Lead (session admin, can promote others), Scout, Medic, Comms + custom roles (custom callsign + icon)
+- [x] Waypoint sharing: "Save to My Waypoints" (personal, persistent) or "Share with Team" (synced via CRDT, session-scoped)
+- [x] Shared annotations layer: tap-to-place polyline/polygon drawing, visible to all peers
+- [x] Team boundary alerts: Lead draws polygon geofence, both Lead and boundary-crosser notified (single boundary per session)
+- [x] Enhanced AAR: per-member tracks, role labels, boundary events in PDF export
+- [x] Custom map marker categories (hazard, rally point, objective, cache)
+- [x] Voice callout queue (NATO phonetic auto-announce with correct digit pronunciation)
+- [x] Export/import session data (versioned JSON backup/restore with validation)
+- [x] 986 tests, 0 warnings
 
 ---
 

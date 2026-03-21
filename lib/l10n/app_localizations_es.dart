@@ -136,4 +136,75 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get mgrsReference => 'Referencia MGRS';
+
+  @override
+  String get teamRoster => 'EQUIPO';
+
+  @override
+  String get roleLead => 'Líder';
+
+  @override
+  String get roleScout => 'Explorador';
+
+  @override
+  String get roleMedic => 'Médico';
+
+  @override
+  String get roleComms => 'Comunicaciones';
+
+  @override
+  String get roleCustom => 'Personalizado';
+
+  @override
+  String get changeRole => 'CAMBIAR ROL';
+
+  @override
+  String get promoteToLead => 'ASCENDER A LÍDER';
+
+  @override
+  String get saveToMyWaypoints => 'GUARDAR EN MIS PUNTOS';
+
+  @override
+  String get shareWithTeam => 'COMPARTIR CON EQUIPO';
+
+  @override
+  String get setBoundary => 'ESTABLECER LÍMITE';
+
+  @override
+  String get boundaryAlert => 'ALERTA DE LÍMITE';
+
+  @override
+  String get youLeftBoundary => 'Saliste del límite del equipo';
+
+  @override
+  String peerLeftBoundary(String callsign) {
+    return '$callsign salió del límite';
+  }
+
+  @override
+  String get voiceCallouts => 'Llamadas de voz';
+
+  @override
+  String get voiceCalloutsSubtitle => 'Actualizaciones de posición NATO';
+
+  @override
+  String get exportSession => 'EXPORTAR SESIÓN';
+
+  @override
+  String get importSession => 'IMPORTAR SESIÓN';
+
+  @override
+  String get sessionHistory => 'HISTORIAL DE SESIONES';
+
+  @override
+  String get deleteAnnotation => '¿Eliminar anotación?';
+
+  @override
+  String get waypointName => 'Nombre del punto';
+
+  @override
+  String get undo => 'DESHACER';
+
+  @override
+  String get done => 'LISTO';
 }

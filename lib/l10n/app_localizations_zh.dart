@@ -136,6 +136,77 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get mgrsReference => 'MGRS参考';
+
+  @override
+  String get teamRoster => '团队名册';
+
+  @override
+  String get roleLead => '队长';
+
+  @override
+  String get roleScout => '侦察';
+
+  @override
+  String get roleMedic => '医疗';
+
+  @override
+  String get roleComms => '通讯';
+
+  @override
+  String get roleCustom => '自定义';
+
+  @override
+  String get changeRole => '更改角色';
+
+  @override
+  String get promoteToLead => '提升为队长';
+
+  @override
+  String get saveToMyWaypoints => '保存到我的航点';
+
+  @override
+  String get shareWithTeam => '与团队共享';
+
+  @override
+  String get setBoundary => '设置边界';
+
+  @override
+  String get boundaryAlert => '边界警报';
+
+  @override
+  String get youLeftBoundary => '你已离开团队边界';
+
+  @override
+  String peerLeftBoundary(String callsign) {
+    return '$callsign已离开边界';
+  }
+
+  @override
+  String get voiceCallouts => '语音呼叫';
+
+  @override
+  String get voiceCalloutsSubtitle => 'NATO语音位置更新';
+
+  @override
+  String get exportSession => '导出会话';
+
+  @override
+  String get importSession => '导入会话';
+
+  @override
+  String get sessionHistory => '会话历史';
+
+  @override
+  String get deleteAnnotation => '删除标注？';
+
+  @override
+  String get waypointName => '航点名称';
+
+  @override
+  String get undo => '撤销';
+
+  @override
+  String get done => '完成';
 }
 
 /// The translations for Chinese, using the Han script (`zh_Hant`).
@@ -270,4 +341,75 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
 
   @override
   String get mgrsReference => 'MGRS參考';
+
+  @override
+  String get teamRoster => '團隊名冊';
+
+  @override
+  String get roleLead => '隊長';
+
+  @override
+  String get roleScout => '偵察';
+
+  @override
+  String get roleMedic => '醫療';
+
+  @override
+  String get roleComms => '通訊';
+
+  @override
+  String get roleCustom => '自訂';
+
+  @override
+  String get changeRole => '更改角色';
+
+  @override
+  String get promoteToLead => '提升為隊長';
+
+  @override
+  String get saveToMyWaypoints => '儲存到我的航點';
+
+  @override
+  String get shareWithTeam => '與團隊共享';
+
+  @override
+  String get setBoundary => '設定邊界';
+
+  @override
+  String get boundaryAlert => '邊界警報';
+
+  @override
+  String get youLeftBoundary => '你已離開團隊邊界';
+
+  @override
+  String peerLeftBoundary(String callsign) {
+    return '$callsign已離開邊界';
+  }
+
+  @override
+  String get voiceCallouts => '語音呼叫';
+
+  @override
+  String get voiceCalloutsSubtitle => 'NATO語音位置更新';
+
+  @override
+  String get exportSession => '匯出會話';
+
+  @override
+  String get importSession => '匯入會話';
+
+  @override
+  String get sessionHistory => '會話歷史';
+
+  @override
+  String get deleteAnnotation => '刪除標註？';
+
+  @override
+  String get waypointName => '航點名稱';
+
+  @override
+  String get undo => '復原';
+
+  @override
+  String get done => '完成';
 }

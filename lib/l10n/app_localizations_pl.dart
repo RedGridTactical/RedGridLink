@@ -136,4 +136,75 @@ class AppLocalizationsPl extends AppLocalizations {
 
   @override
   String get mgrsReference => 'Odniesienie MGRS';
+
+  @override
+  String get teamRoster => 'TEAM ROSTER';
+
+  @override
+  String get roleLead => 'Lead';
+
+  @override
+  String get roleScout => 'Scout';
+
+  @override
+  String get roleMedic => 'Medic';
+
+  @override
+  String get roleComms => 'Comms';
+
+  @override
+  String get roleCustom => 'Custom';
+
+  @override
+  String get changeRole => 'CHANGE ROLE';
+
+  @override
+  String get promoteToLead => 'PROMOTE TO LEAD';
+
+  @override
+  String get saveToMyWaypoints => 'SAVE TO MY WAYPOINTS';
+
+  @override
+  String get shareWithTeam => 'SHARE WITH TEAM';
+
+  @override
+  String get setBoundary => 'SET BOUNDARY';
+
+  @override
+  String get boundaryAlert => 'BOUNDARY ALERT';
+
+  @override
+  String get youLeftBoundary => 'You left the team boundary';
+
+  @override
+  String peerLeftBoundary(String callsign) {
+    return '$callsign left the boundary';
+  }
+
+  @override
+  String get voiceCallouts => 'Voice Callouts';
+
+  @override
+  String get voiceCalloutsSubtitle => 'NATO phonetic position updates';
+
+  @override
+  String get exportSession => 'EXPORT SESSION';
+
+  @override
+  String get importSession => 'IMPORT SESSION';
+
+  @override
+  String get sessionHistory => 'SESSION HISTORY';
+
+  @override
+  String get deleteAnnotation => 'Delete annotation?';
+
+  @override
+  String get waypointName => 'Waypoint Name';
+
+  @override
+  String get undo => 'UNDO';
+
+  @override
+  String get done => 'DONE';
 }

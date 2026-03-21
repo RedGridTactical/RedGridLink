@@ -136,4 +136,75 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get mgrsReference => 'مرجع MGRS';
+
+  @override
+  String get teamRoster => 'قائمة الفريق';
+
+  @override
+  String get roleLead => 'قائد';
+
+  @override
+  String get roleScout => 'كشاف';
+
+  @override
+  String get roleMedic => 'مسعف';
+
+  @override
+  String get roleComms => 'اتصالات';
+
+  @override
+  String get roleCustom => 'مخصص';
+
+  @override
+  String get changeRole => 'تغيير الدور';
+
+  @override
+  String get promoteToLead => 'ترقية لقائد';
+
+  @override
+  String get saveToMyWaypoints => 'حفظ في نقاطي';
+
+  @override
+  String get shareWithTeam => 'مشاركة مع الفريق';
+
+  @override
+  String get setBoundary => 'تعيين حدود';
+
+  @override
+  String get boundaryAlert => 'تنبيه حدود';
+
+  @override
+  String get youLeftBoundary => 'لقد غادرت حدود الفريق';
+
+  @override
+  String peerLeftBoundary(String callsign) {
+    return '$callsign غادر الحدود';
+  }
+
+  @override
+  String get voiceCallouts => 'نداءات صوتية';
+
+  @override
+  String get voiceCalloutsSubtitle => 'تحديثات الموقع بأبجدية الناتو';
+
+  @override
+  String get exportSession => 'تصدير الجلسة';
+
+  @override
+  String get importSession => 'استيراد الجلسة';
+
+  @override
+  String get sessionHistory => 'سجل الجلسات';
+
+  @override
+  String get deleteAnnotation => 'حذف التعليق؟';
+
+  @override
+  String get waypointName => 'اسم النقطة';
+
+  @override
+  String get undo => 'تراجع';
+
+  @override
+  String get done => 'تم';
 }

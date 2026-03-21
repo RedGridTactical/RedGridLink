@@ -136,4 +136,75 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get mgrsReference => 'MGRS 참조';
+
+  @override
+  String get teamRoster => '팀 명부';
+
+  @override
+  String get roleLead => '리더';
+
+  @override
+  String get roleScout => '정찰';
+
+  @override
+  String get roleMedic => '의무병';
+
+  @override
+  String get roleComms => '통신';
+
+  @override
+  String get roleCustom => '사용자정의';
+
+  @override
+  String get changeRole => '역할 변경';
+
+  @override
+  String get promoteToLead => '리더로 승격';
+
+  @override
+  String get saveToMyWaypoints => '내 포인트에 저장';
+
+  @override
+  String get shareWithTeam => '팀과 공유';
+
+  @override
+  String get setBoundary => '경계 설정';
+
+  @override
+  String get boundaryAlert => '경계 알림';
+
+  @override
+  String get youLeftBoundary => '팀 경계를 벗어났습니다';
+
+  @override
+  String peerLeftBoundary(String callsign) {
+    return '$callsign이(가) 경계를 벗어남';
+  }
+
+  @override
+  String get voiceCallouts => '음성 호출';
+
+  @override
+  String get voiceCalloutsSubtitle => 'NATO 음성 위치 업데이트';
+
+  @override
+  String get exportSession => '세션 내보내기';
+
+  @override
+  String get importSession => '세션 가져오기';
+
+  @override
+  String get sessionHistory => '세션 기록';
+
+  @override
+  String get deleteAnnotation => '주석을 삭제하시겠습니까?';
+
+  @override
+  String get waypointName => '포인트 이름';
+
+  @override
+  String get undo => '실행취소';
+
+  @override
+  String get done => '완료';
 }

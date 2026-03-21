@@ -136,4 +136,75 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get mgrsReference => 'MGRS Referans';
+
+  @override
+  String get teamRoster => 'TAKIM';
+
+  @override
+  String get roleLead => 'Lider';
+
+  @override
+  String get roleScout => 'Keşif';
+
+  @override
+  String get roleMedic => 'Sağlık';
+
+  @override
+  String get roleComms => 'İletişim';
+
+  @override
+  String get roleCustom => 'Özel';
+
+  @override
+  String get changeRole => 'ROL DEĞİŞTİR';
+
+  @override
+  String get promoteToLead => 'LİDER YAP';
+
+  @override
+  String get saveToMyWaypoints => 'NOKTALARIMA KAYDET';
+
+  @override
+  String get shareWithTeam => 'TAKIMLA PAYLAŞ';
+
+  @override
+  String get setBoundary => 'SINIR BELİRLE';
+
+  @override
+  String get boundaryAlert => 'SINIR ALARMI';
+
+  @override
+  String get youLeftBoundary => 'Takım sınırını terk ettiniz';
+
+  @override
+  String peerLeftBoundary(String callsign) {
+    return '$callsign sınırı terk etti';
+  }
+
+  @override
+  String get voiceCallouts => 'Sesli bildirim';
+
+  @override
+  String get voiceCalloutsSubtitle => 'NATO fonetik konum güncellemeleri';
+
+  @override
+  String get exportSession => 'OTURUMU DIŞA AKTAR';
+
+  @override
+  String get importSession => 'OTURUM İÇE AKTAR';
+
+  @override
+  String get sessionHistory => 'OTURUM GEÇMİŞİ';
+
+  @override
+  String get deleteAnnotation => 'Açıklama silinsin mi?';
+
+  @override
+  String get waypointName => 'Nokta adı';
+
+  @override
+  String get undo => 'GERİ AL';
+
+  @override
+  String get done => 'BİTTİ';
 }
