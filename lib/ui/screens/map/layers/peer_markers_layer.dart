@@ -23,6 +23,7 @@ import 'package:red_grid_link/data/models/peer.dart';
 import 'package:red_grid_link/data/models/position.dart';
 import 'package:red_grid_link/providers/field_link_provider.dart';
 import 'package:red_grid_link/providers/location_provider.dart';
+import 'package:red_grid_link/ui/common/role_icon.dart';
 
 import '../widgets/peer_popup.dart';
 
@@ -172,22 +173,24 @@ class _PeerMarkerWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     final heading = peer.position?.heading;
     final hasHeading = heading != null && heading > 0;
+    final label = peer.callsign.isNotEmpty ? peer.callsign : peer.displayName;
+    final roleIcon = iconForRole(peer.role);
 
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
-        // Circle + heading arrow
+        // Role icon + heading arrow
         SizedBox(
           width: 28,
           height: 28,
           child: Stack(
             clipBehavior: Clip.none,
             children: [
-              // Main circle
+              // Role icon in circle
               Center(
                 child: Container(
-                  width: 18,
-                  height: 18,
+                  width: 22,
+                  height: 22,
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
                     color: color.withValues(alpha: 0.85),
@@ -199,6 +202,11 @@ class _PeerMarkerWidget extends StatelessWidget {
                         spreadRadius: 1,
                       ),
                     ],
+                  ),
+                  child: Icon(
+                    roleIcon,
+                    size: 12,
+                    color: Colors.white,
                   ),
                 ),
               ),
@@ -217,7 +225,7 @@ class _PeerMarkerWidget extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 2),
-        // Name label
+        // Name label (callsign preferred, fallback to displayName)
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1),
           decoration: BoxDecoration(
@@ -225,9 +233,7 @@ class _PeerMarkerWidget extends StatelessWidget {
             borderRadius: BorderRadius.circular(2),
           ),
           child: Text(
-            peer.displayName.length > 10
-                ? '${peer.displayName.substring(0, 10)}..'
-                : peer.displayName,
+            label.length > 10 ? '${label.substring(0, 10)}..' : label,
             style: TextStyle(
               fontFamily: 'monospace',
               fontSize: 9,

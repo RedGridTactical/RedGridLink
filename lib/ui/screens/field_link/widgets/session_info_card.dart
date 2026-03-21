@@ -12,6 +12,7 @@ import '../../../../providers/theme_provider.dart';
 import '../../../../services/field_link/transport/transport_service.dart';
 import '../../../common/widgets/tactical_card.dart';
 import 'qr_display_sheet.dart';
+import 'team_roster_sheet.dart';
 
 /// Active session information card.
 ///
@@ -183,6 +184,18 @@ class _SessionInfoContent extends StatelessWidget {
                   onTap: () => _shareSession(context),
                 ),
               ),
+
+              const SizedBox(width: 8),
+
+              // Team Roster button
+              Expanded(
+                child: _ActionButton(
+                  icon: Icons.groups,
+                  label: 'Roster',
+                  colors: colors,
+                  onTap: () => _showRosterSheet(context),
+                ),
+              ),
             ],
           ),
         ],
@@ -200,6 +213,16 @@ class _SessionInfoContent extends StatelessWidget {
         session: session,
         colors: colors,
       ),
+    );
+  }
+
+  void _showRosterSheet(BuildContext context) {
+    tapMedium();
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      isScrollControlled: true,
+      builder: (_) => const TeamRosterSheet(),
     );
   }
 
