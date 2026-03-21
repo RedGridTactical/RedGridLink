@@ -85,12 +85,30 @@ Enhanced team coordination for larger groups.
 
 ---
 
+## V1.4 — Extended Range
+
+**Target: Q3 2026**
+
+BLE Long Range and connectivity improvements. Addresses the #1 user request from community feedback.
+
+- [ ] BLE Long Range (Coded PHY S=8): 3-4x range improvement (~400m-1km depending on terrain)
+- [ ] Android: explicit PHY negotiation via platform channel (`setPreferredPhy`)
+- [ ] iOS: Coded PHY support via CoreBluetooth on iPhone 12+ / iOS 14+
+- [ ] Connection quality indicator (RSSI-based signal strength display on peer markers)
+- [ ] Adaptive PHY selection: auto-fallback to 1M PHY when Coded PHY unavailable
+- [ ] Range test mode: built-in tool to measure effective range between two devices
+- [ ] Basic mesh relay: forward position data through intermediate peers (single hop)
+
+---
+
 ## V2.0 — Intelligence Layer + ATAK Interop
 
 **Target: Q4 2026**
 
-Terrain analysis, environmental awareness, and Cursor on Target (CoT) interoperability.
+Terrain analysis, environmental awareness, Cursor on Target (CoT) interoperability, and Meshtastic integration.
 
+- [ ] Meshtastic BLE bridge: detect nearby Meshtastic radios and route Field Link traffic through LoRa mesh for multi-kilometer range
+- [ ] Meshtastic auto-discovery: scan for Meshtastic GATT service UUID, offer bridge mode when detected
 - [ ] ATAK interoperability layer (CoT XML message format — send/receive)
 - [ ] CoT SA (Situational Awareness) message support (position, callsign, team)
 - [ ] CoT bridge: translate Field Link CRDT positions to/from CoT events on local network
