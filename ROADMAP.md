@@ -73,14 +73,13 @@ Bug fixes, waypoint persistence, and heading improvements.
 
 Enhanced team coordination for larger groups.
 
-- [ ] Team roles: Lead, Scout, Medic, Comms (custom callsign + icon)
-- [ ] Waypoint sharing via Field Link (create, share, sync waypoints across team)
-- [ ] Route planning with MGRS waypoint sequences
-- [ ] Team boundary alerts (geofence notifications when peers exit area)
-- [ ] Shared annotations layer (draw on map, visible to all peers)
-- [ ] Voice callout queue (NATO phonetic auto-announce on position updates)
-- [ ] Enhanced AAR: team movement replay with timeline scrubber
+- [ ] Team roles: Lead (session admin, can promote others), Scout, Medic, Comms + custom roles (custom callsign + icon)
+- [ ] Waypoint sharing: "Save to My Waypoints" (personal, persistent) or "Share with Team" (synced via CRDT, session-scoped)
+- [ ] Shared annotations layer: tap-to-place polyline/polygon drawing, visible to all peers
+- [ ] Team boundary alerts: Lead draws polygon geofence, both Lead and boundary-crosser notified (single boundary per session)
+- [ ] Enhanced AAR: per-member tracks, role labels, boundary overlay in PDF export (interactive replay deferred to V2.1)
 - [ ] Custom map marker categories (hazard, rally point, objective, cache)
+- [ ] Voice callout queue (NATO phonetic auto-announce on position updates)
 - [ ] Export/import session data (JSON backup/restore)
 
 ---
@@ -114,6 +113,9 @@ Terrain analysis, environmental awareness, and Cursor on Target (CoT) interopera
 
 Professional-grade navigation tools.
 
+- [ ] Route planning with MGRS waypoint sequences (moved from V1.3)
+- [ ] Freehand annotation drawing mode (complements V1.3 tap-to-place)
+- [ ] Interactive team movement replay with timeline scrubber (deferred from V1.3)
 - [ ] Track recording with breadcrumb trail
 - [ ] Navigate-to-waypoint with bearing/distance compass
 - [ ] Track statistics: distance, elevation gain/loss, moving time, pace
