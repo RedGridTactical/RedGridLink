@@ -49,6 +49,15 @@ class Peers extends Table {
   TextColumn get syncMode =>
       text().withDefault(const Constant('expedition'))();
 
+  /// Team role: scout, medic, leader, navigator, comms, or custom.
+  TextColumn get role => text().withDefault(const Constant('scout'))();
+
+  /// Short tactical callsign.
+  TextColumn get callsign => text().withDefault(const Constant(''))();
+
+  /// Custom role label when role is 'custom'.
+  TextColumn get customRoleLabel => text().nullable()();
+
   @override
   Set<Column> get primaryKey => {id};
 }

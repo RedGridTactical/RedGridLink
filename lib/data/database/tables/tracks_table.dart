@@ -28,4 +28,7 @@ class Tracks extends Table {
 
   /// When this track point was recorded.
   DateTimeColumn get timestamp => dateTime()();
+
+  /// ID of the peer that recorded this track point.
+  TextColumn get peerId => text().withDefault(const Constant(''))();
 }

@@ -36,6 +36,9 @@ class Markers extends Table {
   /// Whether this marker has been synced to peers.
   BoolColumn get isSynced => boolean().withDefault(const Constant(false))();
 
+  /// Origin of the marker: manual, boundary, peer, or system.
+  TextColumn get origin => text().withDefault(const Constant('manual'))();
+
   @override
   Set<Column> get primaryKey => {id};
 }

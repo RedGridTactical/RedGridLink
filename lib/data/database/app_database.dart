@@ -13,6 +13,7 @@ import 'package:red_grid_link/data/database/tables/tracks_table.dart';
 import 'package:red_grid_link/data/database/tables/annotations_table.dart';
 import 'package:red_grid_link/data/database/tables/map_regions_table.dart';
 import 'package:red_grid_link/data/database/tables/session_history_table.dart';
+import 'package:red_grid_link/data/database/tables/boundary_events_table.dart';
 
 import 'package:red_grid_link/data/database/daos/sessions_dao.dart';
 import 'package:red_grid_link/data/database/daos/peers_dao.dart';
@@ -37,6 +38,7 @@ part 'app_database.g.dart';
     Annotations,
     MapRegions,
     SessionHistoryEntries,
+    BoundaryEvents,
   ],
   daos: [
     SessionsDao,
@@ -52,7 +54,7 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase(super.e);
 
   @override
-  int get schemaVersion => 2;
+  int get schemaVersion => 3;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -60,6 +62,14 @@ class AppDatabase extends _$AppDatabase {
         onUpgrade: (m, from, to) async {
           if (from < 2) {
             await m.createTable(sessionHistoryEntries);
+          }
+          if (from < 3) {
+            await m.addColumn(peers, peers.role);
+            await m.addColumn(peers, peers.callsign);
+            await m.addColumn(peers, peers.customRoleLabel);
+            await m.addColumn(markers, markers.origin);
+            await m.addColumn(tracks, tracks.peerId);
+            await m.createTable(boundaryEvents);
           }
         },
       );

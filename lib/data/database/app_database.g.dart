@@ -554,6 +554,27 @@ class $PeersTable extends Peers with TableInfo<$PeersTable, Peer> {
       type: DriftSqlType.string,
       requiredDuringInsert: false,
       defaultValue: const Constant('expedition'));
+  static const VerificationMeta _roleMeta = const VerificationMeta('role');
+  @override
+  late final GeneratedColumn<String> role = GeneratedColumn<String>(
+      'role', aliasedName, false,
+      type: DriftSqlType.string,
+      requiredDuringInsert: false,
+      defaultValue: const Constant('scout'));
+  static const VerificationMeta _callsignMeta =
+      const VerificationMeta('callsign');
+  @override
+  late final GeneratedColumn<String> callsign = GeneratedColumn<String>(
+      'callsign', aliasedName, false,
+      type: DriftSqlType.string,
+      requiredDuringInsert: false,
+      defaultValue: const Constant(''));
+  static const VerificationMeta _customRoleLabelMeta =
+      const VerificationMeta('customRoleLabel');
+  @override
+  late final GeneratedColumn<String> customRoleLabel = GeneratedColumn<String>(
+      'custom_role_label', aliasedName, true,
+      type: DriftSqlType.string, requiredDuringInsert: false);
   @override
   List<GeneratedColumn> get $columns => [
         id,
@@ -570,7 +591,10 @@ class $PeersTable extends Peers with TableInfo<$PeersTable, Peer> {
         lastSeen,
         isConnected,
         batteryLevel,
-        syncMode
+        syncMode,
+        role,
+        callsign,
+        customRoleLabel
       ];
   @override
   String get aliasedName => _alias ?? actualTableName;
@@ -655,6 +679,20 @@ class $PeersTable extends Peers with TableInfo<$PeersTable, Peer> {
       context.handle(_syncModeMeta,
           syncMode.isAcceptableOrUnknown(data['sync_mode']!, _syncModeMeta));
     }
+    if (data.containsKey('role')) {
+      context.handle(
+          _roleMeta, role.isAcceptableOrUnknown(data['role']!, _roleMeta));
+    }
+    if (data.containsKey('callsign')) {
+      context.handle(_callsignMeta,
+          callsign.isAcceptableOrUnknown(data['callsign']!, _callsignMeta));
+    }
+    if (data.containsKey('custom_role_label')) {
+      context.handle(
+          _customRoleLabelMeta,
+          customRoleLabel.isAcceptableOrUnknown(
+              data['custom_role_label']!, _customRoleLabelMeta));
+    }
     return context;
   }
 
@@ -694,6 +732,12 @@ class $PeersTable extends Peers with TableInfo<$PeersTable, Peer> {
           .read(DriftSqlType.int, data['${effectivePrefix}battery_level']),
       syncMode: attachedDatabase.typeMapping
           .read(DriftSqlType.string, data['${effectivePrefix}sync_mode'])!,
+      role: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}role'])!,
+      callsign: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}callsign'])!,
+      customRoleLabel: attachedDatabase.typeMapping.read(
+          DriftSqlType.string, data['${effectivePrefix}custom_role_label']),
     );
   }
 
@@ -748,6 +792,15 @@ class Peer extends DataClass implements Insertable<Peer> {
 
   /// Sync mode: expedition or active.
   final String syncMode;
+
+  /// Team role: scout, medic, leader, navigator, comms, or custom.
+  final String role;
+
+  /// Short tactical callsign.
+  final String callsign;
+
+  /// Custom role label when role is 'custom'.
+  final String? customRoleLabel;
   const Peer(
       {required this.id,
       required this.sessionId,
@@ -763,7 +816,10 @@ class Peer extends DataClass implements Insertable<Peer> {
       required this.lastSeen,
       required this.isConnected,
       this.batteryLevel,
-      required this.syncMode});
+      required this.syncMode,
+      required this.role,
+      required this.callsign,
+      this.customRoleLabel});
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
@@ -798,6 +854,11 @@ class Peer extends DataClass implements Insertable<Peer> {
       map['battery_level'] = Variable<int>(batteryLevel);
     }
     map['sync_mode'] = Variable<String>(syncMode);
+    map['role'] = Variable<String>(role);
+    map['callsign'] = Variable<String>(callsign);
+    if (!nullToAbsent || customRoleLabel != null) {
+      map['custom_role_label'] = Variable<String>(customRoleLabel);
+    }
     return map;
   }
 
@@ -829,6 +890,11 @@ class Peer extends DataClass implements Insertable<Peer> {
           ? const Value.absent()
           : Value(batteryLevel),
       syncMode: Value(syncMode),
+      role: Value(role),
+      callsign: Value(callsign),
+      customRoleLabel: customRoleLabel == null && nullToAbsent
+          ? const Value.absent()
+          : Value(customRoleLabel),
     );
   }
 
@@ -851,6 +917,9 @@ class Peer extends DataClass implements Insertable<Peer> {
       isConnected: serializer.fromJson<bool>(json['isConnected']),
       batteryLevel: serializer.fromJson<int?>(json['batteryLevel']),
       syncMode: serializer.fromJson<String>(json['syncMode']),
+      role: serializer.fromJson<String>(json['role']),
+      callsign: serializer.fromJson<String>(json['callsign']),
+      customRoleLabel: serializer.fromJson<String?>(json['customRoleLabel']),
     );
   }
   @override
@@ -872,6 +941,9 @@ class Peer extends DataClass implements Insertable<Peer> {
       'isConnected': serializer.toJson<bool>(isConnected),
       'batteryLevel': serializer.toJson<int?>(batteryLevel),
       'syncMode': serializer.toJson<String>(syncMode),
+      'role': serializer.toJson<String>(role),
+      'callsign': serializer.toJson<String>(callsign),
+      'customRoleLabel': serializer.toJson<String?>(customRoleLabel),
     };
   }
 
@@ -890,7 +962,10 @@ class Peer extends DataClass implements Insertable<Peer> {
           DateTime? lastSeen,
           bool? isConnected,
           Value<int?> batteryLevel = const Value.absent(),
-          String? syncMode}) =>
+          String? syncMode,
+          String? role,
+          String? callsign,
+          Value<String?> customRoleLabel = const Value.absent()}) =>
       Peer(
         id: id ?? this.id,
         sessionId: sessionId ?? this.sessionId,
@@ -908,6 +983,11 @@ class Peer extends DataClass implements Insertable<Peer> {
         batteryLevel:
             batteryLevel.present ? batteryLevel.value : this.batteryLevel,
         syncMode: syncMode ?? this.syncMode,
+        role: role ?? this.role,
+        callsign: callsign ?? this.callsign,
+        customRoleLabel: customRoleLabel.present
+            ? customRoleLabel.value
+            : this.customRoleLabel,
       );
   Peer copyWithCompanion(PeersCompanion data) {
     return Peer(
@@ -931,6 +1011,11 @@ class Peer extends DataClass implements Insertable<Peer> {
           ? data.batteryLevel.value
           : this.batteryLevel,
       syncMode: data.syncMode.present ? data.syncMode.value : this.syncMode,
+      role: data.role.present ? data.role.value : this.role,
+      callsign: data.callsign.present ? data.callsign.value : this.callsign,
+      customRoleLabel: data.customRoleLabel.present
+          ? data.customRoleLabel.value
+          : this.customRoleLabel,
     );
   }
 
@@ -951,7 +1036,10 @@ class Peer extends DataClass implements Insertable<Peer> {
           ..write('lastSeen: $lastSeen, ')
           ..write('isConnected: $isConnected, ')
           ..write('batteryLevel: $batteryLevel, ')
-          ..write('syncMode: $syncMode')
+          ..write('syncMode: $syncMode, ')
+          ..write('role: $role, ')
+          ..write('callsign: $callsign, ')
+          ..write('customRoleLabel: $customRoleLabel')
           ..write(')'))
         .toString();
   }
@@ -972,7 +1060,10 @@ class Peer extends DataClass implements Insertable<Peer> {
       lastSeen,
       isConnected,
       batteryLevel,
-      syncMode);
+      syncMode,
+      role,
+      callsign,
+      customRoleLabel);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -991,7 +1082,10 @@ class Peer extends DataClass implements Insertable<Peer> {
           other.lastSeen == this.lastSeen &&
           other.isConnected == this.isConnected &&
           other.batteryLevel == this.batteryLevel &&
-          other.syncMode == this.syncMode);
+          other.syncMode == this.syncMode &&
+          other.role == this.role &&
+          other.callsign == this.callsign &&
+          other.customRoleLabel == this.customRoleLabel);
 }
 
 class PeersCompanion extends UpdateCompanion<Peer> {
@@ -1010,6 +1104,9 @@ class PeersCompanion extends UpdateCompanion<Peer> {
   final Value<bool> isConnected;
   final Value<int?> batteryLevel;
   final Value<String> syncMode;
+  final Value<String> role;
+  final Value<String> callsign;
+  final Value<String?> customRoleLabel;
   final Value<int> rowid;
   const PeersCompanion({
     this.id = const Value.absent(),
@@ -1027,6 +1124,9 @@ class PeersCompanion extends UpdateCompanion<Peer> {
     this.isConnected = const Value.absent(),
     this.batteryLevel = const Value.absent(),
     this.syncMode = const Value.absent(),
+    this.role = const Value.absent(),
+    this.callsign = const Value.absent(),
+    this.customRoleLabel = const Value.absent(),
     this.rowid = const Value.absent(),
   });
   PeersCompanion.insert({
@@ -1045,6 +1145,9 @@ class PeersCompanion extends UpdateCompanion<Peer> {
     this.isConnected = const Value.absent(),
     this.batteryLevel = const Value.absent(),
     this.syncMode = const Value.absent(),
+    this.role = const Value.absent(),
+    this.callsign = const Value.absent(),
+    this.customRoleLabel = const Value.absent(),
     this.rowid = const Value.absent(),
   })  : sessionId = Value(sessionId),
         displayName = Value(displayName),
@@ -1065,6 +1168,9 @@ class PeersCompanion extends UpdateCompanion<Peer> {
     Expression<bool>? isConnected,
     Expression<int>? batteryLevel,
     Expression<String>? syncMode,
+    Expression<String>? role,
+    Expression<String>? callsign,
+    Expression<String>? customRoleLabel,
     Expression<int>? rowid,
   }) {
     return RawValuesInsertable({
@@ -1083,6 +1189,9 @@ class PeersCompanion extends UpdateCompanion<Peer> {
       if (isConnected != null) 'is_connected': isConnected,
       if (batteryLevel != null) 'battery_level': batteryLevel,
       if (syncMode != null) 'sync_mode': syncMode,
+      if (role != null) 'role': role,
+      if (callsign != null) 'callsign': callsign,
+      if (customRoleLabel != null) 'custom_role_label': customRoleLabel,
       if (rowid != null) 'rowid': rowid,
     });
   }
@@ -1103,6 +1212,9 @@ class PeersCompanion extends UpdateCompanion<Peer> {
       Value<bool>? isConnected,
       Value<int?>? batteryLevel,
       Value<String>? syncMode,
+      Value<String>? role,
+      Value<String>? callsign,
+      Value<String?>? customRoleLabel,
       Value<int>? rowid}) {
     return PeersCompanion(
       id: id ?? this.id,
@@ -1120,6 +1232,9 @@ class PeersCompanion extends UpdateCompanion<Peer> {
       isConnected: isConnected ?? this.isConnected,
       batteryLevel: batteryLevel ?? this.batteryLevel,
       syncMode: syncMode ?? this.syncMode,
+      role: role ?? this.role,
+      callsign: callsign ?? this.callsign,
+      customRoleLabel: customRoleLabel ?? this.customRoleLabel,
       rowid: rowid ?? this.rowid,
     );
   }
@@ -1172,6 +1287,15 @@ class PeersCompanion extends UpdateCompanion<Peer> {
     if (syncMode.present) {
       map['sync_mode'] = Variable<String>(syncMode.value);
     }
+    if (role.present) {
+      map['role'] = Variable<String>(role.value);
+    }
+    if (callsign.present) {
+      map['callsign'] = Variable<String>(callsign.value);
+    }
+    if (customRoleLabel.present) {
+      map['custom_role_label'] = Variable<String>(customRoleLabel.value);
+    }
     if (rowid.present) {
       map['rowid'] = Variable<int>(rowid.value);
     }
@@ -1196,6 +1320,9 @@ class PeersCompanion extends UpdateCompanion<Peer> {
           ..write('isConnected: $isConnected, ')
           ..write('batteryLevel: $batteryLevel, ')
           ..write('syncMode: $syncMode, ')
+          ..write('role: $role, ')
+          ..write('callsign: $callsign, ')
+          ..write('customRoleLabel: $customRoleLabel, ')
           ..write('rowid: $rowid')
           ..write(')'))
         .toString();
@@ -1276,6 +1403,13 @@ class $MarkersTable extends Markers with TableInfo<$MarkersTable, Marker> {
       defaultConstraints:
           GeneratedColumn.constraintIsAlways('CHECK ("is_synced" IN (0, 1))'),
       defaultValue: const Constant(false));
+  static const VerificationMeta _originMeta = const VerificationMeta('origin');
+  @override
+  late final GeneratedColumn<String> origin = GeneratedColumn<String>(
+      'origin', aliasedName, false,
+      type: DriftSqlType.string,
+      requiredDuringInsert: false,
+      defaultValue: const Constant('manual'));
   @override
   List<GeneratedColumn> get $columns => [
         id,
@@ -1288,7 +1422,8 @@ class $MarkersTable extends Markers with TableInfo<$MarkersTable, Marker> {
         createdBy,
         createdAt,
         color,
-        isSynced
+        isSynced,
+        origin
       ];
   @override
   String get aliasedName => _alias ?? actualTableName;
@@ -1355,6 +1490,10 @@ class $MarkersTable extends Markers with TableInfo<$MarkersTable, Marker> {
       context.handle(_isSyncedMeta,
           isSynced.isAcceptableOrUnknown(data['is_synced']!, _isSyncedMeta));
     }
+    if (data.containsKey('origin')) {
+      context.handle(_originMeta,
+          origin.isAcceptableOrUnknown(data['origin']!, _originMeta));
+    }
     return context;
   }
 
@@ -1386,6 +1525,8 @@ class $MarkersTable extends Markers with TableInfo<$MarkersTable, Marker> {
           .read(DriftSqlType.int, data['${effectivePrefix}color'])!,
       isSynced: attachedDatabase.typeMapping
           .read(DriftSqlType.bool, data['${effectivePrefix}is_synced'])!,
+      origin: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}origin'])!,
     );
   }
 
@@ -1428,6 +1569,9 @@ class Marker extends DataClass implements Insertable<Marker> {
 
   /// Whether this marker has been synced to peers.
   final bool isSynced;
+
+  /// Origin of the marker: manual, boundary, peer, or system.
+  final String origin;
   const Marker(
       {required this.id,
       this.sessionId,
@@ -1439,7 +1583,8 @@ class Marker extends DataClass implements Insertable<Marker> {
       required this.createdBy,
       required this.createdAt,
       required this.color,
-      required this.isSynced});
+      required this.isSynced,
+      required this.origin});
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
@@ -1456,6 +1601,7 @@ class Marker extends DataClass implements Insertable<Marker> {
     map['created_at'] = Variable<DateTime>(createdAt);
     map['color'] = Variable<int>(color);
     map['is_synced'] = Variable<bool>(isSynced);
+    map['origin'] = Variable<String>(origin);
     return map;
   }
 
@@ -1474,6 +1620,7 @@ class Marker extends DataClass implements Insertable<Marker> {
       createdAt: Value(createdAt),
       color: Value(color),
       isSynced: Value(isSynced),
+      origin: Value(origin),
     );
   }
 
@@ -1492,6 +1639,7 @@ class Marker extends DataClass implements Insertable<Marker> {
       createdAt: serializer.fromJson<DateTime>(json['createdAt']),
       color: serializer.fromJson<int>(json['color']),
       isSynced: serializer.fromJson<bool>(json['isSynced']),
+      origin: serializer.fromJson<String>(json['origin']),
     );
   }
   @override
@@ -1509,6 +1657,7 @@ class Marker extends DataClass implements Insertable<Marker> {
       'createdAt': serializer.toJson<DateTime>(createdAt),
       'color': serializer.toJson<int>(color),
       'isSynced': serializer.toJson<bool>(isSynced),
+      'origin': serializer.toJson<String>(origin),
     };
   }
 
@@ -1523,7 +1672,8 @@ class Marker extends DataClass implements Insertable<Marker> {
           String? createdBy,
           DateTime? createdAt,
           int? color,
-          bool? isSynced}) =>
+          bool? isSynced,
+          String? origin}) =>
       Marker(
         id: id ?? this.id,
         sessionId: sessionId.present ? sessionId.value : this.sessionId,
@@ -1536,6 +1686,7 @@ class Marker extends DataClass implements Insertable<Marker> {
         createdAt: createdAt ?? this.createdAt,
         color: color ?? this.color,
         isSynced: isSynced ?? this.isSynced,
+        origin: origin ?? this.origin,
       );
   Marker copyWithCompanion(MarkersCompanion data) {
     return Marker(
@@ -1550,6 +1701,7 @@ class Marker extends DataClass implements Insertable<Marker> {
       createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
       color: data.color.present ? data.color.value : this.color,
       isSynced: data.isSynced.present ? data.isSynced.value : this.isSynced,
+      origin: data.origin.present ? data.origin.value : this.origin,
     );
   }
 
@@ -1566,14 +1718,15 @@ class Marker extends DataClass implements Insertable<Marker> {
           ..write('createdBy: $createdBy, ')
           ..write('createdAt: $createdAt, ')
           ..write('color: $color, ')
-          ..write('isSynced: $isSynced')
+          ..write('isSynced: $isSynced, ')
+          ..write('origin: $origin')
           ..write(')'))
         .toString();
   }
 
   @override
   int get hashCode => Object.hash(id, sessionId, lat, lon, mgrs, label, icon,
-      createdBy, createdAt, color, isSynced);
+      createdBy, createdAt, color, isSynced, origin);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -1588,7 +1741,8 @@ class Marker extends DataClass implements Insertable<Marker> {
           other.createdBy == this.createdBy &&
           other.createdAt == this.createdAt &&
           other.color == this.color &&
-          other.isSynced == this.isSynced);
+          other.isSynced == this.isSynced &&
+          other.origin == this.origin);
 }
 
 class MarkersCompanion extends UpdateCompanion<Marker> {
@@ -1603,6 +1757,7 @@ class MarkersCompanion extends UpdateCompanion<Marker> {
   final Value<DateTime> createdAt;
   final Value<int> color;
   final Value<bool> isSynced;
+  final Value<String> origin;
   final Value<int> rowid;
   const MarkersCompanion({
     this.id = const Value.absent(),
@@ -1616,6 +1771,7 @@ class MarkersCompanion extends UpdateCompanion<Marker> {
     this.createdAt = const Value.absent(),
     this.color = const Value.absent(),
     this.isSynced = const Value.absent(),
+    this.origin = const Value.absent(),
     this.rowid = const Value.absent(),
   });
   MarkersCompanion.insert({
@@ -1630,6 +1786,7 @@ class MarkersCompanion extends UpdateCompanion<Marker> {
     required DateTime createdAt,
     this.color = const Value.absent(),
     this.isSynced = const Value.absent(),
+    this.origin = const Value.absent(),
     this.rowid = const Value.absent(),
   })  : lat = Value(lat),
         lon = Value(lon),
@@ -1649,6 +1806,7 @@ class MarkersCompanion extends UpdateCompanion<Marker> {
     Expression<DateTime>? createdAt,
     Expression<int>? color,
     Expression<bool>? isSynced,
+    Expression<String>? origin,
     Expression<int>? rowid,
   }) {
     return RawValuesInsertable({
@@ -1663,6 +1821,7 @@ class MarkersCompanion extends UpdateCompanion<Marker> {
       if (createdAt != null) 'created_at': createdAt,
       if (color != null) 'color': color,
       if (isSynced != null) 'is_synced': isSynced,
+      if (origin != null) 'origin': origin,
       if (rowid != null) 'rowid': rowid,
     });
   }
@@ -1679,6 +1838,7 @@ class MarkersCompanion extends UpdateCompanion<Marker> {
       Value<DateTime>? createdAt,
       Value<int>? color,
       Value<bool>? isSynced,
+      Value<String>? origin,
       Value<int>? rowid}) {
     return MarkersCompanion(
       id: id ?? this.id,
@@ -1692,6 +1852,7 @@ class MarkersCompanion extends UpdateCompanion<Marker> {
       createdAt: createdAt ?? this.createdAt,
       color: color ?? this.color,
       isSynced: isSynced ?? this.isSynced,
+      origin: origin ?? this.origin,
       rowid: rowid ?? this.rowid,
     );
   }
@@ -1732,6 +1893,9 @@ class MarkersCompanion extends UpdateCompanion<Marker> {
     if (isSynced.present) {
       map['is_synced'] = Variable<bool>(isSynced.value);
     }
+    if (origin.present) {
+      map['origin'] = Variable<String>(origin.value);
+    }
     if (rowid.present) {
       map['rowid'] = Variable<int>(rowid.value);
     }
@@ -1752,6 +1916,7 @@ class MarkersCompanion extends UpdateCompanion<Marker> {
           ..write('createdAt: $createdAt, ')
           ..write('color: $color, ')
           ..write('isSynced: $isSynced, ')
+          ..write('origin: $origin, ')
           ..write('rowid: $rowid')
           ..write(')'))
         .toString();
@@ -1817,9 +1982,26 @@ class $TracksTable extends Tracks with TableInfo<$TracksTable, Track> {
   late final GeneratedColumn<DateTime> timestamp = GeneratedColumn<DateTime>(
       'timestamp', aliasedName, false,
       type: DriftSqlType.dateTime, requiredDuringInsert: true);
+  static const VerificationMeta _peerIdMeta = const VerificationMeta('peerId');
   @override
-  List<GeneratedColumn> get $columns =>
-      [id, sessionId, lat, lon, altitude, speed, heading, accuracy, timestamp];
+  late final GeneratedColumn<String> peerId = GeneratedColumn<String>(
+      'peer_id', aliasedName, false,
+      type: DriftSqlType.string,
+      requiredDuringInsert: false,
+      defaultValue: const Constant(''));
+  @override
+  List<GeneratedColumn> get $columns => [
+        id,
+        sessionId,
+        lat,
+        lon,
+        altitude,
+        speed,
+        heading,
+        accuracy,
+        timestamp,
+        peerId
+      ];
   @override
   String get aliasedName => _alias ?? actualTableName;
   @override
@@ -1871,6 +2053,10 @@ class $TracksTable extends Tracks with TableInfo<$TracksTable, Track> {
     } else if (isInserting) {
       context.missing(_timestampMeta);
     }
+    if (data.containsKey('peer_id')) {
+      context.handle(_peerIdMeta,
+          peerId.isAcceptableOrUnknown(data['peer_id']!, _peerIdMeta));
+    }
     return context;
   }
 
@@ -1898,6 +2084,8 @@ class $TracksTable extends Tracks with TableInfo<$TracksTable, Track> {
           .read(DriftSqlType.double, data['${effectivePrefix}accuracy']),
       timestamp: attachedDatabase.typeMapping
           .read(DriftSqlType.dateTime, data['${effectivePrefix}timestamp'])!,
+      peerId: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}peer_id'])!,
     );
   }
 
@@ -1934,6 +2122,9 @@ class Track extends DataClass implements Insertable<Track> {
 
   /// When this track point was recorded.
   final DateTime timestamp;
+
+  /// ID of the peer that recorded this track point.
+  final String peerId;
   const Track(
       {required this.id,
       this.sessionId,
@@ -1943,7 +2134,8 @@ class Track extends DataClass implements Insertable<Track> {
       this.speed,
       this.heading,
       this.accuracy,
-      required this.timestamp});
+      required this.timestamp,
+      required this.peerId});
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
@@ -1966,6 +2158,7 @@ class Track extends DataClass implements Insertable<Track> {
       map['accuracy'] = Variable<double>(accuracy);
     }
     map['timestamp'] = Variable<DateTime>(timestamp);
+    map['peer_id'] = Variable<String>(peerId);
     return map;
   }
 
@@ -1989,6 +2182,7 @@ class Track extends DataClass implements Insertable<Track> {
           ? const Value.absent()
           : Value(accuracy),
       timestamp: Value(timestamp),
+      peerId: Value(peerId),
     );
   }
 
@@ -2005,6 +2199,7 @@ class Track extends DataClass implements Insertable<Track> {
       heading: serializer.fromJson<double?>(json['heading']),
       accuracy: serializer.fromJson<double?>(json['accuracy']),
       timestamp: serializer.fromJson<DateTime>(json['timestamp']),
+      peerId: serializer.fromJson<String>(json['peerId']),
     );
   }
   @override
@@ -2020,6 +2215,7 @@ class Track extends DataClass implements Insertable<Track> {
       'heading': serializer.toJson<double?>(heading),
       'accuracy': serializer.toJson<double?>(accuracy),
       'timestamp': serializer.toJson<DateTime>(timestamp),
+      'peerId': serializer.toJson<String>(peerId),
     };
   }
 
@@ -2032,7 +2228,8 @@ class Track extends DataClass implements Insertable<Track> {
           Value<double?> speed = const Value.absent(),
           Value<double?> heading = const Value.absent(),
           Value<double?> accuracy = const Value.absent(),
-          DateTime? timestamp}) =>
+          DateTime? timestamp,
+          String? peerId}) =>
       Track(
         id: id ?? this.id,
         sessionId: sessionId.present ? sessionId.value : this.sessionId,
@@ -2043,6 +2240,7 @@ class Track extends DataClass implements Insertable<Track> {
         heading: heading.present ? heading.value : this.heading,
         accuracy: accuracy.present ? accuracy.value : this.accuracy,
         timestamp: timestamp ?? this.timestamp,
+        peerId: peerId ?? this.peerId,
       );
   Track copyWithCompanion(TracksCompanion data) {
     return Track(
@@ -2055,6 +2253,7 @@ class Track extends DataClass implements Insertable<Track> {
       heading: data.heading.present ? data.heading.value : this.heading,
       accuracy: data.accuracy.present ? data.accuracy.value : this.accuracy,
       timestamp: data.timestamp.present ? data.timestamp.value : this.timestamp,
+      peerId: data.peerId.present ? data.peerId.value : this.peerId,
     );
   }
 
@@ -2069,14 +2268,15 @@ class Track extends DataClass implements Insertable<Track> {
           ..write('speed: $speed, ')
           ..write('heading: $heading, ')
           ..write('accuracy: $accuracy, ')
-          ..write('timestamp: $timestamp')
+          ..write('timestamp: $timestamp, ')
+          ..write('peerId: $peerId')
           ..write(')'))
         .toString();
   }
 
   @override
-  int get hashCode => Object.hash(
-      id, sessionId, lat, lon, altitude, speed, heading, accuracy, timestamp);
+  int get hashCode => Object.hash(id, sessionId, lat, lon, altitude, speed,
+      heading, accuracy, timestamp, peerId);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -2089,7 +2289,8 @@ class Track extends DataClass implements Insertable<Track> {
           other.speed == this.speed &&
           other.heading == this.heading &&
           other.accuracy == this.accuracy &&
-          other.timestamp == this.timestamp);
+          other.timestamp == this.timestamp &&
+          other.peerId == this.peerId);
 }
 
 class TracksCompanion extends UpdateCompanion<Track> {
@@ -2102,6 +2303,7 @@ class TracksCompanion extends UpdateCompanion<Track> {
   final Value<double?> heading;
   final Value<double?> accuracy;
   final Value<DateTime> timestamp;
+  final Value<String> peerId;
   const TracksCompanion({
     this.id = const Value.absent(),
     this.sessionId = const Value.absent(),
@@ -2112,6 +2314,7 @@ class TracksCompanion extends UpdateCompanion<Track> {
     this.heading = const Value.absent(),
     this.accuracy = const Value.absent(),
     this.timestamp = const Value.absent(),
+    this.peerId = const Value.absent(),
   });
   TracksCompanion.insert({
     this.id = const Value.absent(),
@@ -2123,6 +2326,7 @@ class TracksCompanion extends UpdateCompanion<Track> {
     this.heading = const Value.absent(),
     this.accuracy = const Value.absent(),
     required DateTime timestamp,
+    this.peerId = const Value.absent(),
   })  : lat = Value(lat),
         lon = Value(lon),
         timestamp = Value(timestamp);
@@ -2136,6 +2340,7 @@ class TracksCompanion extends UpdateCompanion<Track> {
     Expression<double>? heading,
     Expression<double>? accuracy,
     Expression<DateTime>? timestamp,
+    Expression<String>? peerId,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
@@ -2147,6 +2352,7 @@ class TracksCompanion extends UpdateCompanion<Track> {
       if (heading != null) 'heading': heading,
       if (accuracy != null) 'accuracy': accuracy,
       if (timestamp != null) 'timestamp': timestamp,
+      if (peerId != null) 'peer_id': peerId,
     });
   }
 
@@ -2159,7 +2365,8 @@ class TracksCompanion extends UpdateCompanion<Track> {
       Value<double?>? speed,
       Value<double?>? heading,
       Value<double?>? accuracy,
-      Value<DateTime>? timestamp}) {
+      Value<DateTime>? timestamp,
+      Value<String>? peerId}) {
     return TracksCompanion(
       id: id ?? this.id,
       sessionId: sessionId ?? this.sessionId,
@@ -2170,6 +2377,7 @@ class TracksCompanion extends UpdateCompanion<Track> {
       heading: heading ?? this.heading,
       accuracy: accuracy ?? this.accuracy,
       timestamp: timestamp ?? this.timestamp,
+      peerId: peerId ?? this.peerId,
     );
   }
 
@@ -2203,6 +2411,9 @@ class TracksCompanion extends UpdateCompanion<Track> {
     if (timestamp.present) {
       map['timestamp'] = Variable<DateTime>(timestamp.value);
     }
+    if (peerId.present) {
+      map['peer_id'] = Variable<String>(peerId.value);
+    }
     return map;
   }
 
@@ -2217,7 +2428,8 @@ class TracksCompanion extends UpdateCompanion<Track> {
           ..write('speed: $speed, ')
           ..write('heading: $heading, ')
           ..write('accuracy: $accuracy, ')
-          ..write('timestamp: $timestamp')
+          ..write('timestamp: $timestamp, ')
+          ..write('peerId: $peerId')
           ..write(')'))
         .toString();
   }
@@ -3739,6 +3951,400 @@ class SessionHistoryEntriesCompanion
   }
 }
 
+class $BoundaryEventsTable extends BoundaryEvents
+    with TableInfo<$BoundaryEventsTable, BoundaryEvent> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $BoundaryEventsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
+      'id', aliasedName, false,
+      type: DriftSqlType.string, requiredDuringInsert: true);
+  static const VerificationMeta _sessionIdMeta =
+      const VerificationMeta('sessionId');
+  @override
+  late final GeneratedColumn<String> sessionId = GeneratedColumn<String>(
+      'session_id', aliasedName, false,
+      type: DriftSqlType.string, requiredDuringInsert: true);
+  static const VerificationMeta _peerIdMeta = const VerificationMeta('peerId');
+  @override
+  late final GeneratedColumn<String> peerId = GeneratedColumn<String>(
+      'peer_id', aliasedName, false,
+      type: DriftSqlType.string, requiredDuringInsert: true);
+  static const VerificationMeta _callsignMeta =
+      const VerificationMeta('callsign');
+  @override
+  late final GeneratedColumn<String> callsign = GeneratedColumn<String>(
+      'callsign', aliasedName, false,
+      type: DriftSqlType.string, requiredDuringInsert: true);
+  static const VerificationMeta _timestampMeta =
+      const VerificationMeta('timestamp');
+  @override
+  late final GeneratedColumn<DateTime> timestamp = GeneratedColumn<DateTime>(
+      'timestamp', aliasedName, false,
+      type: DriftSqlType.dateTime, requiredDuringInsert: true);
+  static const VerificationMeta _latMeta = const VerificationMeta('lat');
+  @override
+  late final GeneratedColumn<double> lat = GeneratedColumn<double>(
+      'lat', aliasedName, false,
+      type: DriftSqlType.double, requiredDuringInsert: true);
+  static const VerificationMeta _lonMeta = const VerificationMeta('lon');
+  @override
+  late final GeneratedColumn<double> lon = GeneratedColumn<double>(
+      'lon', aliasedName, false,
+      type: DriftSqlType.double, requiredDuringInsert: true);
+  @override
+  List<GeneratedColumn> get $columns =>
+      [id, sessionId, peerId, callsign, timestamp, lat, lon];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'boundary_events';
+  @override
+  VerificationContext validateIntegrity(Insertable<BoundaryEvent> instance,
+      {bool isInserting = false}) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    } else if (isInserting) {
+      context.missing(_idMeta);
+    }
+    if (data.containsKey('session_id')) {
+      context.handle(_sessionIdMeta,
+          sessionId.isAcceptableOrUnknown(data['session_id']!, _sessionIdMeta));
+    } else if (isInserting) {
+      context.missing(_sessionIdMeta);
+    }
+    if (data.containsKey('peer_id')) {
+      context.handle(_peerIdMeta,
+          peerId.isAcceptableOrUnknown(data['peer_id']!, _peerIdMeta));
+    } else if (isInserting) {
+      context.missing(_peerIdMeta);
+    }
+    if (data.containsKey('callsign')) {
+      context.handle(_callsignMeta,
+          callsign.isAcceptableOrUnknown(data['callsign']!, _callsignMeta));
+    } else if (isInserting) {
+      context.missing(_callsignMeta);
+    }
+    if (data.containsKey('timestamp')) {
+      context.handle(_timestampMeta,
+          timestamp.isAcceptableOrUnknown(data['timestamp']!, _timestampMeta));
+    } else if (isInserting) {
+      context.missing(_timestampMeta);
+    }
+    if (data.containsKey('lat')) {
+      context.handle(
+          _latMeta, lat.isAcceptableOrUnknown(data['lat']!, _latMeta));
+    } else if (isInserting) {
+      context.missing(_latMeta);
+    }
+    if (data.containsKey('lon')) {
+      context.handle(
+          _lonMeta, lon.isAcceptableOrUnknown(data['lon']!, _lonMeta));
+    } else if (isInserting) {
+      context.missing(_lonMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  BoundaryEvent map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return BoundaryEvent(
+      id: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}id'])!,
+      sessionId: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}session_id'])!,
+      peerId: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}peer_id'])!,
+      callsign: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}callsign'])!,
+      timestamp: attachedDatabase.typeMapping
+          .read(DriftSqlType.dateTime, data['${effectivePrefix}timestamp'])!,
+      lat: attachedDatabase.typeMapping
+          .read(DriftSqlType.double, data['${effectivePrefix}lat'])!,
+      lon: attachedDatabase.typeMapping
+          .read(DriftSqlType.double, data['${effectivePrefix}lon'])!,
+    );
+  }
+
+  @override
+  $BoundaryEventsTable createAlias(String alias) {
+    return $BoundaryEventsTable(attachedDatabase, alias);
+  }
+}
+
+class BoundaryEvent extends DataClass implements Insertable<BoundaryEvent> {
+  /// Unique event ID (UUID v4).
+  final String id;
+
+  /// Foreign key to sessions table.
+  final String sessionId;
+
+  /// ID of the peer that triggered the event.
+  final String peerId;
+
+  /// Callsign of the peer at the time of the event.
+  final String callsign;
+
+  /// When the boundary event occurred.
+  final DateTime timestamp;
+
+  /// GPS latitude of the crossing point.
+  final double lat;
+
+  /// GPS longitude of the crossing point.
+  final double lon;
+  const BoundaryEvent(
+      {required this.id,
+      required this.sessionId,
+      required this.peerId,
+      required this.callsign,
+      required this.timestamp,
+      required this.lat,
+      required this.lon});
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<String>(id);
+    map['session_id'] = Variable<String>(sessionId);
+    map['peer_id'] = Variable<String>(peerId);
+    map['callsign'] = Variable<String>(callsign);
+    map['timestamp'] = Variable<DateTime>(timestamp);
+    map['lat'] = Variable<double>(lat);
+    map['lon'] = Variable<double>(lon);
+    return map;
+  }
+
+  BoundaryEventsCompanion toCompanion(bool nullToAbsent) {
+    return BoundaryEventsCompanion(
+      id: Value(id),
+      sessionId: Value(sessionId),
+      peerId: Value(peerId),
+      callsign: Value(callsign),
+      timestamp: Value(timestamp),
+      lat: Value(lat),
+      lon: Value(lon),
+    );
+  }
+
+  factory BoundaryEvent.fromJson(Map<String, dynamic> json,
+      {ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return BoundaryEvent(
+      id: serializer.fromJson<String>(json['id']),
+      sessionId: serializer.fromJson<String>(json['sessionId']),
+      peerId: serializer.fromJson<String>(json['peerId']),
+      callsign: serializer.fromJson<String>(json['callsign']),
+      timestamp: serializer.fromJson<DateTime>(json['timestamp']),
+      lat: serializer.fromJson<double>(json['lat']),
+      lon: serializer.fromJson<double>(json['lon']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<String>(id),
+      'sessionId': serializer.toJson<String>(sessionId),
+      'peerId': serializer.toJson<String>(peerId),
+      'callsign': serializer.toJson<String>(callsign),
+      'timestamp': serializer.toJson<DateTime>(timestamp),
+      'lat': serializer.toJson<double>(lat),
+      'lon': serializer.toJson<double>(lon),
+    };
+  }
+
+  BoundaryEvent copyWith(
+          {String? id,
+          String? sessionId,
+          String? peerId,
+          String? callsign,
+          DateTime? timestamp,
+          double? lat,
+          double? lon}) =>
+      BoundaryEvent(
+        id: id ?? this.id,
+        sessionId: sessionId ?? this.sessionId,
+        peerId: peerId ?? this.peerId,
+        callsign: callsign ?? this.callsign,
+        timestamp: timestamp ?? this.timestamp,
+        lat: lat ?? this.lat,
+        lon: lon ?? this.lon,
+      );
+  BoundaryEvent copyWithCompanion(BoundaryEventsCompanion data) {
+    return BoundaryEvent(
+      id: data.id.present ? data.id.value : this.id,
+      sessionId: data.sessionId.present ? data.sessionId.value : this.sessionId,
+      peerId: data.peerId.present ? data.peerId.value : this.peerId,
+      callsign: data.callsign.present ? data.callsign.value : this.callsign,
+      timestamp: data.timestamp.present ? data.timestamp.value : this.timestamp,
+      lat: data.lat.present ? data.lat.value : this.lat,
+      lon: data.lon.present ? data.lon.value : this.lon,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('BoundaryEvent(')
+          ..write('id: $id, ')
+          ..write('sessionId: $sessionId, ')
+          ..write('peerId: $peerId, ')
+          ..write('callsign: $callsign, ')
+          ..write('timestamp: $timestamp, ')
+          ..write('lat: $lat, ')
+          ..write('lon: $lon')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode =>
+      Object.hash(id, sessionId, peerId, callsign, timestamp, lat, lon);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is BoundaryEvent &&
+          other.id == this.id &&
+          other.sessionId == this.sessionId &&
+          other.peerId == this.peerId &&
+          other.callsign == this.callsign &&
+          other.timestamp == this.timestamp &&
+          other.lat == this.lat &&
+          other.lon == this.lon);
+}
+
+class BoundaryEventsCompanion extends UpdateCompanion<BoundaryEvent> {
+  final Value<String> id;
+  final Value<String> sessionId;
+  final Value<String> peerId;
+  final Value<String> callsign;
+  final Value<DateTime> timestamp;
+  final Value<double> lat;
+  final Value<double> lon;
+  final Value<int> rowid;
+  const BoundaryEventsCompanion({
+    this.id = const Value.absent(),
+    this.sessionId = const Value.absent(),
+    this.peerId = const Value.absent(),
+    this.callsign = const Value.absent(),
+    this.timestamp = const Value.absent(),
+    this.lat = const Value.absent(),
+    this.lon = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  BoundaryEventsCompanion.insert({
+    required String id,
+    required String sessionId,
+    required String peerId,
+    required String callsign,
+    required DateTime timestamp,
+    required double lat,
+    required double lon,
+    this.rowid = const Value.absent(),
+  })  : id = Value(id),
+        sessionId = Value(sessionId),
+        peerId = Value(peerId),
+        callsign = Value(callsign),
+        timestamp = Value(timestamp),
+        lat = Value(lat),
+        lon = Value(lon);
+  static Insertable<BoundaryEvent> custom({
+    Expression<String>? id,
+    Expression<String>? sessionId,
+    Expression<String>? peerId,
+    Expression<String>? callsign,
+    Expression<DateTime>? timestamp,
+    Expression<double>? lat,
+    Expression<double>? lon,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (sessionId != null) 'session_id': sessionId,
+      if (peerId != null) 'peer_id': peerId,
+      if (callsign != null) 'callsign': callsign,
+      if (timestamp != null) 'timestamp': timestamp,
+      if (lat != null) 'lat': lat,
+      if (lon != null) 'lon': lon,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  BoundaryEventsCompanion copyWith(
+      {Value<String>? id,
+      Value<String>? sessionId,
+      Value<String>? peerId,
+      Value<String>? callsign,
+      Value<DateTime>? timestamp,
+      Value<double>? lat,
+      Value<double>? lon,
+      Value<int>? rowid}) {
+    return BoundaryEventsCompanion(
+      id: id ?? this.id,
+      sessionId: sessionId ?? this.sessionId,
+      peerId: peerId ?? this.peerId,
+      callsign: callsign ?? this.callsign,
+      timestamp: timestamp ?? this.timestamp,
+      lat: lat ?? this.lat,
+      lon: lon ?? this.lon,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<String>(id.value);
+    }
+    if (sessionId.present) {
+      map['session_id'] = Variable<String>(sessionId.value);
+    }
+    if (peerId.present) {
+      map['peer_id'] = Variable<String>(peerId.value);
+    }
+    if (callsign.present) {
+      map['callsign'] = Variable<String>(callsign.value);
+    }
+    if (timestamp.present) {
+      map['timestamp'] = Variable<DateTime>(timestamp.value);
+    }
+    if (lat.present) {
+      map['lat'] = Variable<double>(lat.value);
+    }
+    if (lon.present) {
+      map['lon'] = Variable<double>(lon.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('BoundaryEventsCompanion(')
+          ..write('id: $id, ')
+          ..write('sessionId: $sessionId, ')
+          ..write('peerId: $peerId, ')
+          ..write('callsign: $callsign, ')
+          ..write('timestamp: $timestamp, ')
+          ..write('lat: $lat, ')
+          ..write('lon: $lon, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$AppDatabase extends GeneratedDatabase {
   _$AppDatabase(QueryExecutor e) : super(e);
   $AppDatabaseManager get managers => $AppDatabaseManager(this);
@@ -3750,6 +4356,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   late final $MapRegionsTable mapRegions = $MapRegionsTable(this);
   late final $SessionHistoryEntriesTable sessionHistoryEntries =
       $SessionHistoryEntriesTable(this);
+  late final $BoundaryEventsTable boundaryEvents = $BoundaryEventsTable(this);
   late final SessionsDao sessionsDao = SessionsDao(this as AppDatabase);
   late final PeersDao peersDao = PeersDao(this as AppDatabase);
   late final MarkersDao markersDao = MarkersDao(this as AppDatabase);
@@ -3770,7 +4377,8 @@ abstract class _$AppDatabase extends GeneratedDatabase {
         tracks,
         annotations,
         mapRegions,
-        sessionHistoryEntries
+        sessionHistoryEntries,
+        boundaryEvents
       ];
   @override
   DriftDatabaseOptions get options =>
@@ -3967,6 +4575,9 @@ typedef $$PeersTableCreateCompanionBuilder = PeersCompanion Function({
   Value<bool> isConnected,
   Value<int?> batteryLevel,
   Value<String> syncMode,
+  Value<String> role,
+  Value<String> callsign,
+  Value<String?> customRoleLabel,
   Value<int> rowid,
 });
 typedef $$PeersTableUpdateCompanionBuilder = PeersCompanion Function({
@@ -3985,6 +4596,9 @@ typedef $$PeersTableUpdateCompanionBuilder = PeersCompanion Function({
   Value<bool> isConnected,
   Value<int?> batteryLevel,
   Value<String> syncMode,
+  Value<String> role,
+  Value<String> callsign,
+  Value<String?> customRoleLabel,
   Value<int> rowid,
 });
 
@@ -4020,6 +4634,9 @@ class $$PeersTableTableManager extends RootTableManager<
             Value<bool> isConnected = const Value.absent(),
             Value<int?> batteryLevel = const Value.absent(),
             Value<String> syncMode = const Value.absent(),
+            Value<String> role = const Value.absent(),
+            Value<String> callsign = const Value.absent(),
+            Value<String?> customRoleLabel = const Value.absent(),
             Value<int> rowid = const Value.absent(),
           }) =>
               PeersCompanion(
@@ -4038,6 +4655,9 @@ class $$PeersTableTableManager extends RootTableManager<
             isConnected: isConnected,
             batteryLevel: batteryLevel,
             syncMode: syncMode,
+            role: role,
+            callsign: callsign,
+            customRoleLabel: customRoleLabel,
             rowid: rowid,
           ),
           createCompanionCallback: ({
@@ -4056,6 +4676,9 @@ class $$PeersTableTableManager extends RootTableManager<
             Value<bool> isConnected = const Value.absent(),
             Value<int?> batteryLevel = const Value.absent(),
             Value<String> syncMode = const Value.absent(),
+            Value<String> role = const Value.absent(),
+            Value<String> callsign = const Value.absent(),
+            Value<String?> customRoleLabel = const Value.absent(),
             Value<int> rowid = const Value.absent(),
           }) =>
               PeersCompanion.insert(
@@ -4074,6 +4697,9 @@ class $$PeersTableTableManager extends RootTableManager<
             isConnected: isConnected,
             batteryLevel: batteryLevel,
             syncMode: syncMode,
+            role: role,
+            callsign: callsign,
+            customRoleLabel: customRoleLabel,
             rowid: rowid,
           ),
         ));
@@ -4156,6 +4782,21 @@ class $$PeersTableFilterComposer
       column: $state.table.syncMode,
       builder: (column, joinBuilders) =>
           ColumnFilters(column, joinBuilders: joinBuilders));
+
+  ColumnFilters<String> get role => $state.composableBuilder(
+      column: $state.table.role,
+      builder: (column, joinBuilders) =>
+          ColumnFilters(column, joinBuilders: joinBuilders));
+
+  ColumnFilters<String> get callsign => $state.composableBuilder(
+      column: $state.table.callsign,
+      builder: (column, joinBuilders) =>
+          ColumnFilters(column, joinBuilders: joinBuilders));
+
+  ColumnFilters<String> get customRoleLabel => $state.composableBuilder(
+      column: $state.table.customRoleLabel,
+      builder: (column, joinBuilders) =>
+          ColumnFilters(column, joinBuilders: joinBuilders));
 }
 
 class $$PeersTableOrderingComposer
@@ -4235,6 +4876,21 @@ class $$PeersTableOrderingComposer
       column: $state.table.syncMode,
       builder: (column, joinBuilders) =>
           ColumnOrderings(column, joinBuilders: joinBuilders));
+
+  ColumnOrderings<String> get role => $state.composableBuilder(
+      column: $state.table.role,
+      builder: (column, joinBuilders) =>
+          ColumnOrderings(column, joinBuilders: joinBuilders));
+
+  ColumnOrderings<String> get callsign => $state.composableBuilder(
+      column: $state.table.callsign,
+      builder: (column, joinBuilders) =>
+          ColumnOrderings(column, joinBuilders: joinBuilders));
+
+  ColumnOrderings<String> get customRoleLabel => $state.composableBuilder(
+      column: $state.table.customRoleLabel,
+      builder: (column, joinBuilders) =>
+          ColumnOrderings(column, joinBuilders: joinBuilders));
 }
 
 typedef $$MarkersTableCreateCompanionBuilder = MarkersCompanion Function({
@@ -4249,6 +4905,7 @@ typedef $$MarkersTableCreateCompanionBuilder = MarkersCompanion Function({
   required DateTime createdAt,
   Value<int> color,
   Value<bool> isSynced,
+  Value<String> origin,
   Value<int> rowid,
 });
 typedef $$MarkersTableUpdateCompanionBuilder = MarkersCompanion Function({
@@ -4263,6 +4920,7 @@ typedef $$MarkersTableUpdateCompanionBuilder = MarkersCompanion Function({
   Value<DateTime> createdAt,
   Value<int> color,
   Value<bool> isSynced,
+  Value<String> origin,
   Value<int> rowid,
 });
 
@@ -4294,6 +4952,7 @@ class $$MarkersTableTableManager extends RootTableManager<
             Value<DateTime> createdAt = const Value.absent(),
             Value<int> color = const Value.absent(),
             Value<bool> isSynced = const Value.absent(),
+            Value<String> origin = const Value.absent(),
             Value<int> rowid = const Value.absent(),
           }) =>
               MarkersCompanion(
@@ -4308,6 +4967,7 @@ class $$MarkersTableTableManager extends RootTableManager<
             createdAt: createdAt,
             color: color,
             isSynced: isSynced,
+            origin: origin,
             rowid: rowid,
           ),
           createCompanionCallback: ({
@@ -4322,6 +4982,7 @@ class $$MarkersTableTableManager extends RootTableManager<
             required DateTime createdAt,
             Value<int> color = const Value.absent(),
             Value<bool> isSynced = const Value.absent(),
+            Value<String> origin = const Value.absent(),
             Value<int> rowid = const Value.absent(),
           }) =>
               MarkersCompanion.insert(
@@ -4336,6 +4997,7 @@ class $$MarkersTableTableManager extends RootTableManager<
             createdAt: createdAt,
             color: color,
             isSynced: isSynced,
+            origin: origin,
             rowid: rowid,
           ),
         ));
@@ -4398,6 +5060,11 @@ class $$MarkersTableFilterComposer
       column: $state.table.isSynced,
       builder: (column, joinBuilders) =>
           ColumnFilters(column, joinBuilders: joinBuilders));
+
+  ColumnFilters<String> get origin => $state.composableBuilder(
+      column: $state.table.origin,
+      builder: (column, joinBuilders) =>
+          ColumnFilters(column, joinBuilders: joinBuilders));
 }
 
 class $$MarkersTableOrderingComposer
@@ -4457,6 +5124,11 @@ class $$MarkersTableOrderingComposer
       column: $state.table.isSynced,
       builder: (column, joinBuilders) =>
           ColumnOrderings(column, joinBuilders: joinBuilders));
+
+  ColumnOrderings<String> get origin => $state.composableBuilder(
+      column: $state.table.origin,
+      builder: (column, joinBuilders) =>
+          ColumnOrderings(column, joinBuilders: joinBuilders));
 }
 
 typedef $$TracksTableCreateCompanionBuilder = TracksCompanion Function({
@@ -4469,6 +5141,7 @@ typedef $$TracksTableCreateCompanionBuilder = TracksCompanion Function({
   Value<double?> heading,
   Value<double?> accuracy,
   required DateTime timestamp,
+  Value<String> peerId,
 });
 typedef $$TracksTableUpdateCompanionBuilder = TracksCompanion Function({
   Value<int> id,
@@ -4480,6 +5153,7 @@ typedef $$TracksTableUpdateCompanionBuilder = TracksCompanion Function({
   Value<double?> heading,
   Value<double?> accuracy,
   Value<DateTime> timestamp,
+  Value<String> peerId,
 });
 
 class $$TracksTableTableManager extends RootTableManager<
@@ -4508,6 +5182,7 @@ class $$TracksTableTableManager extends RootTableManager<
             Value<double?> heading = const Value.absent(),
             Value<double?> accuracy = const Value.absent(),
             Value<DateTime> timestamp = const Value.absent(),
+            Value<String> peerId = const Value.absent(),
           }) =>
               TracksCompanion(
             id: id,
@@ -4519,6 +5194,7 @@ class $$TracksTableTableManager extends RootTableManager<
             heading: heading,
             accuracy: accuracy,
             timestamp: timestamp,
+            peerId: peerId,
           ),
           createCompanionCallback: ({
             Value<int> id = const Value.absent(),
@@ -4530,6 +5206,7 @@ class $$TracksTableTableManager extends RootTableManager<
             Value<double?> heading = const Value.absent(),
             Value<double?> accuracy = const Value.absent(),
             required DateTime timestamp,
+            Value<String> peerId = const Value.absent(),
           }) =>
               TracksCompanion.insert(
             id: id,
@@ -4541,6 +5218,7 @@ class $$TracksTableTableManager extends RootTableManager<
             heading: heading,
             accuracy: accuracy,
             timestamp: timestamp,
+            peerId: peerId,
           ),
         ));
 }
@@ -4592,6 +5270,11 @@ class $$TracksTableFilterComposer
       column: $state.table.timestamp,
       builder: (column, joinBuilders) =>
           ColumnFilters(column, joinBuilders: joinBuilders));
+
+  ColumnFilters<String> get peerId => $state.composableBuilder(
+      column: $state.table.peerId,
+      builder: (column, joinBuilders) =>
+          ColumnFilters(column, joinBuilders: joinBuilders));
 }
 
 class $$TracksTableOrderingComposer
@@ -4639,6 +5322,11 @@ class $$TracksTableOrderingComposer
 
   ColumnOrderings<DateTime> get timestamp => $state.composableBuilder(
       column: $state.table.timestamp,
+      builder: (column, joinBuilders) =>
+          ColumnOrderings(column, joinBuilders: joinBuilders));
+
+  ColumnOrderings<String> get peerId => $state.composableBuilder(
+      column: $state.table.peerId,
       builder: (column, joinBuilders) =>
           ColumnOrderings(column, joinBuilders: joinBuilders));
 }
@@ -5234,6 +5922,167 @@ class $$SessionHistoryEntriesTableOrderingComposer
           ColumnOrderings(column, joinBuilders: joinBuilders));
 }
 
+typedef $$BoundaryEventsTableCreateCompanionBuilder = BoundaryEventsCompanion
+    Function({
+  required String id,
+  required String sessionId,
+  required String peerId,
+  required String callsign,
+  required DateTime timestamp,
+  required double lat,
+  required double lon,
+  Value<int> rowid,
+});
+typedef $$BoundaryEventsTableUpdateCompanionBuilder = BoundaryEventsCompanion
+    Function({
+  Value<String> id,
+  Value<String> sessionId,
+  Value<String> peerId,
+  Value<String> callsign,
+  Value<DateTime> timestamp,
+  Value<double> lat,
+  Value<double> lon,
+  Value<int> rowid,
+});
+
+class $$BoundaryEventsTableTableManager extends RootTableManager<
+    _$AppDatabase,
+    $BoundaryEventsTable,
+    BoundaryEvent,
+    $$BoundaryEventsTableFilterComposer,
+    $$BoundaryEventsTableOrderingComposer,
+    $$BoundaryEventsTableCreateCompanionBuilder,
+    $$BoundaryEventsTableUpdateCompanionBuilder> {
+  $$BoundaryEventsTableTableManager(
+      _$AppDatabase db, $BoundaryEventsTable table)
+      : super(TableManagerState(
+          db: db,
+          table: table,
+          filteringComposer:
+              $$BoundaryEventsTableFilterComposer(ComposerState(db, table)),
+          orderingComposer:
+              $$BoundaryEventsTableOrderingComposer(ComposerState(db, table)),
+          updateCompanionCallback: ({
+            Value<String> id = const Value.absent(),
+            Value<String> sessionId = const Value.absent(),
+            Value<String> peerId = const Value.absent(),
+            Value<String> callsign = const Value.absent(),
+            Value<DateTime> timestamp = const Value.absent(),
+            Value<double> lat = const Value.absent(),
+            Value<double> lon = const Value.absent(),
+            Value<int> rowid = const Value.absent(),
+          }) =>
+              BoundaryEventsCompanion(
+            id: id,
+            sessionId: sessionId,
+            peerId: peerId,
+            callsign: callsign,
+            timestamp: timestamp,
+            lat: lat,
+            lon: lon,
+            rowid: rowid,
+          ),
+          createCompanionCallback: ({
+            required String id,
+            required String sessionId,
+            required String peerId,
+            required String callsign,
+            required DateTime timestamp,
+            required double lat,
+            required double lon,
+            Value<int> rowid = const Value.absent(),
+          }) =>
+              BoundaryEventsCompanion.insert(
+            id: id,
+            sessionId: sessionId,
+            peerId: peerId,
+            callsign: callsign,
+            timestamp: timestamp,
+            lat: lat,
+            lon: lon,
+            rowid: rowid,
+          ),
+        ));
+}
+
+class $$BoundaryEventsTableFilterComposer
+    extends FilterComposer<_$AppDatabase, $BoundaryEventsTable> {
+  $$BoundaryEventsTableFilterComposer(super.$state);
+  ColumnFilters<String> get id => $state.composableBuilder(
+      column: $state.table.id,
+      builder: (column, joinBuilders) =>
+          ColumnFilters(column, joinBuilders: joinBuilders));
+
+  ColumnFilters<String> get sessionId => $state.composableBuilder(
+      column: $state.table.sessionId,
+      builder: (column, joinBuilders) =>
+          ColumnFilters(column, joinBuilders: joinBuilders));
+
+  ColumnFilters<String> get peerId => $state.composableBuilder(
+      column: $state.table.peerId,
+      builder: (column, joinBuilders) =>
+          ColumnFilters(column, joinBuilders: joinBuilders));
+
+  ColumnFilters<String> get callsign => $state.composableBuilder(
+      column: $state.table.callsign,
+      builder: (column, joinBuilders) =>
+          ColumnFilters(column, joinBuilders: joinBuilders));
+
+  ColumnFilters<DateTime> get timestamp => $state.composableBuilder(
+      column: $state.table.timestamp,
+      builder: (column, joinBuilders) =>
+          ColumnFilters(column, joinBuilders: joinBuilders));
+
+  ColumnFilters<double> get lat => $state.composableBuilder(
+      column: $state.table.lat,
+      builder: (column, joinBuilders) =>
+          ColumnFilters(column, joinBuilders: joinBuilders));
+
+  ColumnFilters<double> get lon => $state.composableBuilder(
+      column: $state.table.lon,
+      builder: (column, joinBuilders) =>
+          ColumnFilters(column, joinBuilders: joinBuilders));
+}
+
+class $$BoundaryEventsTableOrderingComposer
+    extends OrderingComposer<_$AppDatabase, $BoundaryEventsTable> {
+  $$BoundaryEventsTableOrderingComposer(super.$state);
+  ColumnOrderings<String> get id => $state.composableBuilder(
+      column: $state.table.id,
+      builder: (column, joinBuilders) =>
+          ColumnOrderings(column, joinBuilders: joinBuilders));
+
+  ColumnOrderings<String> get sessionId => $state.composableBuilder(
+      column: $state.table.sessionId,
+      builder: (column, joinBuilders) =>
+          ColumnOrderings(column, joinBuilders: joinBuilders));
+
+  ColumnOrderings<String> get peerId => $state.composableBuilder(
+      column: $state.table.peerId,
+      builder: (column, joinBuilders) =>
+          ColumnOrderings(column, joinBuilders: joinBuilders));
+
+  ColumnOrderings<String> get callsign => $state.composableBuilder(
+      column: $state.table.callsign,
+      builder: (column, joinBuilders) =>
+          ColumnOrderings(column, joinBuilders: joinBuilders));
+
+  ColumnOrderings<DateTime> get timestamp => $state.composableBuilder(
+      column: $state.table.timestamp,
+      builder: (column, joinBuilders) =>
+          ColumnOrderings(column, joinBuilders: joinBuilders));
+
+  ColumnOrderings<double> get lat => $state.composableBuilder(
+      column: $state.table.lat,
+      builder: (column, joinBuilders) =>
+          ColumnOrderings(column, joinBuilders: joinBuilders));
+
+  ColumnOrderings<double> get lon => $state.composableBuilder(
+      column: $state.table.lon,
+      builder: (column, joinBuilders) =>
+          ColumnOrderings(column, joinBuilders: joinBuilders));
+}
+
 class $AppDatabaseManager {
   final _$AppDatabase _db;
   $AppDatabaseManager(this._db);
@@ -5251,4 +6100,6 @@ class $AppDatabaseManager {
       $$MapRegionsTableTableManager(_db, _db.mapRegions);
   $$SessionHistoryEntriesTableTableManager get sessionHistoryEntries =>
       $$SessionHistoryEntriesTableTableManager(_db, _db.sessionHistoryEntries);
+  $$BoundaryEventsTableTableManager get boundaryEvents =>
+      $$BoundaryEventsTableTableManager(_db, _db.boundaryEvents);
 }
