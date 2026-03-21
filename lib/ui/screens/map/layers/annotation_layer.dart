@@ -5,7 +5,7 @@
 //   - Polygons with fill (low alpha) and stroke
 //   - Labels at centroid of annotation
 //   - Synced annotations from other peers rendered with slight transparency
-//   - Tap interaction: show annotation info popup
+//   - Tap interaction: show annotation info popup with delete option
 //
 // Reads reactively from syncedAnnotationsProvider.
 
@@ -37,13 +37,17 @@ class _AnnotationLayerState extends ConsumerState<AnnotationLayer> {
     final localDeviceId = ref.watch(localDeviceIdProvider);
 
     return annotationsAsync.when(
-      data: (annotations) => _buildLayers(annotations, localDeviceId),
+      data: (annotations) => _buildLayers(context, annotations, localDeviceId),
       loading: () => const SizedBox.shrink(),
       error: (_, __) => const SizedBox.shrink(),
     );
   }
 
-  Widget _buildLayers(List<Annotation> annotations, String localDeviceId) {
+  Widget _buildLayers(
+    BuildContext context,
+    List<Annotation> annotations,
+    String localDeviceId,
+  ) {
     final polylines = <fm.Polyline>[];
     final polygons = <fm.Polygon>[];
     final labelMarkers = <fm.Marker>[];
@@ -78,51 +82,75 @@ class _AnnotationLayerState extends ConsumerState<AnnotationLayer> {
         );
       }
 
-      // Label at centroid
-      if (annotation.label != null && annotation.label!.isNotEmpty) {
-        final centroid = _computeCentroid(points);
-        labelMarkers.add(
-          fm.Marker(
-            point: centroid,
-            width: 100,
-            height: 20,
-            child: GestureDetector(
-              onTap: () {
-                setState(() {
-                  _selectedAnnotationId =
-                      _selectedAnnotationId == annotation.id
-                          ? null
-                          : annotation.id;
-                });
-              },
-              child: Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
-                decoration: BoxDecoration(
-                  color: widget.colors.bg.withValues(alpha: 0.8),
-                  borderRadius: BorderRadius.circular(3),
-                  border: Border.all(
-                    color: color.withValues(alpha: 0.5),
-                    width: 0.5,
+      // Tappable label/target at centroid
+      final centroid = _computeCentroid(points);
+      final hasLabel = annotation.label != null && annotation.label!.isNotEmpty;
+
+      labelMarkers.add(
+        fm.Marker(
+          point: centroid,
+          width: hasLabel ? 100 : 30,
+          height: hasLabel ? 20 : 30,
+          child: GestureDetector(
+            onTap: () {
+              setState(() {
+                _selectedAnnotationId =
+                    _selectedAnnotationId == annotation.id
+                        ? null
+                        : annotation.id;
+              });
+            },
+            child: hasLabel
+                ? Container(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 4, vertical: 2),
+                    decoration: BoxDecoration(
+                      color: widget.colors.bg.withValues(alpha: 0.8),
+                      borderRadius: BorderRadius.circular(3),
+                      border: Border.all(
+                        color: color.withValues(alpha: 0.5),
+                        width: 0.5,
+                      ),
+                    ),
+                    child: Text(
+                      annotation.label!,
+                      style: TextStyle(
+                        fontFamily: 'monospace',
+                        fontSize: 9,
+                        color: color,
+                        fontWeight: FontWeight.bold,
+                        letterSpacing: 0.3,
+                      ),
+                      textAlign: TextAlign.center,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  )
+                : Container(
+                    // Invisible tap target for annotations without labels
+                    width: 30,
+                    height: 30,
+                    decoration: BoxDecoration(
+                      color: color.withValues(alpha: 0.15),
+                      shape: BoxShape.circle,
+                      border: Border.all(
+                        color: color.withValues(alpha: 0.3),
+                        width: 0.5,
+                      ),
+                    ),
+                    child: Center(
+                      child: Container(
+                        width: 6,
+                        height: 6,
+                        decoration: BoxDecoration(
+                          color: color.withValues(alpha: 0.6),
+                          shape: BoxShape.circle,
+                        ),
+                      ),
+                    ),
                   ),
-                ),
-                child: Text(
-                  annotation.label!,
-                  style: TextStyle(
-                    fontFamily: 'monospace',
-                    fontSize: 9,
-                    color: color,
-                    fontWeight: FontWeight.bold,
-                    letterSpacing: 0.3,
-                  ),
-                  textAlign: TextAlign.center,
-                  overflow: TextOverflow.ellipsis,
-                ),
-              ),
-            ),
           ),
-        );
-      }
+        ),
+      );
     }
 
     // Info popup for selected annotation
@@ -141,13 +169,15 @@ class _AnnotationLayerState extends ConsumerState<AnnotationLayer> {
           fm.Marker(
             point: centroid,
             width: 240,
-            height: 160,
+            height: 180,
             alignment: Alignment.topCenter,
             child: _AnnotationInfoPopup(
               annotation: selected,
               colors: widget.colors,
               onClose: () =>
                   setState(() => _selectedAnnotationId = null),
+              onDelete: () =>
+                  _confirmDeleteAnnotation(context, selected),
             ),
           ),
         );
@@ -164,6 +194,71 @@ class _AnnotationLayerState extends ConsumerState<AnnotationLayer> {
         if (labelMarkers.isNotEmpty)
           fm.MarkerLayer(markers: labelMarkers),
       ],
+    );
+  }
+
+  /// Show a confirmation dialog before deleting an annotation.
+  void _confirmDeleteAnnotation(
+    BuildContext context,
+    Annotation annotation,
+  ) {
+    final displayName = (annotation.label != null && annotation.label!.isNotEmpty)
+        ? annotation.label!
+        : 'annotation';
+
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: widget.colors.card,
+        title: Text(
+          'DELETE ${ displayName.toUpperCase() }?',
+          style: TextStyle(
+            fontFamily: 'monospace',
+            fontSize: 14,
+            fontWeight: FontWeight.bold,
+            color: widget.colors.text,
+            letterSpacing: 1,
+          ),
+        ),
+        content: Text(
+          'This will remove the annotation for all peers.',
+          style: TextStyle(
+            fontFamily: 'monospace',
+            fontSize: 11,
+            color: widget.colors.text2,
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(),
+            child: Text(
+              'CANCEL',
+              style: TextStyle(
+                fontFamily: 'monospace',
+                fontSize: 11,
+                color: widget.colors.text3,
+              ),
+            ),
+          ),
+          TextButton(
+            onPressed: () {
+              Navigator.of(ctx).pop();
+              ref.read(fieldLinkServiceProvider).removeAnnotation(
+                    annotation.id,
+                  );
+              setState(() => _selectedAnnotationId = null);
+            },
+            child: const Text(
+              'DELETE',
+              style: TextStyle(
+                fontFamily: 'monospace',
+                fontSize: 11,
+                color: Color(0xFFCC4444),
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 
@@ -187,11 +282,13 @@ class _AnnotationInfoPopup extends StatelessWidget {
   final Annotation annotation;
   final TacticalColorScheme colors;
   final VoidCallback onClose;
+  final VoidCallback onDelete;
 
   const _AnnotationInfoPopup({
     required this.annotation,
     required this.colors,
     required this.onClose,
+    required this.onDelete,
   });
 
   @override
@@ -268,6 +365,36 @@ class _AnnotationInfoPopup extends StatelessWidget {
                 ? '${annotation.createdBy.substring(0, 12)}..'
                 : annotation.createdBy,
             colors: colors,
+          ),
+
+          const SizedBox(height: 8),
+
+          // Delete button
+          GestureDetector(
+            onTap: onDelete,
+            child: Container(
+              width: double.infinity,
+              padding: const EdgeInsets.symmetric(vertical: 6),
+              decoration: BoxDecoration(
+                color: const Color(0xFFCC4444).withValues(alpha: 0.1),
+                borderRadius: BorderRadius.circular(4),
+                border: Border.all(
+                  color: const Color(0xFFCC4444).withValues(alpha: 0.3),
+                  width: 0.5,
+                ),
+              ),
+              child: const Text(
+                'DELETE',
+                style: TextStyle(
+                  fontFamily: 'monospace',
+                  fontSize: 10,
+                  color: Color(0xFFCC4444),
+                  fontWeight: FontWeight.bold,
+                  letterSpacing: 0.5,
+                ),
+                textAlign: TextAlign.center,
+              ),
+            ),
           ),
         ],
       ),

@@ -229,6 +229,26 @@ class CrdtState {
     );
   }
 
+  /// Tombstone an annotation (mark as deleted).
+  CrdtState deleteAnnotation(String nodeId, String annotationId) {
+    final register = LwwRegister<Annotation?>(
+      nodeId: nodeId,
+      timestamp: DateTime.now().millisecondsSinceEpoch,
+      value: null,
+    );
+    final updatedAnnotations =
+        Map<String, LwwRegister<Annotation?>>.from(annotations);
+    final existing = updatedAnnotations[annotationId];
+    updatedAnnotations[annotationId] =
+        existing != null ? existing.merge(register) : register;
+    return CrdtState(
+      positions: positions,
+      markers: markers,
+      annotations: updatedAnnotations,
+      sequenceCounter: sequenceCounter.increment(nodeId),
+    );
+  }
+
   /// Get all live (non-tombstoned) markers.
   List<Marker> get liveMarkers => markers.values
       .where((r) => r.value != null)

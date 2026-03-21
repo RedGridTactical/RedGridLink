@@ -100,6 +100,21 @@ class DeltaEncoder {
     );
   }
 
+  /// Encode an annotation deletion (tombstone).
+  SyncPayload encodeAnnotationDelete(
+    String senderId,
+    String annotationId,
+    int sequenceNum,
+  ) {
+    return SyncPayload(
+      type: SyncPayloadType.annotation,
+      senderId: senderId,
+      sequenceNum: sequenceNum,
+      timestamp: DateTime.now(),
+      data: {'id': annotationId, '_deleted': true},
+    );
+  }
+
   /// Encode a control message (join, leave, ping, etc.).
   SyncPayload encodeControl(
     String senderId,

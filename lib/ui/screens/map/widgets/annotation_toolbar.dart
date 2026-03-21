@@ -3,7 +3,7 @@
 // Toggle bar at the bottom of the map (above the coordinate bar):
 //   - Tools: draw polyline, draw polygon, place marker, cancel
 //   - When drawing: tap map to add points, double-tap to finish
-//   - Color picker (5 preset colors)
+//   - Color picker (6 preset colors)
 //   - Label input on completion
 //   - Save annotation to sync engine
 //
@@ -19,13 +19,14 @@ import 'package:red_grid_link/data/models/marker.dart' as model;
 import 'package:red_grid_link/providers/field_link_provider.dart';
 import 'package:red_grid_link/providers/map_provider.dart';
 
-/// 5 preset annotation colors.
+/// 6 preset annotation colors.
 const List<Color> annotationColors = [
   Color(0xFFFF4444), // Red
   Color(0xFF44AAFF), // Blue
   Color(0xFF44CC44), // Green
   Color(0xFFFFAA00), // Orange
   Color(0xFFCC44CC), // Purple
+  Color(0xFFFFFFFF), // White
 ];
 
 class AnnotationToolbar extends ConsumerWidget {
@@ -94,19 +95,19 @@ class AnnotationToolbar extends ConsumerWidget {
                     ),
                     const SizedBox(width: 8),
                     // Undo last point
-                    if (drawingPoints.isNotEmpty)
-                      _SmallButton(
-                        icon: Icons.undo,
-                        colors: colors,
-                        onTap: () {
-                          final current = ref.read(drawingPointsProvider);
-                          if (current.isNotEmpty) {
-                            ref.read(drawingPointsProvider.notifier).state =
-                                List.from(current)..removeLast();
-                          }
-                        },
-                        tooltip: 'Undo point',
-                      ),
+                    _SmallButton(
+                      icon: Icons.undo,
+                      colors: colors,
+                      isDisabled: drawingPoints.isEmpty,
+                      onTap: () {
+                        final current = ref.read(drawingPointsProvider);
+                        if (current.isNotEmpty) {
+                          ref.read(drawingPointsProvider.notifier).state =
+                              List.from(current)..removeLast();
+                        }
+                      },
+                      tooltip: 'Undo point',
+                    ),
                     const SizedBox(width: 4),
                     // Done
                     if (drawingPoints.length >= 2)
@@ -413,7 +414,7 @@ class _ToolButton extends StatelessWidget {
   }
 }
 
-/// Color picker: 5 small circles.
+/// Color picker: 6 small circles.
 class _ColorPicker extends StatelessWidget {
   final TacticalColorScheme colors;
   final int selectedIndex;
@@ -460,6 +461,7 @@ class _SmallButton extends StatelessWidget {
   final TacticalColorScheme colors;
   final VoidCallback onTap;
   final bool isAccent;
+  final bool isDisabled;
   final String? tooltip;
 
   const _SmallButton({
@@ -467,14 +469,17 @@ class _SmallButton extends StatelessWidget {
     required this.colors,
     required this.onTap,
     this.isAccent = false,
+    this.isDisabled = false,
     this.tooltip,
   });
 
   @override
   Widget build(BuildContext context) {
     final widget = GestureDetector(
-      onTap: onTap,
-      child: Container(
+      onTap: isDisabled ? null : onTap,
+      child: Opacity(
+        opacity: isDisabled ? 0.35 : 1.0,
+        child: Container(
         width: 28,
         height: 28,
         decoration: BoxDecoration(
@@ -494,6 +499,7 @@ class _SmallButton extends StatelessWidget {
             color: isAccent ? colors.accent : colors.text2,
           ),
         ),
+      ),
       ),
     );
 

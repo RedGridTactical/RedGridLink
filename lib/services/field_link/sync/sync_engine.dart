@@ -229,6 +229,22 @@ class SyncEngine {
     _emitState();
   }
 
+  /// Remove an annotation by ID and broadcast a tombstone.
+  Future<void> removeAnnotation(String annotationId) async {
+    if (!_isRunning) return;
+
+    _state = _state.deleteAnnotation(_localDeviceId, annotationId);
+
+    final payload = _encoder.encodeAnnotationDelete(
+      _localDeviceId,
+      annotationId,
+      _state.sequenceCounter.countFor(_localDeviceId),
+    );
+    await _transport.broadcast(payload.toBytes());
+
+    _emitState();
+  }
+
   /// Broadcast a control message payload to all connected peers.
   ///
   /// Used by [FieldLinkService] to send role assignments, callsign

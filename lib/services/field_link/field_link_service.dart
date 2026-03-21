@@ -367,6 +367,11 @@ class FieldLinkService {
     _syncEngine.removeMarker(markerId);
   }
 
+  /// Remove an annotation by ID (tombstone via CRDT).
+  void removeAnnotation(String annotationId) {
+    _syncEngine.removeAnnotation(annotationId);
+  }
+
   // ---------------------------------------------------------------------------
   // Battery
   // ---------------------------------------------------------------------------
