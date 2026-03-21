@@ -187,12 +187,16 @@ class _MarkerRow extends StatelessWidget {
     switch (icon) {
       case MarkerIcon.waypoint:
         return Icons.location_on;
-      case MarkerIcon.danger:
+      case MarkerIcon.hazard:
         return Icons.warning;
       case MarkerIcon.camp:
         return Icons.cabin;
-      case MarkerIcon.rally:
+      case MarkerIcon.rallyPoint:
         return Icons.flag;
+      case MarkerIcon.objective:
+        return Icons.gps_fixed;
+      case MarkerIcon.cache:
+        return Icons.inventory_2;
       case MarkerIcon.find:
         return Icons.search;
       case MarkerIcon.checkpoint:

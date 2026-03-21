@@ -1,19 +1,70 @@
 /// Icon type for map markers
 enum MarkerIcon {
   waypoint,
-  danger,
+  hazard, // was 'danger'
   camp,
-  rally,
+  rallyPoint, // was 'rally'
+  objective, // new
+  cache, // new
   find,
   checkpoint,
   stand,
   custom;
 
-  static MarkerIcon fromString(String value) =>
-      MarkerIcon.values.firstWhere(
-        (e) => e.name == value,
-        orElse: () => MarkerIcon.waypoint,
-      );
+  static MarkerIcon fromString(String value) {
+    switch (value.toLowerCase()) {
+      case 'waypoint':
+        return MarkerIcon.waypoint;
+      case 'hazard':
+      case 'danger':
+        return MarkerIcon.hazard; // migration
+      case 'camp':
+        return MarkerIcon.camp;
+      case 'rallypoint':
+      case 'rally':
+        return MarkerIcon.rallyPoint; // migration
+      case 'objective':
+        return MarkerIcon.objective;
+      case 'cache':
+        return MarkerIcon.cache;
+      case 'find':
+        return MarkerIcon.find;
+      case 'checkpoint':
+        return MarkerIcon.checkpoint;
+      case 'stand':
+        return MarkerIcon.stand;
+      case 'custom':
+        return MarkerIcon.custom;
+      default:
+        return MarkerIcon.waypoint;
+    }
+  }
+}
+
+/// Origin of a marker (manual placement vs shared waypoint)
+enum MarkerOrigin {
+  manual,
+  sharedWaypoint;
+
+  static MarkerOrigin fromString(String value) {
+    switch (value.toLowerCase()) {
+      case 'sw':
+      case 'sharedwaypoint':
+        return MarkerOrigin.sharedWaypoint;
+      case 'manual':
+      default:
+        return MarkerOrigin.manual;
+    }
+  }
+
+  String toShortString() {
+    switch (this) {
+      case MarkerOrigin.manual:
+        return 'manual';
+      case MarkerOrigin.sharedWaypoint:
+        return 'sw';
+    }
+  }
 }
 
 /// Synced map marker
@@ -28,6 +79,7 @@ class Marker {
   final DateTime createdAt;
   final int color;
   final bool isSynced;
+  final MarkerOrigin origin;
 
   const Marker({
     required this.id,
@@ -40,6 +92,7 @@ class Marker {
     required this.createdAt,
     this.color = 0xFFFF0000,
     this.isSynced = false,
+    this.origin = MarkerOrigin.manual,
   });
 
   Map<String, dynamic> toJson() => {
@@ -53,6 +106,7 @@ class Marker {
     'at': createdAt.millisecondsSinceEpoch,
     'clr': color,
     'syn': isSynced,
+    'o': origin.toShortString(),
   };
 
   factory Marker.fromJson(Map<String, dynamic> json) => Marker(
@@ -66,6 +120,7 @@ class Marker {
     createdAt: DateTime.fromMillisecondsSinceEpoch(json['at'] as int),
     color: json['clr'] as int? ?? 0xFFFF0000,
     isSynced: json['syn'] as bool? ?? false,
+    origin: MarkerOrigin.fromString(json['o'] as String? ?? 'manual'),
   );
 
   Marker copyWith({
@@ -73,6 +128,7 @@ class Marker {
     MarkerIcon? icon,
     int? color,
     bool? isSynced,
+    MarkerOrigin? origin,
   }) =>
       Marker(
         id: id,
@@ -85,5 +141,6 @@ class Marker {
         createdAt: createdAt,
         color: color ?? this.color,
         isSynced: isSynced ?? this.isSynced,
+        origin: origin ?? this.origin,
       );
 }

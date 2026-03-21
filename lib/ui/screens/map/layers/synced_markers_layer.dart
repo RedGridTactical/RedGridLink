@@ -302,9 +302,11 @@ class _SyncedMarkerWidget extends StatelessWidget {
   IconData _iconForType(model.MarkerIcon icon) {
     return switch (icon) {
       model.MarkerIcon.waypoint => Icons.place,
-      model.MarkerIcon.danger => Icons.warning,
+      model.MarkerIcon.hazard => Icons.warning,
       model.MarkerIcon.camp => Icons.cabin,
-      model.MarkerIcon.rally => Icons.flag,
+      model.MarkerIcon.rallyPoint => Icons.flag,
+      model.MarkerIcon.objective => Icons.gps_fixed,
+      model.MarkerIcon.cache => Icons.inventory_2,
       model.MarkerIcon.find => Icons.search,
       model.MarkerIcon.checkpoint => Icons.check_circle_outline,
       model.MarkerIcon.stand => Icons.person_pin_circle,
