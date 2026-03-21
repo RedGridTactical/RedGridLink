@@ -50,6 +50,12 @@
 	<string>Red Grid Link uses the camera to scan QR codes for quick Field Link session joining.</string>
 
 	<!-- ================================================================== -->
+	<!-- Photo library usage (share_plus / file_picker may access photos)   -->
+	<!-- ================================================================== -->
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Red Grid Link may access photos when sharing session exports or importing files.</string>
+
+	<!-- ================================================================== -->
 	<!-- Local network usage (Multipeer Connectivity)                       -->
 	<!-- ================================================================== -->
 	<key>NSLocalNetworkUsageDescription</key>
