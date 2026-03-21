@@ -24,10 +24,8 @@ import 'package:latlong2/latlong.dart';
 import 'package:red_grid_link/core/constants/map_constants.dart';
 import 'package:red_grid_link/core/theme/tactical_colors.dart';
 import 'package:red_grid_link/data/models/map_region.dart';
-import 'package:red_grid_link/core/utils/crypto_utils.dart';
 import 'package:red_grid_link/core/utils/haptics.dart';
 import 'package:red_grid_link/core/utils/mgrs.dart';
-import 'package:red_grid_link/data/models/waypoint.dart';
 import 'package:red_grid_link/providers/field_link_provider.dart';
 import 'package:red_grid_link/providers/location_provider.dart';
 import 'package:red_grid_link/providers/map_provider.dart';
@@ -35,8 +33,6 @@ import 'package:red_grid_link/providers/mode_provider.dart';
 import 'package:red_grid_link/providers/theme_provider.dart';
 import 'package:red_grid_link/services/map/mgrs_grid_overlay.dart';
 import 'package:red_grid_link/services/map/tile_manager.dart';
-import 'package:red_grid_link/ui/common/dialogs/text_input_dialog.dart';
-
 import 'layers/annotation_layer.dart';
 import 'layers/ghost_markers_layer.dart';
 import 'layers/peer_markers_layer.dart';
@@ -44,6 +40,7 @@ import 'layers/synced_markers_layer.dart';
 import 'widgets/annotation_toolbar.dart';
 import 'widgets/coordinate_bar.dart';
 import 'widgets/map_controls.dart';
+import 'widgets/waypoint_action_sheet.dart';
 
 class MapScreen extends ConsumerStatefulWidget {
   final TacticalColorScheme colors;
@@ -308,38 +305,19 @@ class _MapScreenState extends ConsumerState<MapScreen> {
     }
   }
 
-  /// Handle map tap when NOT in drawing mode — create a waypoint.
-  void _onMapTapWaypoint(LatLng point) async {
+  /// Handle map tap when NOT in drawing mode — show waypoint action sheet.
+  void _onMapTapWaypoint(LatLng point) {
     tapMedium();
-
-    final colors = ref.read(currentThemeProvider);
     if (!mounted) return;
 
-    final name = await showTextInputDialog(
-      context,
-      title: 'Name Waypoint',
-      hintText: 'e.g. Rally Point',
-      colors: colors,
-    );
-
-    if (name == null || name.isEmpty || !mounted) return;
-
     final mgrsRaw = toMGRS(point.latitude, point.longitude);
-    final mgrsFormatted = formatMGRS(mgrsRaw);
 
-    final waypoint = Waypoint(
-      id: generateDeviceId(),
-      name: name,
+    showWaypointActionSheet(
+      context,
       lat: point.latitude,
       lon: point.longitude,
       mgrs: mgrsRaw,
-      mgrsFormatted: mgrsFormatted,
-      createdAt: DateTime.now(),
     );
-
-    ref.read(waypointListProvider.notifier).add(waypoint);
-    ref.read(activeWaypointProvider.notifier).state = waypoint;
-    notifySuccess();
   }
 
   /// Auto-finish when a marker point is placed.

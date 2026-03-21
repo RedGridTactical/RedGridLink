@@ -253,25 +253,55 @@ class _SyncedMarkerWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isSharedWaypoint =
+        marker.origin == model.MarkerOrigin.sharedWaypoint;
+
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
-        // Icon container
-        Container(
-          width: 28,
-          height: 28,
-          decoration: BoxDecoration(
-            color: creatorColor.withValues(alpha: 0.15),
-            shape: BoxShape.circle,
-            border: Border.all(color: creatorColor, width: 1.5),
-          ),
-          child: Center(
-            child: Icon(
-              _iconForType(marker.icon),
-              size: 14,
-              color: creatorColor,
+        // Icon container with optional shared waypoint badge
+        Stack(
+          clipBehavior: Clip.none,
+          children: [
+            Container(
+              width: 28,
+              height: 28,
+              decoration: BoxDecoration(
+                color: creatorColor.withValues(alpha: 0.15),
+                shape: BoxShape.circle,
+                border: Border.all(color: creatorColor, width: 1.5),
+              ),
+              child: Center(
+                child: Icon(
+                  _iconForType(marker.icon),
+                  size: 14,
+                  color: creatorColor,
+                ),
+              ),
             ),
-          ),
+            // Shared waypoint badge
+            if (isSharedWaypoint)
+              Positioned(
+                right: -4,
+                top: -4,
+                child: Container(
+                  width: 14,
+                  height: 14,
+                  decoration: BoxDecoration(
+                    color: colors.bg,
+                    shape: BoxShape.circle,
+                    border: Border.all(color: creatorColor, width: 1),
+                  ),
+                  child: Center(
+                    child: Icon(
+                      Icons.wifi,
+                      size: 8,
+                      color: creatorColor,
+                    ),
+                  ),
+                ),
+              ),
+          ],
         ),
         const SizedBox(height: 1),
         // Label
