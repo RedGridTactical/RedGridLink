@@ -81,6 +81,18 @@ void main() {
       expect(manager.roleForPeer('peer-2'), TeamRole.comms);
     });
 
+    test('applyRemoteRoleChange stores custom label', () {
+      manager.applyRemoteRoleChange(
+        'peer-2',
+        TeamRole.custom,
+        fromLeader: 'leader-1',
+        customLabel: 'Navigator',
+      );
+
+      expect(manager.roleForPeer('peer-2'), TeamRole.custom);
+      expect(manager.customLabelForPeer('peer-2'), 'Navigator');
+    });
+
     test('applyRemoteCallsign stores peer callsign', () {
       manager.applyRemoteCallsign('peer-1', 'Alpha');
       expect(manager.callsignForPeer('peer-1'), 'Alpha');
@@ -127,7 +139,14 @@ void main() {
   });
 
   group('handleControlEvent', () {
-    test('processes role_assign event', () {
+    test('processes role_assign event from leader', () {
+      // Register leader-1 as lead peer first.
+      manager.applyRemoteRoleChange(
+        'leader-1',
+        TeamRole.lead,
+        fromLeader: 'leader-1',
+      );
+
       manager.handleControlEvent({
         'evt': 'role_assign',
         'target': 'device-local',
@@ -137,7 +156,14 @@ void main() {
       expect(manager.localRole, TeamRole.medic);
     });
 
-    test('processes role_assign for peer target', () {
+    test('processes role_assign for peer target from leader', () {
+      // Register leader-1 as lead peer first.
+      manager.applyRemoteRoleChange(
+        'leader-1',
+        TeamRole.lead,
+        fromLeader: 'leader-1',
+      );
+
       manager.handleControlEvent({
         'evt': 'role_assign',
         'target': 'peer-2',
@@ -145,6 +171,46 @@ void main() {
       }, 'leader-1');
 
       expect(manager.roleForPeer('peer-2'), TeamRole.comms);
+    });
+
+    test('non-lead peer cannot assign roles via control event', () {
+      manager.initializeAsJoiner();
+
+      manager.handleControlEvent({
+        'evt': 'role_assign',
+        'target': 'device-local',
+        'role': 'medic',
+      }, 'non-leader-peer');
+
+      // Should remain unchanged — non-leader cannot assign roles.
+      expect(manager.localRole, TeamRole.scout);
+    });
+
+    test('custom role label is preserved through control event round-trip', () {
+      // Set up a lead manager to encode the assignment.
+      final leadManager = RoleManager(localDeviceId: 'leader-1');
+      leadManager.initializeAsCreator();
+      final payload = leadManager.encodeRoleAssignment(
+        'peer-2',
+        TeamRole.custom,
+        customLabel: 'Navigator',
+      );
+
+      expect(payload, isNotNull);
+      expect(payload!['crl'], 'Navigator');
+
+      // On the receiving side, register leader-1 as lead.
+      manager.applyRemoteRoleChange(
+        'leader-1',
+        TeamRole.lead,
+        fromLeader: 'leader-1',
+      );
+
+      // Process the encoded payload as a control event.
+      manager.handleControlEvent(payload, 'leader-1');
+
+      expect(manager.roleForPeer('peer-2'), TeamRole.custom);
+      expect(manager.customLabelForPeer('peer-2'), 'Navigator');
     });
 
     test('processes callsign_update event', () {
@@ -181,11 +247,18 @@ void main() {
   });
 
   group('reset', () {
-    test('clears all state', () {
+    test('clears all state including custom labels', () {
       manager.initializeAsCreator();
       manager.setCallsign('Echo');
       manager.assignRole('peer-1', TeamRole.medic);
       manager.applyRemoteCallsign('peer-1', 'Foxtrot');
+      // Store a custom label via remote role change (local is lead).
+      manager.applyRemoteRoleChange(
+        'peer-2',
+        TeamRole.custom,
+        fromLeader: 'device-local',
+        customLabel: 'Navigator',
+      );
 
       manager.reset();
 
@@ -194,6 +267,7 @@ void main() {
       expect(manager.callsign, '');
       expect(manager.roleForPeer('peer-1'), TeamRole.scout);
       expect(manager.callsignForPeer('peer-1'), '');
+      expect(manager.customLabelForPeer('peer-2'), isNull);
     });
   });
 

@@ -617,6 +617,21 @@ class FieldLinkService {
       }
     }
 
+    // Sync boundary annotation from CRDT state to BoundaryManager.
+    final annotations = state.liveAnnotations;
+    Annotation? boundaryAnnotation;
+    for (final a in annotations) {
+      if (a.type == AnnotationType.boundary) {
+        boundaryAnnotation = a;
+        break;
+      }
+    }
+    if (boundaryAnnotation != null) {
+      _boundaryManager.setBoundary(boundaryAnnotation);
+    } else {
+      _boundaryManager.clearBoundary();
+    }
+
     // Check peer positions against the boundary.
     if (_boundaryManager.hasBoundary) {
       for (final peer in peers) {

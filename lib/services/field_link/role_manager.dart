@@ -14,6 +14,7 @@ class RoleManager {
   final Map<String, TeamRole> _peerRoles = {};
   String? _callsign;
   final Map<String, String> _peerCallsigns = {};
+  final Map<String, String?> _peerCustomLabels = {};
 
   RoleManager({required this.localDeviceId});
 
@@ -29,6 +30,9 @@ class RoleManager {
 
   /// Whether the local device is the session lead.
   bool get isLead => _localRole.isLead;
+
+  /// Get the custom role label for a specific peer, or null if unset.
+  String? customLabelForPeer(String peerId) => _peerCustomLabels[peerId];
 
   // ---------------------------------------------------------------------------
   // Setters
@@ -85,19 +89,33 @@ class RoleManager {
   // Remote state application
   // ---------------------------------------------------------------------------
 
+  /// Returns `true` if [deviceId] currently holds the lead role.
+  bool _isLeader(String deviceId) {
+    if (deviceId == localDeviceId) return isLead;
+    return _peerRoles[deviceId] == TeamRole.lead;
+  }
+
   /// Apply an incoming role change from the session leader.
   ///
   /// If [targetId] matches the local device, the local role is updated.
   /// Otherwise the peer role map is updated.
+  ///
+  /// **Note:** Caller is responsible for verifying the sender is the lead
+  /// before invoking this method (see [handleControlEvent]).
   void applyRemoteRoleChange(
     String targetId,
     TeamRole role, {
     required String fromLeader,
+    String? customLabel,
   }) {
     if (targetId == localDeviceId) {
       _localRole = role;
     } else {
       _peerRoles[targetId] = role;
+    }
+
+    if (customLabel != null) {
+      _peerCustomLabels[targetId] = customLabel;
     }
   }
 
@@ -143,9 +161,16 @@ class RoleManager {
     final evt = data['evt'] as String?;
     switch (evt) {
       case 'role_assign':
+        if (!_isLeader(senderId)) break; // ignore unauthorized role assignments
         final target = data['target'] as String;
         final role = TeamRole.fromString(data['role'] as String);
-        applyRemoteRoleChange(target, role, fromLeader: senderId);
+        final customLabel = data['crl'] as String?;
+        applyRemoteRoleChange(
+          target,
+          role,
+          fromLeader: senderId,
+          customLabel: customLabel,
+        );
         break;
       case 'callsign_update':
         applyRemoteCallsign(senderId, data['cs'] as String? ?? '');
@@ -163,5 +188,6 @@ class RoleManager {
     _peerRoles.clear();
     _callsign = null;
     _peerCallsigns.clear();
+    _peerCustomLabels.clear();
   }
 }
