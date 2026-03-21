@@ -22,6 +22,7 @@ import 'package:red_grid_link/data/database/daos/tracks_dao.dart';
 import 'package:red_grid_link/data/database/daos/annotations_dao.dart';
 import 'package:red_grid_link/data/database/daos/map_regions_dao.dart';
 import 'package:red_grid_link/data/database/daos/session_history_dao.dart';
+import 'package:red_grid_link/data/database/daos/boundary_event_dao.dart';
 
 part 'app_database.g.dart';
 
@@ -48,6 +49,7 @@ part 'app_database.g.dart';
     AnnotationsDao,
     MapRegionsDao,
     SessionHistoryDao,
+    BoundaryEventDao,
   ],
 )
 class AppDatabase extends _$AppDatabase {

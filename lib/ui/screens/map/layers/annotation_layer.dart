@@ -71,6 +71,24 @@ class _AnnotationLayerState extends ConsumerState<AnnotationLayer> {
             strokeWidth: annotation.strokeWidth,
           ),
         );
+      } else if (annotation.type == AnnotationType.boundary) {
+        // Boundary: dashed outline with semi-transparent fill
+        polygons.add(
+          fm.Polygon(
+            points: points,
+            color: color.withValues(alpha: 0.08 * displayOpacity),
+            borderColor: color.withValues(alpha: displayOpacity),
+            borderStrokeWidth: annotation.strokeWidth + 1.0,
+          ),
+        );
+        polylines.add(
+          fm.Polyline(
+            points: [...points, points.first], // close the loop
+            color: color.withValues(alpha: displayOpacity),
+            strokeWidth: annotation.strokeWidth,
+            pattern: const fm.StrokePattern.dotted(),
+          ),
+        );
       } else if (annotation.type == AnnotationType.polygon) {
         polygons.add(
           fm.Polygon(
@@ -293,9 +311,11 @@ class _AnnotationInfoPopup extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final typeStr = annotation.type == AnnotationType.polyline
-        ? 'POLYLINE'
-        : 'POLYGON';
+    final typeStr = switch (annotation.type) {
+      AnnotationType.polyline => 'POLYLINE',
+      AnnotationType.polygon => 'POLYGON',
+      AnnotationType.boundary => 'BOUNDARY',
+    };
     final pointCount = annotation.points.length;
 
     // MGRS of first point

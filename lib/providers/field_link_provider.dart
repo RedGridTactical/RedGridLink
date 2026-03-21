@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:red_grid_link/data/models/annotation.dart';
+import 'package:red_grid_link/data/models/boundary_event.dart';
 import 'package:red_grid_link/data/models/ghost.dart';
 import 'package:red_grid_link/data/models/marker.dart' as model;
 import 'package:red_grid_link/data/models/peer.dart';
@@ -163,6 +164,30 @@ final isLeadProvider = Provider<bool>((ref) {
 final localDeviceIdProvider = Provider<String>((ref) {
   final service = ref.watch(fieldLinkServiceProvider);
   return service.localDeviceId;
+});
+
+// ---------------------------------------------------------------------------
+// Boundary state
+// ---------------------------------------------------------------------------
+
+/// The currently active boundary annotation, or null.
+///
+/// Derived from [syncedAnnotationsProvider] by filtering for boundary
+/// type annotations. Only one boundary per session is expected.
+final activeBoundaryProvider = Provider<Annotation?>((ref) {
+  final annotations = ref.watch(syncedAnnotationsProvider).value ?? [];
+  return annotations
+      .where((a) => a.type == AnnotationType.boundary)
+      .firstOrNull;
+});
+
+/// Stream of boundary crossing events (exits).
+///
+/// Emits a [BoundaryEvent] whenever the local user or a peer crosses
+/// outside the active boundary. Used by the map screen to show alerts.
+final boundaryEventStreamProvider = StreamProvider<BoundaryEvent>((ref) {
+  final service = ref.watch(fieldLinkServiceProvider);
+  return service.boundaryEventStream;
 });
 
 // ---------------------------------------------------------------------------

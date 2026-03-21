@@ -93,6 +93,9 @@ enum DrawingMode {
 
   /// Placing a single marker.
   marker,
+
+  /// Drawing a geofence boundary (polygon with alert).
+  boundary,
 }
 
 /// Whether the annotation toolbar is visible.

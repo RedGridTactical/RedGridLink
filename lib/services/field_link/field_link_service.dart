@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:red_grid_link/core/utils/crypto_utils.dart';
 import 'package:red_grid_link/data/models/annotation.dart';
+import 'package:red_grid_link/data/models/boundary_event.dart';
 import 'package:red_grid_link/data/models/ghost.dart';
 import 'package:red_grid_link/data/models/marker.dart';
 import 'package:red_grid_link/data/models/operational_mode.dart';
@@ -13,6 +14,7 @@ import 'package:red_grid_link/data/repositories/peer_repository.dart';
 import 'package:red_grid_link/data/repositories/session_repository.dart';
 import 'package:red_grid_link/data/models/team_role.dart';
 import 'package:red_grid_link/services/field_link/battery/battery_manager.dart';
+import 'package:red_grid_link/services/field_link/boundary_manager.dart';
 import 'package:red_grid_link/services/field_link/ghost/ghost_manager.dart';
 import 'package:red_grid_link/services/field_link/role_manager.dart';
 import 'package:red_grid_link/services/field_link/sync/crdt/crdt_state.dart';
@@ -56,6 +58,7 @@ class FieldLinkService {
   final PeerRepository _peerRepository;
   final String _localDeviceId;
   late final RoleManager _roleManager;
+  late final BoundaryManager _boundaryManager;
 
   Session? _activeSession;
   StreamSubscription<TransportState>? _transportStateSub;
@@ -80,6 +83,8 @@ class FieldLinkService {
       StreamController<List<Peer>>.broadcast();
   final StreamController<FieldLinkStatus> _statusController =
       StreamController<FieldLinkStatus>.broadcast();
+  final StreamController<BoundaryEvent> _boundaryEventController =
+      StreamController<BoundaryEvent>.broadcast();
 
   FieldLinkStatus _status = FieldLinkStatus.idle;
 
@@ -99,6 +104,7 @@ class FieldLinkService {
         _peerRepository = peerRepository,
         _localDeviceId = localDeviceId {
     _roleManager = RoleManager(localDeviceId: localDeviceId);
+    _boundaryManager = BoundaryManager();
   }
 
   // ---------------------------------------------------------------------------
@@ -253,6 +259,7 @@ class FieldLinkService {
     await _sessionRepository.deactivateAll();
 
     _roleManager.reset();
+    _boundaryManager.clearBoundary();
     _activeSession = null;
     _emitSession();
     _setStatus(FieldLinkStatus.idle);
@@ -304,6 +311,53 @@ class FieldLinkService {
 
   /// The role manager for this session.
   RoleManager get roleManager => _roleManager;
+
+  /// The boundary manager for geofence alerts.
+  BoundaryManager get boundaryManager => _boundaryManager;
+
+  /// Stream of boundary crossing events (local user or peers exiting).
+  Stream<BoundaryEvent> get boundaryEventStream =>
+      _boundaryEventController.stream;
+
+  /// Check if the local user's position has crossed the boundary.
+  ///
+  /// Call this whenever the local GPS position updates. If a crossing
+  /// is detected, a [BoundaryEvent] is emitted on [boundaryEventStream]
+  /// and a `boundary_exit` control message is broadcast to peers.
+  void checkLocalBoundary(double lat, double lon) {
+    if (!_boundaryManager.hasBoundary) return;
+
+    final crossed = _boundaryManager.checkBoundaryCrossing(
+      _localDeviceId,
+      lat,
+      lon,
+    );
+
+    if (crossed) {
+      final callsign = _roleManager.callsign;
+      final event = BoundaryEvent(
+        id: '${_localDeviceId}_${DateTime.now().millisecondsSinceEpoch}',
+        peerId: _localDeviceId,
+        callsign: callsign,
+        timestamp: DateTime.now(),
+        lat: lat,
+        lon: lon,
+      );
+
+      if (!_boundaryEventController.isClosed) {
+        _boundaryEventController.add(event);
+      }
+
+      // Notify peers (especially the Lead) about the exit.
+      _syncEngine.broadcastControl({
+        'evt': 'boundary_exit',
+        'pid': _localDeviceId,
+        'cs': callsign,
+        'lat': lat,
+        'lon': lon,
+      });
+    }
+  }
 
   // ---------------------------------------------------------------------------
   // Role management
@@ -442,6 +496,7 @@ class FieldLinkService {
     _sessionController.close();
     _peersController.close();
     _statusController.close();
+    _boundaryEventController.close();
   }
 
   // ---------------------------------------------------------------------------
@@ -559,6 +614,35 @@ class FieldLinkService {
       } else {
         // Peer reconnected — snap-to-live.
         _ghostManager.onPeerReconnected(entry.key);
+      }
+    }
+
+    // Check peer positions against the boundary.
+    if (_boundaryManager.hasBoundary) {
+      for (final peer in peers) {
+        if (!peer.isConnected) continue;
+        final pos = peer.position;
+        if (pos == null) continue;
+        final crossed = _boundaryManager.checkBoundaryCrossing(
+          peer.id,
+          pos.lat,
+          pos.lon,
+        );
+        if (crossed) {
+          final peerCallsign = _roleManager.callsignForPeer(peer.id);
+          final callsign = peerCallsign.isNotEmpty ? peerCallsign : peer.displayName;
+          final event = BoundaryEvent(
+            id: '${peer.id}_${DateTime.now().millisecondsSinceEpoch}',
+            peerId: peer.id,
+            callsign: callsign,
+            timestamp: DateTime.now(),
+            lat: pos.lat,
+            lon: pos.lon,
+          );
+          if (!_boundaryEventController.isClosed) {
+            _boundaryEventController.add(event);
+          }
+        }
       }
     }
 

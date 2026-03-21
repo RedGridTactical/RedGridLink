@@ -55,6 +55,39 @@ class _MapScreenState extends ConsumerState<MapScreen> {
   TacticalColorScheme get colors => widget.colors;
 
   @override
+  void initState() {
+    super.initState();
+    // Listen for boundary exit events and show alert SnackBars.
+    // Uses addPostFrameCallback to ensure context is ready for SnackBar.
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      ref.listenManual(boundaryEventStreamProvider, (previous, next) {
+        next.whenData((event) {
+          if (!mounted) return;
+          final service = ref.read(fieldLinkServiceProvider);
+          final isLocal = event.peerId == service.localDeviceId;
+          final message = isLocal
+              ? 'You left the team boundary'
+              : '${event.callsign.isNotEmpty ? event.callsign : event.peerId.substring(0, 8)} left the boundary';
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(
+                message,
+                style: const TextStyle(
+                  fontFamily: 'monospace',
+                  fontSize: 12,
+                ),
+              ),
+              backgroundColor: const Color(0xFFCC4444),
+              duration: const Duration(seconds: 4),
+              behavior: SnackBarBehavior.floating,
+            ),
+          );
+        });
+      });
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
     final mapSource = ref.watch(mapSourceProvider);
     final showGrid = ref.watch(showMgrsGridProvider);
@@ -69,6 +102,14 @@ class _MapScreenState extends ConsumerState<MapScreen> {
     if (gpsPosition != null) {
       final latLng = LatLng(gpsPosition.lat, gpsPosition.lon);
       controllerService.followPosition(latLng);
+
+      // Check local position against the active boundary.
+      if (isSessionActive) {
+        ref.read(fieldLinkServiceProvider).checkLocalBoundary(
+              gpsPosition.lat,
+              gpsPosition.lon,
+            );
+      }
     }
     final showToolbar = ref.watch(showAnnotationToolbarProvider);
     final isDrawing = ref.watch(isDrawingActiveProvider);
@@ -381,15 +422,31 @@ class _MapScreenState extends ConsumerState<MapScreen> {
       return const SizedBox.shrink();
     }
 
-    if (mode == DrawingMode.polygon) {
-      return PolygonLayer(
-        polygons: [
-          Polygon(
-            points: points,
-            color: color.withValues(alpha: 0.15),
-            borderColor: color.withValues(alpha: 0.7),
-            borderStrokeWidth: 2,
+    if (mode == DrawingMode.polygon || mode == DrawingMode.boundary) {
+      final isBoundary = mode == DrawingMode.boundary;
+      return Stack(
+        children: [
+          PolygonLayer(
+            polygons: [
+              Polygon(
+                points: points,
+                color: color.withValues(alpha: isBoundary ? 0.08 : 0.15),
+                borderColor: color.withValues(alpha: 0.7),
+                borderStrokeWidth: isBoundary ? 0 : 2,
+              ),
+            ],
           ),
+          if (isBoundary)
+            PolylineLayer(
+              polylines: [
+                Polyline(
+                  points: [...points, points.first],
+                  color: color.withValues(alpha: 0.7),
+                  strokeWidth: 2,
+                  pattern: const StrokePattern.dotted(),
+                ),
+              ],
+            ),
         ],
       );
     }
@@ -495,6 +552,7 @@ class _DrawingHint extends StatelessWidget {
     final hint = switch (mode) {
       DrawingMode.polyline => 'TAP MAP TO ADD POINTS. USE TOOLBAR TO FINISH.',
       DrawingMode.polygon => 'TAP MAP TO ADD VERTICES. USE TOOLBAR TO FINISH.',
+      DrawingMode.boundary => 'TAP MAP TO SET BOUNDARY. USE TOOLBAR TO FINISH.',
       DrawingMode.marker => 'TAP MAP TO PLACE ${markerLabel.toUpperCase()}.',
       DrawingMode.none => '',
     };

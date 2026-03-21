@@ -65,7 +65,9 @@ class AnnotationToolbar extends ConsumerWidget {
                           ? Icons.timeline
                           : drawingMode == DrawingMode.polygon
                               ? Icons.crop_square
-                              : Icons.place,
+                              : drawingMode == DrawingMode.boundary
+                                  ? Icons.fence
+                                  : Icons.place,
                       size: 14,
                       color: colors.accent,
                     ),
@@ -143,6 +145,16 @@ class AnnotationToolbar extends ConsumerWidget {
                   isActive: drawingMode == DrawingMode.polygon,
                   onTap: () => _selectTool(ref, DrawingMode.polygon),
                 ),
+
+                // Boundary (Lead only)
+                if (ref.watch(isLeadProvider))
+                  _ToolButton(
+                    icon: Icons.fence,
+                    label: 'BOUND',
+                    colors: colors,
+                    isActive: drawingMode == DrawingMode.boundary,
+                    onTap: () => _selectTool(ref, DrawingMode.boundary),
+                  ),
 
                 // Marker
                 _ToolButton(
@@ -322,11 +334,25 @@ class AnnotationToolbar extends ConsumerWidget {
           .map((p) => AnnotationPoint(lat: p.latitude, lon: p.longitude))
           .toList();
 
+      final AnnotationType annotationType;
+      if (mode == DrawingMode.boundary) {
+        annotationType = AnnotationType.boundary;
+        // Remove any existing boundary (one boundary per session).
+        final existing = service.currentAnnotations
+            .where((a) => a.type == AnnotationType.boundary)
+            .toList();
+        for (final old in existing) {
+          service.removeAnnotation(old.id);
+        }
+      } else if (mode == DrawingMode.polygon) {
+        annotationType = AnnotationType.polygon;
+      } else {
+        annotationType = AnnotationType.polyline;
+      }
+
       final annotation = Annotation(
         id: id,
-        type: mode == DrawingMode.polygon
-            ? AnnotationType.polygon
-            : AnnotationType.polyline,
+        type: annotationType,
         points: annotationPoints,
         color: colorValue,
         strokeWidth: 2.0,
@@ -336,6 +362,11 @@ class AnnotationToolbar extends ConsumerWidget {
         isSynced: true,
       );
       service.addAnnotation(annotation);
+
+      // If boundary, update the boundary manager.
+      if (annotationType == AnnotationType.boundary) {
+        service.boundaryManager.setBoundary(annotation);
+      }
     }
 
     // Reset drawing state
@@ -347,6 +378,7 @@ class AnnotationToolbar extends ConsumerWidget {
     return switch (mode) {
       DrawingMode.polyline => 'DRAWING LINE',
       DrawingMode.polygon => 'DRAWING AREA',
+      DrawingMode.boundary => 'SET BOUNDARY',
       DrawingMode.marker => 'PLACE MARKER',
       DrawingMode.none => '',
     };

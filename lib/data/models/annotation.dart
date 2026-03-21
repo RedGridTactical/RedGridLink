@@ -1,13 +1,21 @@
 /// Annotation geometry type
 enum AnnotationType {
   polyline,
-  polygon;
+  polygon,
+  boundary;
 
-  static AnnotationType fromString(String value) =>
-      AnnotationType.values.firstWhere(
-        (e) => e.name == value,
-        orElse: () => AnnotationType.polyline,
-      );
+  static AnnotationType fromString(String value) {
+    switch (value.toLowerCase()) {
+      case 'polyline':
+        return AnnotationType.polyline;
+      case 'polygon':
+        return AnnotationType.polygon;
+      case 'boundary':
+        return AnnotationType.boundary;
+      default:
+        return AnnotationType.polyline;
+    }
+  }
 }
 
 /// A lat/lon point within an annotation
