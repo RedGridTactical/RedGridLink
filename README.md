@@ -19,7 +19,7 @@
 
 **Offline MGRS navigation and proximity team coordination for small teams (2-8 people). No cell service needed.**
 
-Built on the MGRS engine from [Red Grid MGRS](https://github.com/RedGridMGRS/RedGridMGRS). Field Link adds zero-config proximity sync over Bluetooth and WiFi Direct -- your team appears on the map the moment they're in range.
+Built on the MGRS engine from [Red Grid MGRS](https://github.com/RedGridTactical/RedGridMGRS). Field Link adds zero-config proximity sync over Bluetooth and WiFi Direct -- your team appears on the map the moment they're in range.
 
 > **Available now on iOS.** Android version coming soon.
 
@@ -187,7 +187,7 @@ See the [Roadmap](ROADMAP.md) for planned features and where help is needed.
 
 ## Related Projects
 
-- [Red Grid MGRS](https://github.com/RedGridMGRS/RedGridMGRS) -- solo MGRS navigator (React Native / Expo)
+- [Red Grid MGRS](https://github.com/RedGridTactical/RedGridMGRS) -- solo MGRS navigator (React Native / Expo)
 
 ---
 
