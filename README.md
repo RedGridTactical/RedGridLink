@@ -21,6 +21,8 @@
 
 Built on the MGRS engine from [Red Grid MGRS](https://github.com/RedGridTactical/RedGridMGRS). Field Link adds zero-config proximity sync over Bluetooth and WiFi Direct -- your team appears on the map the moment they're in range.
 
+> **Solo navigator?** [Red Grid MGRS](https://github.com/RedGridTactical/RedGridMGRS) gives you the same MGRS engine as a standalone tool with DAGR-class precision, 9 tactical tools, and 6 radio-ready report templates. Part of the [Red Grid Tactical](https://redgridtactical.com) ecosystem.
+
 > **Available now on iOS.** Android version coming soon.
 
 ---
@@ -189,9 +191,14 @@ See the [Roadmap](ROADMAP.md) for planned features and where help is needed.
 
 ---
 
-## Related Projects
+## Red Grid Tactical Ecosystem
 
-- [Red Grid MGRS](https://github.com/RedGridTactical/RedGridMGRS) -- solo MGRS navigator (React Native / Expo)
+| App | Purpose | Platform | Link |
+|-----|---------|----------|------|
+| **Red Grid MGRS** | Solo MGRS navigator (DAGR-class) | iOS | [GitHub](https://github.com/RedGridTactical/RedGridMGRS) · [App Store](https://apps.apple.com/app/id6759629554) |
+| **Red Grid Link** | Team coordination + encrypted sync | iOS | [GitHub](https://github.com/RedGridTactical/RedGridLink) · [App Store](https://apps.apple.com/app/red-grid-link/id6760084718) |
+
+Website: [redgridtactical.com](https://redgridtactical.com)
 
 ---
 
