@@ -181,16 +181,28 @@
     </div>
   </section>
 
-  <!-- SCREENSHOTS -->
+  <!-- SCREENSHOTS CAROUSEL -->
   <section class="section" aria-label="App screenshots" style="padding-top: 40px; padding-bottom: 40px;">
     <div class="container">
-      <div style="display: flex; gap: 16px; justify-content: center; align-items: center; overflow-x: auto; padding: 16px 0; -webkit-overflow-scrolling: touch;">
-        <img src="images/appstore_1_map_team.png" alt="Red Grid Link map view with team members tracked in real time over Bluetooth" style="height: 360px; width: auto; border-radius: 16px; box-shadow: 0 4px 24px rgba(0,0,0,0.4); flex-shrink: 0;">
-        <img src="images/appstore_3_field_link.png" alt="Field Link session with encrypted peer connections and position sharing" style="height: 360px; width: auto; border-radius: 16px; box-shadow: 0 4px 24px rgba(0,0,0,0.4); flex-shrink: 0;">
-        <img src="images/appstore_2_grid_view.png" alt="MGRS grid overlay on offline topographic map" style="height: 360px; width: auto; border-radius: 16px; box-shadow: 0 4px 24px rgba(0,0,0,0.4); flex-shrink: 0;">
-        <img src="images/appstore_4_tools.png" alt="11 tactical tools including dead reckoning, resection, and pace count" style="height: 360px; width: auto; border-radius: 16px; box-shadow: 0 4px 24px rgba(0,0,0,0.4); flex-shrink: 0;">
-        <img src="images/appstore_5_themes.png" alt="Four operational themes including Red Light for night operations" style="height: 360px; width: auto; border-radius: 16px; box-shadow: 0 4px 24px rgba(0,0,0,0.4); flex-shrink: 0;">
-        <img src="images/appstore_6_ghost_markers.png" alt="Ghost markers showing last-known teammate positions with time-decay opacity" style="height: 360px; width: auto; border-radius: 16px; box-shadow: 0 4px 24px rgba(0,0,0,0.4); flex-shrink: 0;">
+      <div class="carousel" style="position: relative; display: flex; align-items: center; justify-content: center; gap: 24px; max-width: 500px; margin: 0 auto;">
+        <button class="carousel-prev" aria-label="Previous screenshot" style="background: var(--bg-tertiary); border: 1px solid var(--border); color: var(--text-primary); width: 44px; height: 44px; border-radius: 50%; cursor: pointer; font-size: 1.2rem; display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: background 0.2s;">&larr;</button>
+        <div class="carousel-track" style="position: relative; width: 280px; height: 500px; flex-shrink: 0;">
+          <img src="images/appstore_1_map_team.png" alt="Red Grid Link map view with team positions" class="carousel-slide active" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: contain; border-radius: 16px; transition: opacity 0.4s ease; opacity: 1;">
+          <img src="images/appstore_3_field_link.png" alt="Field Link encrypted team sync session" class="carousel-slide" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: contain; border-radius: 16px; transition: opacity 0.4s ease; opacity: 0;">
+          <img src="images/appstore_2_grid_view.png" alt="MGRS grid coordinate view" class="carousel-slide" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: contain; border-radius: 16px; transition: opacity 0.4s ease; opacity: 0;">
+          <img src="images/appstore_4_tools.png" alt="11 tactical tools" class="carousel-slide" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: contain; border-radius: 16px; transition: opacity 0.4s ease; opacity: 0;">
+          <img src="images/appstore_5_themes.png" alt="Four display themes" class="carousel-slide" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: contain; border-radius: 16px; transition: opacity 0.4s ease; opacity: 0;">
+          <img src="images/appstore_6_ghost_markers.png" alt="Ghost markers with time-decay" class="carousel-slide" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: contain; border-radius: 16px; transition: opacity 0.4s ease; opacity: 0;">
+        </div>
+        <button class="carousel-next" aria-label="Next screenshot" style="background: var(--bg-tertiary); border: 1px solid var(--border); color: var(--text-primary); width: 44px; height: 44px; border-radius: 50%; cursor: pointer; font-size: 1.2rem; display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: background 0.2s;">&rarr;</button>
+      </div>
+      <div class="carousel-dots" style="display: flex; justify-content: center; gap: 8px; margin-top: 16px;">
+        <span class="carousel-dot active" style="width: 8px; height: 8px; border-radius: 50%; background: var(--accent); cursor: pointer; transition: background 0.2s;"></span>
+        <span class="carousel-dot" style="width: 8px; height: 8px; border-radius: 50%; background: var(--border); cursor: pointer; transition: background 0.2s;"></span>
+        <span class="carousel-dot" style="width: 8px; height: 8px; border-radius: 50%; background: var(--border); cursor: pointer; transition: background 0.2s;"></span>
+        <span class="carousel-dot" style="width: 8px; height: 8px; border-radius: 50%; background: var(--border); cursor: pointer; transition: background 0.2s;"></span>
+        <span class="carousel-dot" style="width: 8px; height: 8px; border-radius: 50%; background: var(--border); cursor: pointer; transition: background 0.2s;"></span>
+        <span class="carousel-dot" style="width: 8px; height: 8px; border-radius: 50%; background: var(--border); cursor: pointer; transition: background 0.2s;"></span>
       </div>
     </div>
   </section>

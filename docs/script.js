@@ -176,6 +176,39 @@ document.addEventListener('DOMContentLoaded', () => {
     history.pushState(null, '', targetId);
   });
 
+  // ─── Screenshot Carousel ───────────────────────────────────────
+  const carousel = document.querySelector('.carousel');
+  if (carousel) {
+    const slides = carousel.querySelectorAll('.carousel-slide');
+    const dots = document.querySelectorAll('.carousel-dot');
+    const prevBtn = carousel.querySelector('.carousel-prev');
+    const nextBtn = carousel.querySelector('.carousel-next');
+    let current = 0;
+
+    function showSlide(index) {
+      slides.forEach((s, i) => { s.style.opacity = i === index ? '1' : '0'; });
+      dots.forEach((d, i) => { d.style.background = i === index ? 'var(--accent)' : 'var(--border)'; });
+      current = index;
+    }
+
+    if (prevBtn) prevBtn.addEventListener('click', () => {
+      showSlide(current === 0 ? slides.length - 1 : current - 1);
+    });
+
+    if (nextBtn) nextBtn.addEventListener('click', () => {
+      showSlide(current === slides.length - 1 ? 0 : current + 1);
+    });
+
+    dots.forEach((dot, i) => {
+      dot.addEventListener('click', () => showSlide(i));
+    });
+
+    // Auto-advance every 5 seconds
+    setInterval(() => {
+      showSlide(current === slides.length - 1 ? 0 : current + 1);
+    }, 5000);
+  }
+
   // ─── Roadmap Tab Toggle ─────────────────────────────────────────
   const tabContainer = document.querySelector('.roadmap-tabs');
 
