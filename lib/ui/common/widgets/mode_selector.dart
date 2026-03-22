@@ -107,16 +107,18 @@ class _ModeChip extends StatelessWidget {
                 const SizedBox(width: 2),
               ],
               Flexible(
-                child: Text(
-                  mode.label,
-                  style: TacticalTextStyles.caption(colors).copyWith(
-                    color: isSelected ? Colors.white : colors.text2,
-                    fontWeight:
-                        isSelected ? FontWeight.bold : FontWeight.normal,
-                    fontSize: 10,
+                child: FittedBox(
+                  fit: BoxFit.scaleDown,
+                  child: Text(
+                    mode.label,
+                    style: TacticalTextStyles.caption(colors).copyWith(
+                      color: isSelected ? Colors.white : colors.text2,
+                      fontWeight:
+                          isSelected ? FontWeight.bold : FontWeight.normal,
+                      fontSize: 11,
+                    ),
+                    maxLines: 1,
                   ),
-                  overflow: TextOverflow.ellipsis,
-                  maxLines: 1,
                 ),
               ),
             ],

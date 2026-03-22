@@ -43,13 +43,13 @@ class ToolsScreen extends ConsumerWidget {
 
   static final List<_ToolDef> _tools = [
     _ToolDef(
-      label: 'DEAD\nRECKON',
+      label: 'DEAD\nRECKONING',
       icon: Icons.explore,
       description: 'Plot position from heading + distance',
       builder: (_) => const DeadReckoningTool(),
     ),
     _ToolDef(
-      label: 'RESECT',
+      label: 'RESECTION',
       icon: Icons.architecture,
       description: 'Locate position from 2 known points',
       builder: (_) => const ResectionTool(),
@@ -61,19 +61,19 @@ class ToolsScreen extends ConsumerWidget {
       builder: (_) => const PaceCountTool(),
     ),
     _ToolDef(
-      label: 'DECLI-\nNATION',
+      label: 'DECLINATION',
       icon: Icons.compass_calibration,
       description: 'Magnetic to true bearing conversion',
       builder: (_) => const DeclinationTool(),
     ),
     _ToolDef(
-      label: 'CELESTIAL\nNAV',
+      label: 'CELESTIAL\nNAVIGATION',
       icon: Icons.wb_sunny,
       description: 'Sun and moon bearing reference',
       builder: (_) => const SolarBearingTool(),
     ),
     _ToolDef(
-      label: 'TIME\nDIST SPD',
+      label: 'TIME DISTANCE\nSPEED',
       icon: Icons.timer,
       description: 'Time-distance-speed calculator',
       builder: (colors) => TdsTool(colors: colors),
@@ -85,25 +85,25 @@ class ToolsScreen extends ConsumerWidget {
       builder: (colors) => BackAzimuthTool(colors: colors),
     ),
     _ToolDef(
-      label: 'COORD\nCONVERT',
+      label: 'COORDINATE\nCONVERTER',
       icon: Icons.sync_alt,
       description: 'MGRS / Lat-Lon / DMS / UTM',
       builder: (colors) => CoordinateConverterTool(colors: colors),
     ),
     _ToolDef(
-      label: 'RANGE\nESTIMATE',
+      label: 'RANGE\nESTIMATION',
       icon: Icons.straighten,
       description: 'Mil-relation range estimation',
       builder: (colors) => RangeEstimationTool(colors: colors),
     ),
     _ToolDef(
-      label: 'SLOPE\nCALC',
+      label: 'SLOPE\nCALCULATOR',
       icon: Icons.trending_up,
       description: 'Slope percentage and angle',
       builder: (colors) => SlopeCalculatorTool(colors: colors),
     ),
     _ToolDef(
-      label: 'PRECISION\nREF',
+      label: 'PRECISION\nREFERENCE',
       icon: Icons.grid_on,
       description: 'MGRS precision level reference',
       builder: (colors) => PrecisionReferenceTool(colors: colors),
@@ -203,14 +203,17 @@ class _ToolCard extends StatelessWidget {
             size: 28,
           ),
           const SizedBox(height: 8),
-          Text(
-            tool.label,
-            style: TacticalTextStyles.buttonText(colors).copyWith(
-              fontSize: 12,
-              height: 1.2,
+          FittedBox(
+            fit: BoxFit.scaleDown,
+            child: Text(
+              tool.label,
+              style: TacticalTextStyles.buttonText(colors).copyWith(
+                fontSize: 11,
+                height: 1.2,
+              ),
+              textAlign: TextAlign.center,
+              maxLines: 2,
             ),
-            textAlign: TextAlign.center,
-            maxLines: 2,
           ),
           const SizedBox(height: 4),
           Flexible(
