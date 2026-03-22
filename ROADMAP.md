@@ -85,19 +85,36 @@ Enhanced team coordination for larger groups.
 
 ---
 
-## V1.4 — Extended Range
+## V1.4 — Android Launch + Extended Range
 
 **Target: Q3 2026**
 
-BLE Long Range and connectivity improvements. Addresses the #1 user request from community feedback.
+Android release, BLE Long Range, and new features driven by community feedback.
 
-- [ ] BLE Long Range (Coded PHY S=8): 3-4x range improvement (~400m-1km depending on terrain)
-- [ ] Android: explicit PHY negotiation via platform channel (`setPreferredPhy`)
-- [ ] iOS: Coded PHY support via CoreBluetooth on iPhone 12+ / iOS 14+
-- [ ] Connection quality indicator (RSSI-based signal strength display on peer markers)
-- [ ] Adaptive PHY selection: auto-fallback to 1M PHY when Coded PHY unavailable
-- [ ] Range test mode: built-in tool to measure effective range between two devices
-- [ ] Basic mesh relay: forward position data through intermediate peers (single hop)
+### Android Launch
+- [ ] Android QA: test BLE transport, Nearby Connections, foreground service on physical devices
+- [ ] Play Store listing: keystore, screenshots, privacy policy, content rating
+- [ ] Codemagic android-release workflow verification and Play Store publishing
+- [ ] F-Droid submission with reproducible build configuration (pinned SDK versions, Gradle config)
+
+### BLE Long Range (Android-only — Apple removed Coded PHY support in iOS 14)
+- [ ] BLE Long Range (Coded PHY S=8): 3-4x range improvement (~400m-1km) via `flutter_blue_plus` `setPreferredPhy`
+- [ ] Adaptive PHY selection: auto-fallback to 1M PHY when Coded PHY unavailable or on iOS
+- [ ] PHY indicator on peer markers showing current connection type (1M vs Coded)
+
+### Connectivity
+- [ ] Connection quality indicator (RSSI-based signal strength on peer markers, color-coded green/yellow/red)
+- [ ] Range test mode: built-in tool showing RSSI, current PHY, estimated distance between two devices
+
+### FixPhrase — Location in Four Words
+- [ ] Port FixPhrase algorithm to Dart (open source, patent-free what3words alternative)
+- [ ] Display FixPhrase alongside MGRS coordinates on grid view
+- [ ] FixPhrase search input: type four words to navigate to a location
+- [ ] Fully offline: word list bundled as asset, no network required
+
+### Map Sources
+- [ ] Add vanilla OpenStreetMap as tile source option (alongside USGS Topo + OpenTopoMap)
+- [ ] Tile source selector in map settings
 
 ---
 

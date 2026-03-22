@@ -13,7 +13,7 @@
 [![AES-256](https://img.shields.io/badge/Encryption-AES--256--GCM-8B0000)]()
 [![Flutter](https://img.shields.io/badge/Built%20with-Flutter-CC0000?logo=flutter)]()
 [![Tests](https://img.shields.io/badge/Tests-986%20Passing-brightgreen)]()
-[![Platform](https://img.shields.io/badge/Platform-iOS-8B0000)]()
+[![Platform](https://img.shields.io/badge/Platform-iOS%20%7C%20Android%20Q3%202026-8B0000)]()
 [![PRs Welcome](https://img.shields.io/badge/PRs-Welcome-CC0000)](https://github.com/RedGridTactical/RedGridLink/pulls)
 [![Buy Me a Coffee](https://img.shields.io/badge/Buy%20Me%20a%20Coffee-Support-FFDD00?logo=buymeacoffee&logoColor=black)](https://buymeacoffee.com/redgridtac0)
 
@@ -162,7 +162,7 @@ Full roadmap with feature checklists: [ROADMAP.md](ROADMAP.md)
 | **V1.1** | **Complete** | Field Hardening | Kalman filter, step detector, Peer HUD, Ultra Expedition, auto-reconnect, map downloads, Sentry, l10n, Help/About |
 | **V1.2.1** | **Complete** | Reliability | Field Link session fix, waypoint persistence, relative bearing arrow, demo mode |
 | **V1.3** | **Complete** | Team Features | Team roles (Lead/Scout/Medic/Comms), waypoint sharing, shared annotations, boundary alerts, NATO voice callouts, session export/import |
-| **V1.4** | Q3 2026 | Extended Range | BLE Long Range (Coded PHY), signal strength indicator, basic mesh relay, range test mode |
+| **V1.4** | Q3 2026 | Android + Range | Android launch, BLE Long Range (Android, Coded PHY), FixPhrase (4-word locations), F-Droid, OSM tiles |
 | **V2.0** | Q4 2026 | Intelligence + Interop | ATAK/CoT interop, Meshtastic BLE bridge, elevation profiles, terrain analysis, weather overlay |
 | **V2.1** | Q1 2027 | Advanced Nav | Route planning, freehand annotations, track recording, GPX import/export, timeline replay |
 | **V3.0** | Q2 2027 | Connected Ops | Cloud relay, web dashboard, mesh networking, session scheduling, API |
