@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>About — Red Grid Tactical</title>
+<meta name="description" content="Red Grid Tactical builds offline-first navigation and team coordination tools. Founded by an active duty Army officer to bridge the gap between military tools and civilian team needs.">
+<meta name="author" content="Red Grid Tactical">
+<link rel="canonical" href="https://redgridtactical.com/about.html">
+<link rel="icon" type="image/png" href="images/icon.png">
+
+<!-- Open Graph -->
+<meta property="og:title" content="About — Red Grid Tactical">
+<meta property="og:description" content="Red Grid Tactical builds offline-first navigation and team coordination tools. Founded by an active duty Army officer to bridge the gap between military tools and civilian team needs.">
+<meta property="og:image" content="https://redgridtactical.com/images/social-preview.png">
+<meta property="og:url" content="https://redgridtactical.com/about.html">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Red Grid Tactical">
+
+<!-- Twitter Card -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="About — Red Grid Tactical">
+<meta name="twitter:description" content="Red Grid Tactical builds offline-first navigation and team coordination tools. Founded by an active duty Army officer to bridge the gap between military tools and civilian team needs.">
+<meta name="twitter:image" content="https://redgridtactical.com/images/social-preview.png">
+
+<!-- Structured Data: Organization -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  "name": "Red Grid Tactical",
+  "url": "https://redgridtactical.com",
+  "logo": "https://redgridtactical.com/images/icon.png",
+  "description": "Red Grid Tactical builds offline-first navigation and team coordination tools. Founded by an active duty Army officer to bridge the gap between military tools and civilian team needs.",
+  "sameAs": [
+    "https://github.com/RedGridTactical"
+  ]
+}
+</script>
+
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<!-- NAVIGATION -->
+<header>
+  <nav class="nav">
+    <div class="nav-container container">
+      <button class="nav-hamburger" aria-label="Menu">
+        <span></span><span></span><span></span>
+      </button>
+      <a href="/" class="nav-logo">
+        <img src="images/icon.png" alt="Red Grid" width="32" height="32">
+        Red Grid Tactical
+      </a>
+      <a href="link.html" class="nav-cta btn btn-primary">Download App</a>
+    </div>
+  </nav>
+</header>
+
+<!-- Slide-out menu -->
+<div class="nav-overlay"></div>
+<div class="nav-menu">
+  <a href="/">Home</a>
+  <div class="submenu-group">
+    <a href="#" class="submenu-toggle">Our Apps</a>
+    <div class="submenu">
+      <a href="link.html">Red Grid Link</a>
+      <a href="mgrs.html">Red Grid MGRS</a>
+    </div>
+  </div>
+  <a href="roadmap.html">Roadmap</a>
+  <a href="about.html">About</a>
+  <a href="index.html#contact" class="nav-menu-cta">Contact Us</a>
+</div>
+
+<main>
+
+  <!-- HERO -->
+  <section class="hero hero-sm" aria-label="Hero">
+    <div class="container">
+      <h1>About <span class="accent">Red Grid</span> Tactical</h1>
+      <p class="pitch">Built by someone who needed it in the field.</p>
+    </div>
+  </section>
+
+  <!-- THE STORY -->
+  <section class="section fade-in" aria-label="Our story">
+    <div class="container" style="max-width: 800px;">
+      <h2 class="section-title">Why Red Grid Exists</h2>
+      <p class="mb-3">Red Grid Tactical was founded by an active duty Army officer who spent years watching the gap between military-grade navigation tools and what civilian teams actually have access to. Military units have ATAK, DAGR receivers, and encrypted radio networks. A volunteer SAR team trying to coordinate a search in the backcountry? They get group texts that don't work without cell service.</p>
+      <p class="mb-3">The idea was simple: take the concepts that work in military operations and make them accessible to everyone. Real MGRS coordinates, not approximations. Encrypted peer-to-peer sync, not cloud-dependent tracking. Tools that work when infrastructure doesn't. No accounts to create, no servers to maintain, no subscriptions required just to see where your teammate is.</p>
+      <p>Red Grid started as a solo MGRS navigator (Red Grid MGRS) that could match the precision of a $2,500 military DAGR. Then came the question every team lead asks: how do I see where my people are? That became Red Grid Link, with its Field Link proximity sync engine. Two apps, one mission: give small teams the situational awareness tools that used to require military infrastructure.</p>
+    </div>
+  </section>
+
+  <!-- OPEN SOURCE -->
+  <section class="section fade-in" aria-label="Open source">
+    <div class="container" style="max-width: 800px;">
+      <h2 class="section-title">Built In Public</h2>
+      <p class="mb-3">Both Red Grid apps are open source. The code is on GitHub. You can read every line, verify the encryption, and build it yourself. We believe security tools should be transparent. If you're trusting an app with your team's positions, you should be able to verify exactly what it does with that data.</p>
+      <p>The answer is: nothing. No analytics, no tracking, no cloud sync, no accounts. Your data stays on your device. Field Link sessions are ephemeral. When you disconnect, the session data disappears. That's not a feature we advertise. It's a design principle.</p>
+    </div>
+  </section>
+
+  <!-- THE TECH -->
+  <section class="section fade-in" aria-label="Technology">
+    <div class="container">
+      <h2 class="section-title">What Powers Red Grid</h2>
+      <div class="grid-2">
+        <div class="card">
+          <h3>Flutter</h3>
+          <p>Cross-platform framework delivering a single codebase for iOS and Android. Native performance, consistent experience.</p>
+        </div>
+        <div class="card">
+          <h3>CRDT Sync Engine</h3>
+          <p>Conflict-free Replicated Data Types for reliable peer-to-peer state synchronization. No central server, no merge conflicts.</p>
+        </div>
+        <div class="card">
+          <h3>AES-256-GCM + ECDH P-256</h3>
+          <p>Military-standard encryption with ephemeral key exchange. New session keys every connection. No pre-shared secrets.</p>
+        </div>
+        <div class="card">
+          <h3>Drift + SQLite</h3>
+          <p>Local-first data storage with no cloud dependency. Your data lives on your device and nowhere else.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CONTACT CTA -->
+  <section class="section fade-in text-center" aria-label="Contact">
+    <div class="container">
+      <h2 class="section-title">Want to reach us?</h2>
+      <p class="mb-3">We'd love to hear from you.</p>
+      <a href="index.html#contact" class="btn btn-primary btn-lg">Contact Us</a>
+    </div>
+  </section>
+
+</main>
+
+<!-- FOOTER -->
+<footer class="footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-col">
+        <h4>Products</h4>
+        <a href="link.html">Red Grid Link</a>
+        <a href="mgrs.html">Red Grid MGRS</a>
+      </div>
+      <div class="footer-col">
+        <h4>Company</h4>
+        <a href="about.html">About</a>
+        <a href="roadmap.html">Roadmap</a>
+        <a href="index.html#contact">Contact</a>
+      </div>
+      <div class="footer-col">
+        <h4>Legal</h4>
+        <a href="privacy.html">Privacy Policy</a>
+        <a href="terms.html">Terms of Use</a>
+      </div>
+      <div class="footer-col">
+        <h4>Community</h4>
+        <a href="https://github.com/RedGridTactical/RedGridLink">GitHub</a>
+        <a href="https://buymeacoffee.com/redgridtactical">Buy Me a Coffee</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>&copy; 2026 Red Grid Tactical. All rights reserved.</p>
+    </div>
+  </div>
+</footer>
+
+<script src="script.js"></script>
+</body>
+</html>

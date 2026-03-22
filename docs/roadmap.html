@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Roadmap — Red Grid Tactical</title>
+<meta name="description" content="See what's coming next for Red Grid Link and Red Grid MGRS. Android launch, BLE Long Range, Meshtastic integration, ATAK interop, and more.">
+<meta name="author" content="Red Grid Tactical">
+<link rel="canonical" href="https://redgridtactical.com/roadmap.html">
+<link rel="icon" type="image/png" href="images/icon.png">
+
+<!-- Open Graph -->
+<meta property="og:title" content="Roadmap — Red Grid Tactical">
+<meta property="og:description" content="See what's coming next for Red Grid Link and Red Grid MGRS. Android launch, BLE Long Range, Meshtastic integration, ATAK interop, and more.">
+<meta property="og:image" content="https://redgridtactical.com/images/social-preview.png">
+<meta property="og:url" content="https://redgridtactical.com/roadmap.html">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Red Grid Tactical">
+
+<!-- Twitter Card -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Roadmap — Red Grid Tactical">
+<meta name="twitter:description" content="See what's coming next for Red Grid Link and Red Grid MGRS. Android launch, BLE Long Range, Meshtastic integration, ATAK interop, and more.">
+<meta name="twitter:image" content="https://redgridtactical.com/images/social-preview.png">
+
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<!-- NAVIGATION -->
+<header>
+  <nav class="nav">
+    <div class="nav-container container">
+      <button class="nav-hamburger" aria-label="Menu">
+        <span></span><span></span><span></span>
+      </button>
+      <a href="/" class="nav-logo">
+        <img src="images/icon.png" alt="Red Grid" width="32" height="32">
+        Red Grid Tactical
+      </a>
+      <a href="link.html" class="nav-cta btn btn-primary">Download App</a>
+    </div>
+  </nav>
+</header>
+
+<!-- Slide-out menu -->
+<div class="nav-overlay"></div>
+<div class="nav-menu">
+  <a href="/">Home</a>
+  <div class="submenu-group">
+    <a href="#" class="submenu-toggle">Our Apps</a>
+    <div class="submenu">
+      <a href="link.html">Red Grid Link</a>
+      <a href="mgrs.html">Red Grid MGRS</a>
+    </div>
+  </div>
+  <a href="roadmap.html">Roadmap</a>
+  <a href="about.html">About</a>
+  <a href="index.html#contact" class="nav-menu-cta">Contact Us</a>
+</div>
+
+<main>
+
+  <!-- HERO -->
+  <section class="hero hero-sm" aria-label="Hero">
+    <div class="container">
+      <h1>Product <span class="accent">Roadmap</span></h1>
+      <p class="pitch">Where we've been and where we're going. Both apps, one vision.</p>
+    </div>
+  </section>
+
+  <!-- TAB TOGGLE -->
+  <section class="section" aria-label="Roadmap">
+    <div class="container">
+      <div class="roadmap-tabs">
+        <button class="roadmap-tab active" data-tab="link">Red Grid Link</button>
+        <button class="roadmap-tab" data-tab="mgrs">Red Grid MGRS</button>
+      </div>
+
+      <!-- RED GRID LINK TIMELINE -->
+      <div class="timeline active" data-tab="link">
+
+        <div class="timeline-item completed">
+          <div class="timeline-version">V1.0 — Foundation</div>
+          <div class="timeline-date">March 2026</div>
+          <ul class="timeline-features">
+            <li>MGRS navigation with 10-digit precision</li>
+            <li>Field Link: BLE + WiFi Direct proximity sync (2-8 devices)</li>
+            <li>AES-256-GCM encryption with ECDH key exchange</li>
+            <li>11 tactical tools</li>
+            <li>Offline MBTiles map downloads</li>
+            <li>After-Action Report PDF export</li>
+            <li>4 tactical themes</li>
+            <li>In-app subscriptions</li>
+          </ul>
+        </div>
+
+        <div class="timeline-item completed">
+          <div class="timeline-version">V1.1 — Field Hardening</div>
+          <div class="timeline-date">March 2026</div>
+          <ul class="timeline-features">
+            <li>GPS Kalman filter smoothing</li>
+            <li>Ultra Expedition battery mode (&lt;2%/hr)</li>
+            <li>Exponential backoff reconnect logic</li>
+            <li>Peer distance/bearing HUD overlay</li>
+            <li>Session history persistence</li>
+            <li>Localization (English + Spanish)</li>
+            <li>Help, About, and Terms screens</li>
+          </ul>
+        </div>
+
+        <div class="timeline-item completed">
+          <div class="timeline-version">V1.2.1 — Reliability</div>
+          <div class="timeline-date">March 2026</div>
+          <ul class="timeline-features">
+            <li>Persistent waypoint system</li>
+            <li>Relative bearing arrow fix</li>
+            <li>BLE transport debug logging</li>
+            <li>Compass heading audit</li>
+          </ul>
+        </div>
+
+        <div class="timeline-item completed">
+          <div class="timeline-version">V1.3 — Team Features</div>
+          <div class="timeline-date">March 2026</div>
+          <ul class="timeline-features">
+            <li>Team roles: Lead, Scout, Medic, Comms, Custom</li>
+            <li>Waypoint sharing (personal + team)</li>
+            <li>Shared annotations with undo/delete</li>
+            <li>Boundary geofence alerts</li>
+            <li>Enhanced AAR with per-member tracks</li>
+            <li>NATO phonetic voice callouts</li>
+            <li>Session export/import</li>
+            <li>New marker categories</li>
+            <li>986 tests passing</li>
+          </ul>
+        </div>
+
+        <div class="timeline-item current">
+          <div class="timeline-version">V1.4 — Android Launch + Extended Range</div>
+          <div class="timeline-date">Q3 2026</div>
+          <ul class="timeline-features">
+            <li>Android release on Google Play</li>
+            <li>F-Droid submission</li>
+            <li>BLE Long Range (Coded PHY) for 400m-1km range</li>
+            <li>Connection quality indicator (RSSI-based)</li>
+            <li>FixPhrase: 4-word location encoding (open source what3words alternative)</li>
+            <li>OpenStreetMap tile source option</li>
+          </ul>
+        </div>
+
+        <div class="timeline-item planned">
+          <div class="timeline-version">V2.0 — Intelligence Layer + ATAK Interop</div>
+          <div class="timeline-date">Q4 2026</div>
+          <ul class="timeline-features">
+            <li>Meshtastic BLE bridge for multi-kilometer range</li>
+            <li>ATAK/Cursor on Target interoperability</li>
+            <li>Elevation profile analysis</li>
+            <li>Line-of-sight calculator</li>
+            <li>Weather overlay (offline NOAA data)</li>
+          </ul>
+        </div>
+
+        <div class="timeline-item planned">
+          <div class="timeline-version">V2.1 — Advanced Navigation</div>
+          <div class="timeline-date">Q1 2027</div>
+          <ul class="timeline-features">
+            <li>Route planning with waypoint sequences</li>
+            <li>Freehand annotation drawing</li>
+            <li>Interactive team movement replay</li>
+            <li>GPX/KML import/export</li>
+            <li>Track recording with statistics</li>
+          </ul>
+        </div>
+
+        <div class="timeline-item planned">
+          <div class="timeline-version">V3.0 — Connected Operations</div>
+          <div class="timeline-date">Q2 2027</div>
+          <ul class="timeline-features">
+            <li>Cloud session relay (optional, encrypted)</li>
+            <li>Web dashboard for team leads</li>
+            <li>Mesh networking through intermediate peers</li>
+            <li>Team management portal</li>
+          </ul>
+        </div>
+
+        <div class="timeline-item planned">
+          <div class="timeline-version">V4.0 — Training &amp; Simulation</div>
+          <div class="timeline-date">Q4 2027</div>
+          <ul class="timeline-features">
+            <li>Training scenario builder</li>
+            <li>Real-time scoring for land nav exercises</li>
+            <li>Instructor mode</li>
+            <li>Performance analytics</li>
+            <li>AR compass overlay</li>
+          </ul>
+        </div>
+
+      </div>
+
+      <!-- RED GRID MGRS TIMELINE -->
+      <div class="timeline" data-tab="mgrs">
+
+        <div class="timeline-item completed">
+          <div class="timeline-version">V2.1 — Polish</div>
+          <div class="timeline-date">2026</div>
+          <ul class="timeline-features">
+            <li>OLED dark mode</li>
+            <li>SF Pro typography</li>
+            <li>6-tab navigation</li>
+            <li>Coordinate format selector</li>
+          </ul>
+        </div>
+
+        <div class="timeline-item completed">
+          <div class="timeline-version">V2.5 — Pro Features</div>
+          <div class="timeline-date">2026</div>
+          <ul class="timeline-features">
+            <li>HUD mode</li>
+            <li>Photo geostamp</li>
+            <li>Haptic grid crossing alerts</li>
+            <li>Shake-to-speak NATO voice</li>
+          </ul>
+        </div>
+
+        <div class="timeline-item planned">
+          <div class="timeline-version">V3.0 — Tactical Map</div>
+          <div class="timeline-date">Fall 2026</div>
+          <ul class="timeline-features">
+            <li>MGRS grid overlay map</li>
+            <li>Mission planning tools</li>
+            <li>Photo geostamp insets</li>
+            <li>GPX/KML import/export</li>
+            <li>External GPS support (Garmin GLO, Bad Elf)</li>
+          </ul>
+        </div>
+
+        <div class="timeline-item planned">
+          <div class="timeline-version">V3.5 — Platform Ecosystem</div>
+          <div class="timeline-date">2027</div>
+          <ul class="timeline-features">
+            <li>Apple Watch companion</li>
+            <li>iOS Live Activity / Dynamic Island</li>
+            <li>Siri Shortcuts</li>
+            <li>Android launch</li>
+          </ul>
+        </div>
+
+      </div>
+
+    </div>
+  </section>
+
+</main>
+
+<!-- FOOTER -->
+<footer class="footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-col">
+        <h4>Products</h4>
+        <a href="link.html">Red Grid Link</a>
+        <a href="mgrs.html">Red Grid MGRS</a>
+      </div>
+      <div class="footer-col">
+        <h4>Company</h4>
+        <a href="about.html">About</a>
+        <a href="roadmap.html">Roadmap</a>
+        <a href="index.html#contact">Contact</a>
+      </div>
+      <div class="footer-col">
+        <h4>Legal</h4>
+        <a href="privacy.html">Privacy Policy</a>
+        <a href="terms.html">Terms of Use</a>
+      </div>
+      <div class="footer-col">
+        <h4>Community</h4>
+        <a href="https://github.com/RedGridTactical/RedGridLink">GitHub</a>
+        <a href="https://buymeacoffee.com/redgridtactical">Buy Me a Coffee</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>&copy; 2026 Red Grid Tactical. All rights reserved.</p>
+    </div>
+  </div>
+</footer>
+
+<script src="script.js"></script>
+</body>
+</html>

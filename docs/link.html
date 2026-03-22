@@ -1,0 +1,532 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Red Grid Link — Encrypted Team Coordination Over Bluetooth</title>
+<meta name="description" content="Encrypted Bluetooth team coordination with offline MGRS maps. Track 2-8 team members, share waypoints, set boundaries. No cell towers, no servers. Free on iOS, Android beta available.">
+<meta name="keywords" content="ATAK alternative, blue force tracking, team tracker, offline map, MGRS, tactical navigation, encrypted team sync, offline GPS, SAR app, hunting app, backcountry navigation, Bluetooth team tracking, goTenna alternative, Field Link, ghost markers">
+<meta name="author" content="Red Grid Tactical">
+<link rel="canonical" href="https://redgridtactical.com/link.html">
+<link rel="icon" type="image/png" href="images/icon.png">
+
+<!-- Open Graph -->
+<meta property="og:title" content="Red Grid Link — Encrypted Team Coordination Over Bluetooth">
+<meta property="og:description" content="Encrypted Bluetooth team coordination with offline MGRS maps. Track 2-8 team members, share waypoints, set boundaries. No cell towers, no servers.">
+<meta property="og:image" content="https://redgridtactical.com/images/social-preview.png">
+<meta property="og:url" content="https://redgridtactical.com/link.html">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Red Grid Tactical">
+
+<!-- Twitter Card -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Red Grid Link — Encrypted Team Coordination Over Bluetooth">
+<meta name="twitter:description" content="Encrypted Bluetooth team coordination with offline MGRS maps. Track 2-8 team members, share waypoints, set boundaries. No cell towers, no servers.">
+<meta name="twitter:image" content="https://redgridtactical.com/images/social-preview.png">
+
+<!-- Structured Data: MobileApplication -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "MobileApplication",
+  "name": "Red Grid Link",
+  "operatingSystem": "iOS, Android",
+  "applicationCategory": "NavigationApplication",
+  "offers": {
+    "@type": "Offer",
+    "price": "0",
+    "priceCurrency": "USD"
+  },
+  "softwareVersion": "1.3.1",
+  "description": "Encrypted Bluetooth team coordination with offline MGRS maps. Track 2-8 team members, share waypoints, set boundaries. No cell towers, no servers, no accounts.",
+  "screenshot": "https://redgridtactical.com/images/appstore_1_map_team.png",
+  "url": "https://redgridtactical.com/link.html",
+  "downloadUrl": "https://apps.apple.com/app/id6760084718",
+  "author": {
+    "@type": "Organization",
+    "name": "Red Grid Tactical",
+    "url": "https://redgridtactical.com"
+  },
+  "aggregateRating": {
+    "@type": "AggregateRating",
+    "ratingValue": "5",
+    "ratingCount": "1"
+  }
+}
+</script>
+
+<!-- Structured Data: FAQPage -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "How does Field Link work?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Field Link uses Bluetooth Low Energy and WiFi Direct to auto-discover nearby teammates and share encrypted position data. No pairing, no configuration. AES-256-GCM encryption with ECDH P-256 ephemeral session keys. New keys are generated for every session."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Does it work without cell service?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Yes. Red Grid Link uses GPS satellites for positioning and Bluetooth for team sync. No cell towers, no WiFi, no internet required. Download maps ahead of time for full offline operation."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "What data do you collect?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "None. No accounts, no analytics, no cloud sync, no tracking. Location data stays on your device. Field Link session data is ephemeral and disappears when the session ends."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "How is this different from ATAK?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Red Grid Link is a lightweight ATAK alternative. It works on both iOS and Android (ATAK is Android-only), requires no TAK Server, sets up in 30 seconds, and is designed for civilian SAR, hunting, and backcountry teams rather than military operations."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Can I use it for hunting?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Yes. Hunting mode adapts terminology and icons for hunting operations, including stand locations and party tracking. Know where every member of your hunting party is without radio chatter."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "When is Android coming?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Android is in closed beta now. You can join the beta on Google Play at https://play.google.com/apps/testing/com.redgrid.red_grid_link."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "How far does Bluetooth reach?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Standard BLE range is 100-300 meters depending on terrain and devices. BLE Long Range mode is coming in V1.4, extending range to 400m-1km."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "What are Ghost Markers?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "When a teammate goes out of Bluetooth range, their last-known position stays on your map as a Ghost Marker. The marker's opacity fades over 30 minutes, and a projected heading vector shows their likely direction of travel."
+      }
+    }
+  ]
+}
+</script>
+
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<!-- NAVIGATION -->
+<header>
+  <nav class="nav">
+    <div class="nav-container container">
+      <button class="nav-hamburger" aria-label="Menu">
+        <span></span><span></span><span></span>
+      </button>
+      <a href="/" class="nav-logo">
+        <img src="images/icon.png" alt="Red Grid" width="32" height="32">
+        Red Grid Tactical
+      </a>
+      <a href="link.html" class="nav-cta btn btn-primary">Download App</a>
+    </div>
+  </nav>
+</header>
+
+<!-- Slide-out menu -->
+<div class="nav-overlay"></div>
+<div class="nav-menu">
+  <a href="/">Home</a>
+  <div class="submenu-group">
+    <a href="#" class="submenu-toggle">Our Apps</a>
+    <div class="submenu">
+      <a href="link.html">Red Grid Link</a>
+      <a href="mgrs.html">Red Grid MGRS</a>
+    </div>
+  </div>
+  <a href="roadmap.html">Roadmap</a>
+  <a href="about.html">About</a>
+  <a href="https://redgridtactical.com/#contact" class="nav-menu-cta">Contact Us</a>
+</div>
+
+<main>
+
+  <!-- PRODUCT HERO -->
+  <section class="hero" aria-label="Product hero">
+    <div class="container">
+      <img src="images/icon.png" alt="Red Grid Link app icon" width="80" height="80" style="border-radius: 18px; margin-bottom: 24px;">
+      <h1><span class="accent">Red Grid</span> Link</h1>
+      <span class="badge badge-red" style="margin-bottom: 16px;">V1.3 — Team Features</span>
+      <p class="pitch">Encrypted team coordination over Bluetooth. No cell towers. No servers. No accounts.</p>
+      <div class="cta-row">
+        <a href="https://apps.apple.com/app/id6760084718" class="btn btn-primary btn-lg">Download on App Store</a>
+        <a href="https://play.google.com/apps/testing/com.redgrid.red_grid_link" class="btn btn-secondary btn-lg">Join Android Beta</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- SCREENSHOTS -->
+  <section class="screenshots" aria-label="App screenshots">
+    <div class="screenshots-inner">
+      <img src="images/appstore_1_map_team.png" alt="Red Grid Link map view with team members tracked in real time over Bluetooth">
+      <img src="images/appstore_3_field_link.png" alt="Field Link session with encrypted peer connections and position sharing">
+      <img src="images/appstore_2_grid_view.png" alt="MGRS grid overlay on offline topographic map">
+      <img src="images/appstore_4_tools.png" alt="11 tactical tools including dead reckoning, resection, and pace count">
+      <img src="images/appstore_5_themes.png" alt="Four operational themes including Red Light for night operations">
+      <img src="images/appstore_6_ghost_markers.png" alt="Ghost markers showing last-known teammate positions with time-decay opacity">
+    </div>
+  </section>
+
+  <!-- FEATURES GRID -->
+  <section class="section fade-in" aria-label="Features">
+    <div class="container">
+      <h2 class="section-title text-center mb-4">What Red Grid Link Does</h2>
+      <div class="grid-3">
+        <div class="card">
+          <h3>Field Link — Encrypted Team Sync</h3>
+          <p>Auto-discover teammates via BLE + WiFi Direct. AES-256-GCM encrypted with ECDH ephemeral keys. No servers, no pairing, no configuration. Sync positions with 2-8 team members in real time.</p>
+        </div>
+        <div class="card">
+          <h3>Offline MGRS Maps</h3>
+          <p>Download USGS Topo and OpenTopoMap regions. MGRS grid overlay at all zoom levels. Full offline operation with MBTiles. Never depend on cell service for maps.</p>
+        </div>
+        <div class="card">
+          <h3>11 Tactical Tools</h3>
+          <p>Dead reckoning, two-point resection, pace count, bearing/back azimuth, coordinate converter, range estimation, slope calculator, ETA/speed, declination, celestial nav, MGRS reference.</p>
+        </div>
+        <div class="card">
+          <h3>Team Roles &amp; Coordination</h3>
+          <p>Assign Lead, Scout, Medic, Comms, or custom roles with callsigns. Share waypoints, draw boundaries, get alerts when teammates cross the geofence.</p>
+        </div>
+        <div class="card">
+          <h3>Ghost Markers &amp; Time-Decay</h3>
+          <p>When teammates go out of range, their last-known position stays on your map. Opacity fades over 30 minutes with projected heading vectors.</p>
+        </div>
+        <div class="card">
+          <h3>4 Operational Modes</h3>
+          <p>SAR, Backcountry, Hunting, Training. UI adapts terminology, icons, and quick actions to your mission context.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- V1.3 FEATURE HIGHLIGHT -->
+  <section class="section fade-in" aria-label="V1.3 features" style="background: var(--bg-secondary); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border);">
+    <div class="container">
+      <h2 class="section-title text-center mb-4">New in V1.3 — Team Features</h2>
+      <div class="grid-4">
+        <div class="card">
+          <h3>Team Roles</h3>
+          <p>Assign Lead, Scout, Medic, Comms, or custom roles with callsigns for every team member.</p>
+        </div>
+        <div class="card">
+          <h3>Waypoint Sharing</h3>
+          <p>Save waypoints to your personal list or share them with your entire team in one tap.</p>
+        </div>
+        <div class="card">
+          <h3>Shared Annotations</h3>
+          <p>Tap-to-place shared annotations on the map with 6 colors and undo support.</p>
+        </div>
+        <div class="card">
+          <h3>Boundary Alerts</h3>
+          <p>Draw geofence boundaries on the map. Get notified when any team member crosses the line.</p>
+        </div>
+        <div class="card">
+          <h3>NATO Voice Callouts</h3>
+          <p>Automatic text-to-speech with correct NATO phonetic digit pronunciations for hands-free operation.</p>
+        </div>
+        <div class="card">
+          <h3>Session Export/Import</h3>
+          <p>Export complete sessions as versioned JSON. Import on another device to review or continue.</p>
+        </div>
+        <div class="card">
+          <h3>Enhanced AARs</h3>
+          <p>After-Action Reports now include team roster, per-member track summary, and boundary events.</p>
+        </div>
+        <div class="card">
+          <h3>New Marker Categories</h3>
+          <p>Hazard, objective, cache, rally point, and more. Categorize markers for clearer situational awareness.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- COMPARISON TABLE -->
+  <section class="section fade-in" aria-label="Comparison">
+    <div class="container">
+      <h2 class="section-title text-center mb-4">Red Grid Link vs. The Competition</h2>
+      <div style="overflow-x: auto;">
+        <table class="compare-table">
+          <thead>
+            <tr>
+              <th>Feature</th>
+              <th class="highlight-col">Red Grid Link</th>
+              <th>ATAK</th>
+              <th>goTenna</th>
+              <th>Garmin inReach</th>
+              <th>Meshtastic</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Price</td>
+              <td class="highlight-col"><strong>Free / $5.99/mo</strong></td>
+              <td>Free</td>
+              <td>$99+ device</td>
+              <td>$299+ device</td>
+              <td>$30+ device</td>
+            </tr>
+            <tr>
+              <td>Server required</td>
+              <td class="highlight-col"><span class="check">No</span></td>
+              <td><span class="cross">TAK Server</span></td>
+              <td><span class="check">No</span></td>
+              <td><span class="cross">Garmin cloud</span></td>
+              <td><span class="check">No</span></td>
+            </tr>
+            <tr>
+              <td>iOS + Android</td>
+              <td class="highlight-col"><span class="check">Both</span></td>
+              <td><span class="cross">Android only</span></td>
+              <td><span class="check">Both</span></td>
+              <td><span class="check">Both</span></td>
+              <td><span class="cross">Android only</span></td>
+            </tr>
+            <tr>
+              <td>Encryption</td>
+              <td class="highlight-col"><span class="check">AES-256-GCM + ECDH</span></td>
+              <td><span class="check">TLS</span></td>
+              <td><span class="check">AES-256</span></td>
+              <td><span class="cross">Proprietary</span></td>
+              <td><span class="check">AES-256</span></td>
+            </tr>
+            <tr>
+              <td>MGRS native</td>
+              <td class="highlight-col"><span class="check">Yes</span></td>
+              <td><span class="check">Yes</span></td>
+              <td><span class="cross">No</span></td>
+              <td><span class="cross">No</span></td>
+              <td><span class="cross">No</span></td>
+            </tr>
+            <tr>
+              <td>Offline maps</td>
+              <td class="highlight-col"><span class="check">MBTiles download</span></td>
+              <td><span class="check">Yes</span></td>
+              <td><span class="cross">No</span></td>
+              <td><span class="cross">Basic</span></td>
+              <td><span class="cross">No</span></td>
+            </tr>
+            <tr>
+              <td>Max team size</td>
+              <td class="highlight-col"><strong>8 devices</strong></td>
+              <td>Unlimited</td>
+              <td>Varies</td>
+              <td>Unlimited</td>
+              <td>Varies</td>
+            </tr>
+            <tr>
+              <td>Accounts required</td>
+              <td class="highlight-col"><span class="check">None</span></td>
+              <td><span class="cross">Yes</span></td>
+              <td><span class="cross">Yes</span></td>
+              <td><span class="cross">Yes</span></td>
+              <td><span class="check">None</span></td>
+            </tr>
+            <tr>
+              <td>Additional hardware</td>
+              <td class="highlight-col"><span class="check">Phone only</span></td>
+              <td><span class="check">Phone only</span></td>
+              <td><span class="cross">goTenna device</span></td>
+              <td><span class="cross">inReach device</span></td>
+              <td><span class="cross">LoRa radio</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- BATTERY & PERFORMANCE -->
+  <section class="section fade-in" aria-label="Battery performance" style="background: var(--bg-secondary); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border);">
+    <div class="container">
+      <h2 class="section-title text-center mb-4">Built For All-Day Operations</h2>
+      <div class="grid-3">
+        <div class="card" style="text-align: center;">
+          <h3 style="color: var(--accent); font-size: 2rem; margin-bottom: 4px;">&lt;5%</h3>
+          <p style="color: var(--text-primary); font-weight: 600; margin-bottom: 8px;">battery/hr</p>
+          <p><strong>Active Mode</strong><br>5-second position updates</p>
+        </div>
+        <div class="card" style="text-align: center;">
+          <h3 style="color: var(--accent); font-size: 2rem; margin-bottom: 4px;">&lt;3%</h3>
+          <p style="color: var(--text-primary); font-weight: 600; margin-bottom: 8px;">battery/hr</p>
+          <p><strong>Expedition Mode</strong><br>30-second position updates</p>
+        </div>
+        <div class="card" style="text-align: center;">
+          <h3 style="color: var(--accent); font-size: 2rem; margin-bottom: 4px;">&lt;2%</h3>
+          <p style="color: var(--text-primary); font-weight: 600; margin-bottom: 8px;">battery/hr</p>
+          <p><strong>Ultra Expedition</strong><br>60-second position updates</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PRICING -->
+  <section class="section fade-in" aria-label="Pricing">
+    <div class="container">
+      <h2 class="section-title text-center mb-4">Pricing</h2>
+      <div class="pricing-grid">
+        <div class="price-card">
+          <div class="tier">Free</div>
+          <div class="amount">$0</div>
+          <div class="period">forever</div>
+          <ul>
+            <li>All 4 operational modes</li>
+            <li>2-device Field Link</li>
+            <li>1 offline map region</li>
+            <li>11 tactical tools</li>
+            <li>Red Light theme</li>
+          </ul>
+        </div>
+        <div class="price-card">
+          <div class="tier">Pro</div>
+          <div class="amount">$3.99</div>
+          <div class="period">/month or $29.99/year</div>
+          <ul>
+            <li>All 4 themes</li>
+            <li>Unlimited map downloads</li>
+            <li>After-Action Reports</li>
+            <li>2-device Field Link</li>
+          </ul>
+        </div>
+        <div class="price-card featured">
+          <div class="tier">Pro+Link</div>
+          <div class="amount">$5.99</div>
+          <div class="period">/month or $44.99/year</div>
+          <ul>
+            <li>Everything in Pro</li>
+            <li>8-device Field Link</li>
+            <li>Team coordination</li>
+            <li>Ghost markers</li>
+          </ul>
+        </div>
+        <div class="price-card">
+          <div class="tier">Enterprise</div>
+          <div class="amount">Custom</div>
+          <div class="period">contact us</div>
+          <ul>
+            <li>Source license rights</li>
+            <li>Priority support</li>
+            <li>Build documentation</li>
+            <li>Project continuity guarantee</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FAQ -->
+  <section class="section fade-in" aria-label="FAQ">
+    <div class="container">
+      <h2 class="section-title text-center mb-4">Frequently Asked Questions</h2>
+      <div style="max-width: 800px; margin: 0 auto;">
+        <details class="faq-item">
+          <summary>How does Field Link work?</summary>
+          <p>Field Link uses Bluetooth Low Energy and WiFi Direct to auto-discover nearby teammates and share encrypted position data. No pairing, no configuration needed. AES-256-GCM encryption with ECDH P-256 ephemeral session keys means new cryptographic keys are generated for every session. Data syncs peer-to-peer with no servers involved.</p>
+        </details>
+        <details class="faq-item">
+          <summary>Does it work without cell service?</summary>
+          <p>Yes. Red Grid Link uses GPS satellites for positioning and Bluetooth for team sync. No cell towers, no WiFi, no internet connection required. Download your map regions over WiFi before heading out and you have full offline operation with MGRS grid overlay, all 11 tools, and team coordination.</p>
+        </details>
+        <details class="faq-item">
+          <summary>What data do you collect?</summary>
+          <p>None. No accounts, no analytics, no cloud sync, no tracking. Your location data never leaves your device. Field Link session data is ephemeral and disappears when the session ends. We have no servers to store data on even if we wanted to.</p>
+        </details>
+        <details class="faq-item">
+          <summary>How is this different from ATAK?</summary>
+          <p>Red Grid Link is a lightweight ATAK alternative built for civilian teams. It works on both iOS and Android (ATAK is Android-only), requires no TAK Server infrastructure, sets up in 30 seconds, and is designed for SAR, hunting, and backcountry teams rather than military operations. No IT department required.</p>
+        </details>
+        <details class="faq-item">
+          <summary>Can I use it for hunting?</summary>
+          <p>Absolutely. Hunting mode adapts the UI with hunting-specific terminology, icons, and quick actions. Track every member of your hunting party on the map, share stand locations, mark game trails, and coordinate without radio chatter. All over encrypted Bluetooth.</p>
+        </details>
+        <details class="faq-item">
+          <summary>When is Android coming?</summary>
+          <p>Android is in closed beta right now. You can <a href="https://play.google.com/apps/testing/com.redgrid.red_grid_link">join the Android beta on Google Play</a> and start testing today. Full public launch is coming soon.</p>
+        </details>
+        <details class="faq-item">
+          <summary>How far does Bluetooth reach?</summary>
+          <p>Standard BLE range is 100-300 meters depending on terrain, obstacles, and device hardware. BLE Long Range mode is coming in V1.4, which will extend the effective range to 400 meters to 1 kilometer in open terrain.</p>
+        </details>
+        <details class="faq-item">
+          <summary>What are Ghost Markers?</summary>
+          <p>When a teammate moves out of Bluetooth range, their last-known position stays on your map as a Ghost Marker. The marker's opacity gradually fades over 30 minutes so you can tell how stale the data is. A projected heading vector shows their likely direction of travel based on their last movement.</p>
+        </details>
+      </div>
+    </div>
+  </section>
+
+  <!-- DOWNLOAD CTA STRIP -->
+  <section class="section fade-in" aria-label="Download" style="background: linear-gradient(180deg, var(--bg-primary) 0%, #1a0000 50%, var(--bg-primary) 100%); text-align: center;">
+    <div class="container">
+      <h2>Ready to coordinate?</h2>
+      <p class="mt-2 mb-3" style="max-width: 600px; margin-left: auto; margin-right: auto; font-size: 1.1rem;">Download Red Grid Link and get your team on the map in 30 seconds.</p>
+      <div class="cta-row" style="justify-content: center;">
+        <a href="https://apps.apple.com/app/id6760084718" class="btn btn-primary btn-lg">Download on App Store</a>
+        <a href="https://play.google.com/apps/testing/com.redgrid.red_grid_link" class="btn btn-secondary btn-lg">Join Android Beta</a>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<!-- FOOTER -->
+<footer class="footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-col">
+        <h4>Products</h4>
+        <a href="link.html">Red Grid Link</a>
+        <a href="mgrs.html">Red Grid MGRS</a>
+      </div>
+      <div class="footer-col">
+        <h4>Company</h4>
+        <a href="about.html">About</a>
+        <a href="roadmap.html">Roadmap</a>
+        <a href="https://redgridtactical.com/#contact">Contact</a>
+      </div>
+      <div class="footer-col">
+        <h4>Legal</h4>
+        <a href="privacy.html">Privacy Policy</a>
+        <a href="terms.html">Terms of Use</a>
+      </div>
+      <div class="footer-col">
+        <h4>Community</h4>
+        <a href="https://github.com/RedGridTactical/RedGridLink">GitHub</a>
+        <a href="https://buymeacoffee.com/redgridtactical">Buy Me a Coffee</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>&copy; 2026 Red Grid Tactical. All rights reserved.</p>
+    </div>
+  </div>
+</footer>
+
+<script src="script.js"></script>
+</body>
+</html>

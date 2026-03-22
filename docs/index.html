@@ -3,70 +3,39 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Red Grid Link — Encrypted Team Coordination Over Bluetooth</title>
-<meta name="description" content="Red Grid Link is an encrypted Bluetooth team coordination app with offline MGRS maps. No cell towers, no servers, no accounts. A lightweight ATAK alternative for SAR, hunting, and backcountry teams. Free on the App Store.">
+<title>Red Grid Tactical — Offline Navigation & Team Coordination</title>
+<meta name="description" content="Military-grade offline navigation and encrypted team coordination apps. No cell towers, no servers, no accounts. Built for SAR, hunting, and backcountry teams.">
 <meta name="keywords" content="ATAK alternative, blue force tracking, team tracker, offline map, MGRS, tactical navigation, encrypted team sync, offline GPS, SAR app, hunting app, backcountry navigation, Bluetooth team tracking, goTenna alternative">
 <meta name="author" content="Red Grid Tactical">
 <link rel="canonical" href="https://redgridtactical.com/">
 <link rel="icon" type="image/png" href="images/icon.png">
 
 <!-- Open Graph -->
-<meta property="og:title" content="Red Grid Link — Encrypted Team Coordination Over Bluetooth">
-<meta property="og:description" content="ATAK requires servers, licenses, and Android. Red Grid Link gives you encrypted team coordination over Bluetooth for $5.99/mo. No cell towers. No accounts. No complexity.">
+<meta property="og:title" content="Red Grid Tactical — Offline Navigation & Team Coordination">
+<meta property="og:description" content="Military-grade offline navigation and encrypted team coordination apps. No cell towers, no servers, no accounts. Built for SAR, hunting, and backcountry teams.">
 <meta property="og:image" content="https://redgridtactical.com/images/social-preview.png">
 <meta property="og:url" content="https://redgridtactical.com/">
 <meta property="og:type" content="website">
-<meta property="og:site_name" content="Red Grid Link">
+<meta property="og:site_name" content="Red Grid Tactical">
 
 <!-- Twitter Card -->
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="Red Grid Link — Encrypted Team Coordination Over Bluetooth">
-<meta name="twitter:description" content="Encrypted Bluetooth team tracking + offline MGRS maps. No servers, no accounts. A lightweight ATAK alternative.">
+<meta name="twitter:title" content="Red Grid Tactical — Offline Navigation & Team Coordination">
+<meta name="twitter:description" content="Military-grade offline navigation and encrypted team coordination apps. No cell towers, no servers, no accounts.">
 <meta name="twitter:image" content="https://redgridtactical.com/images/social-preview.png">
 
-<!-- Structured Data: MobileApplication -->
+<!-- Structured Data: Organization -->
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
-  "@type": "MobileApplication",
-  "name": "Red Grid Link",
-  "operatingSystem": "iOS",
-  "applicationCategory": "NavigationApplication",
-  "offers": [
-    {
-      "@type": "Offer",
-      "price": "0",
-      "priceCurrency": "USD",
-      "description": "Free tier with 2-device Field Link"
-    },
-    {
-      "@type": "Offer",
-      "price": "5.99",
-      "priceCurrency": "USD",
-      "description": "Pro+Link monthly subscription"
-    },
-    {
-      "@type": "Offer",
-      "price": "99.99",
-      "priceCurrency": "USD",
-      "description": "Lifetime Pro+Link"
-    }
-  ],
-  "aggregateRating": {
-    "@type": "AggregateRating",
-    "ratingValue": "5",
-    "ratingCount": "1"
-  },
-  "description": "Encrypted Bluetooth team coordination with offline MGRS maps. A lightweight ATAK alternative for SAR, hunting, and backcountry teams. No servers, no accounts, no cell towers required.",
-  "url": "https://redgridtactical.com/",
-  "downloadUrl": "https://apps.apple.com/app/id6760084718",
-  "softwareVersion": "1.3.0",
-  "datePublished": "2026-03-01",
-  "screenshot": "https://redgridtactical.com/images/appstore_1_map_team.png",
-  "author": {
-    "@type": "Organization",
-    "name": "Red Grid Tactical"
-  }
+  "@type": "Organization",
+  "name": "Red Grid Tactical",
+  "url": "https://redgridtactical.com",
+  "logo": "https://redgridtactical.com/images/icon.png",
+  "description": "Military-grade offline navigation and encrypted team coordination apps.",
+  "sameAs": [
+    "https://github.com/RedGridTactical"
+  ]
 }
 </script>
 
@@ -128,646 +97,271 @@
 }
 </script>
 
-<style>
-  :root {
-    --red: #8B0000;
-    --red-light: #A50000;
-    --dark: #0a0a0a;
-    --gray: #1a1a1a;
-    --gray-light: #666;
-    --bg: #fafafa;
-    --card-bg: #fff;
-    --border: #e0e0e0;
-  }
-
-  * { margin: 0; padding: 0; box-sizing: border-box; }
-
-  body {
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
-    color: var(--gray);
-    line-height: 1.6;
-    background: var(--bg);
-  }
-
-  /* HERO */
-  .hero {
-    background: linear-gradient(135deg, #0a0a0a 0%, #1a0000 50%, #2a0000 100%);
-    color: #fff;
-    text-align: center;
-    padding: 3rem 1.5rem 2.5rem;
-  }
-
-  .hero h1 {
-    font-size: 2.5rem;
-    font-weight: 800;
-    letter-spacing: -0.5px;
-    margin-bottom: 0.25rem;
-    color: #fff;
-  }
-
-  .hero h1 span { color: #cc3333; }
-
-  .hero .tagline {
-    font-size: 1.1rem;
-    color: #cc9999;
-    font-weight: 500;
-    margin-bottom: 1.25rem;
-    letter-spacing: 2px;
-    text-transform: uppercase;
-  }
-
-  .hero .pitch {
-    font-size: 1.15rem;
-    color: #ccc;
-    max-width: 680px;
-    margin: 0 auto 1.5rem;
-    line-height: 1.7;
-  }
-
-  .hero .pitch strong { color: #fff; }
-
-  .cta-row {
-    display: flex;
-    justify-content: center;
-    gap: 1rem;
-    flex-wrap: wrap;
-    margin-bottom: 1.5rem;
-  }
-
-  .cta-btn {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5rem;
-    padding: 0.75rem 1.5rem;
-    border-radius: 10px;
-    font-size: 1rem;
-    font-weight: 600;
-    text-decoration: none;
-    transition: transform 0.15s, box-shadow 0.15s;
-  }
-
-  .cta-btn:hover { transform: translateY(-2px); box-shadow: 0 4px 20px rgba(0,0,0,0.3); }
-
-  .cta-primary {
-    background: #fff;
-    color: var(--dark);
-  }
-
-  .cta-secondary {
-    background: transparent;
-    color: #fff;
-    border: 1.5px solid rgba(255,255,255,0.3);
-  }
-
-  .cta-btn svg { width: 20px; height: 20px; }
-
-  .badges {
-    display: flex;
-    justify-content: center;
-    gap: 0.5rem;
-    flex-wrap: wrap;
-    margin-top: 0.5rem;
-  }
-
-  .badges img { height: 22px; }
-
-  /* SCREENSHOTS */
-  .screenshots {
-    padding: 2rem 1rem;
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
-  }
-
-  .screenshots-inner {
-    display: flex;
-    gap: 1rem;
-    justify-content: center;
-    max-width: 900px;
-    margin: 0 auto;
-  }
-
-  .screenshots-inner img {
-    width: 200px;
-    border-radius: 16px;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.12);
-    flex-shrink: 0;
-  }
-
-  /* SECTIONS */
-  section {
-    max-width: 800px;
-    margin: 0 auto;
-    padding: 2.5rem 1.5rem;
-  }
-
-  section h2 {
-    font-size: 1.6rem;
-    color: var(--red);
-    margin-bottom: 1rem;
-    font-weight: 700;
-  }
-
-  section h3 {
-    font-size: 1.1rem;
-    color: var(--gray);
-    margin: 1.25rem 0 0.5rem;
-    font-weight: 600;
-  }
-
-  /* FEATURES GRID */
-  .features {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-    gap: 1.25rem;
-    margin-top: 1rem;
-  }
-
-  .feature-card {
-    background: var(--card-bg);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    padding: 1.25rem;
-  }
-
-  .feature-card .icon {
-    font-size: 1.5rem;
-    margin-bottom: 0.5rem;
-  }
-
-  .feature-card h4 {
-    font-size: 0.95rem;
-    font-weight: 700;
-    margin-bottom: 0.35rem;
-    color: var(--gray);
-  }
-
-  .feature-card p {
-    font-size: 0.85rem;
-    color: var(--gray-light);
-    line-height: 1.5;
-  }
-
-  /* COMPARISON TABLE */
-  .compare-table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-top: 1rem;
-    font-size: 0.9rem;
-  }
-
-  .compare-table th, .compare-table td {
-    padding: 0.6rem 0.75rem;
-    text-align: left;
-    border-bottom: 1px solid var(--border);
-  }
-
-  .compare-table th {
-    background: #f5f5f5;
-    font-weight: 600;
-    font-size: 0.8rem;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    color: var(--gray-light);
-  }
-
-  .compare-table td:first-child { font-weight: 600; }
-
-  .compare-table .highlight-col { background: rgba(139, 0, 0, 0.04); }
-
-  .check { color: #2e7d32; font-weight: 700; }
-  .cross { color: #999; }
-
-  /* PRICING */
-  .pricing-cards {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 1.25rem;
-    margin-top: 1rem;
-  }
-
-  .price-card {
-    background: var(--card-bg);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    padding: 1.5rem;
-  }
-
-  .price-card.featured {
-    border-color: var(--red);
-    box-shadow: 0 0 0 1px var(--red);
-  }
-
-  .price-card .tier-label {
-    font-size: 0.8rem;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    color: var(--gray-light);
-    margin-bottom: 0.25rem;
-  }
-
-  .price-card .price {
-    font-size: 2rem;
-    font-weight: 800;
-    color: var(--gray);
-  }
-
-  .price-card .price-label {
-    font-size: 0.85rem;
-    color: var(--gray-light);
-    margin-bottom: 0.75rem;
-  }
-
-  .price-card ul {
-    list-style: none;
-    padding: 0;
-  }
-
-  .price-card li {
-    font-size: 0.9rem;
-    padding: 0.25rem 0;
-    color: var(--gray);
-  }
-
-  .price-card li::before {
-    content: "\2713 ";
-    color: var(--red);
-    font-weight: 700;
-  }
-
-  .price-card .featured-badge {
-    display: inline-block;
-    background: var(--red);
-    color: #fff;
-    font-size: 0.7rem;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    padding: 0.2rem 0.6rem;
-    border-radius: 4px;
-    margin-bottom: 0.5rem;
-  }
-
-  /* PRIVACY STRIP */
-  .privacy-strip {
-    background: var(--dark);
-    color: #ccc;
-    text-align: center;
-    padding: 2rem 1.5rem;
-  }
-
-  .privacy-strip h2 { color: #cc3333; margin-bottom: 0.75rem; }
-
-  .privacy-grid {
-    display: flex;
-    justify-content: center;
-    gap: 2rem;
-    flex-wrap: wrap;
-    margin-top: 1rem;
-  }
-
-  .privacy-item {
-    text-align: center;
-    max-width: 160px;
-  }
-
-  .privacy-item .icon { font-size: 1.5rem; margin-bottom: 0.35rem; }
-  .privacy-item strong { display: block; color: #fff; font-size: 0.9rem; }
-  .privacy-item span { font-size: 0.8rem; color: #999; }
-
-  /* FAQ */
-  .faq-item {
-    border-bottom: 1px solid var(--border);
-    padding: 1rem 0;
-  }
-
-  .faq-item h4 {
-    font-size: 0.95rem;
-    color: var(--gray);
-    margin-bottom: 0.35rem;
-  }
-
-  .faq-item p {
-    font-size: 0.9rem;
-    color: var(--gray-light);
-  }
-
-  /* FOOTER */
-  footer {
-    text-align: center;
-    padding: 2rem 1rem;
-    border-top: 1px solid var(--border);
-    color: var(--gray-light);
-    font-size: 0.85rem;
-  }
-
-  footer a { color: var(--red); text-decoration: none; }
-  footer a:hover { text-decoration: underline; }
-
-  .footer-links {
-    display: flex;
-    justify-content: center;
-    gap: 1.5rem;
-    flex-wrap: wrap;
-    margin-bottom: 0.75rem;
-  }
-
-  /* RESPONSIVE */
-  @media (max-width: 600px) {
-    .hero h1 { font-size: 1.8rem; }
-    .hero .pitch { font-size: 1rem; }
-    .screenshots-inner img { width: 150px; }
-    section { padding: 2rem 1rem; }
-    .privacy-grid { gap: 1rem; }
-    .pricing-cards { grid-template-columns: 1fr 1fr; }
-  }
-
-  @media (max-width: 480px) {
-    .pricing-cards { grid-template-columns: 1fr; }
-    .features { grid-template-columns: 1fr; }
-  }
-</style>
+<link rel="stylesheet" href="styles.css">
 </head>
 <body>
 
-<!-- HERO -->
-<div class="hero">
-  <h1><span>Red Grid</span> Link</h1>
-  <div class="tagline">Your team. Your grid. No cell towers required.</div>
-  <p class="pitch">
-    ATAK requires servers, licenses, and Android.
-    Red Grid Link gives you <strong>encrypted team coordination over Bluetooth</strong>
-    for <strong>$5.99/mo</strong>. No cell towers. No accounts. No complexity.
-  </p>
+<!-- NAVIGATION -->
+<header>
+  <nav class="nav">
+    <div class="nav-container container">
+      <button class="nav-hamburger" aria-label="Menu">
+        <span></span><span></span><span></span>
+      </button>
+      <a href="/" class="nav-logo">
+        <img src="images/icon.png" alt="Red Grid" width="32" height="32">
+        Red Grid Tactical
+      </a>
+      <a href="link.html" class="nav-cta btn btn-primary">Download App</a>
+    </div>
+  </nav>
+</header>
 
-  <div class="cta-row">
-    <a href="https://apps.apple.com/app/id6760084718" class="cta-btn cta-primary">
-      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/></svg>
-      App Store — Free
-    </a>
-    <a href="https://github.com/RedGridTactical/RedGridLink" class="cta-btn cta-secondary">
-      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
-      GitHub
-    </a>
+<!-- Slide-out menu -->
+<div class="nav-overlay"></div>
+<div class="nav-menu">
+  <a href="/">Home</a>
+  <div class="submenu-group">
+    <a href="#" class="submenu-toggle">Our Apps</a>
+    <div class="submenu">
+      <a href="link.html">Red Grid Link</a>
+      <a href="mgrs.html">Red Grid MGRS</a>
+    </div>
   </div>
-
-  <div class="badges">
-    <img src="https://img.shields.io/badge/Encryption-AES--256--GCM-CC0000" alt="AES-256-GCM Encrypted">
-    <img src="https://img.shields.io/badge/Tracking-None-CC0000" alt="No Tracking">
-    <img src="https://img.shields.io/badge/Offline-100%25-CC0000" alt="100% Offline">
-    <img src="https://img.shields.io/badge/MGRS-Native-8B0000" alt="MGRS Native">
-  </div>
+  <a href="roadmap.html">Roadmap</a>
+  <a href="about.html">About</a>
+  <a href="#contact" class="nav-menu-cta">Contact Us</a>
 </div>
 
-<!-- SCREENSHOTS -->
-<div class="screenshots">
-  <div class="screenshots-inner">
-    <img src="images/appstore_1_map_team.png" alt="Red Grid Link map view with team positions" loading="lazy">
-    <img src="images/appstore_3_field_link.png" alt="Field Link encrypted team sync session" loading="lazy">
-    <img src="images/appstore_2_grid_view.png" alt="MGRS grid coordinate view" loading="lazy">
-    <img src="images/appstore_4_tools.png" alt="Tactical tools and operational modes" loading="lazy">
-    <img src="images/appstore_5_themes.png" alt="Four display themes including NVG and Red Light" loading="lazy">
-    <img src="images/appstore_6_ghost_markers.png" alt="Ghost markers showing last-known teammate positions" loading="lazy">
-  </div>
-</div>
+<main>
 
-<!-- FEATURES -->
-<section>
-  <h2>Built for Teams Beyond Cell Service</h2>
-  <div class="features">
-    <div class="feature-card">
-      <div class="icon">&#128225;</div>
-      <h4>Field Link &mdash; Encrypted Team Sync</h4>
-      <p>Auto-discover teammates via BLE + WiFi Direct. AES-256-GCM encrypted with ECDH ephemeral keys. No servers, no pairing, no configuration.</p>
+  <!-- HERO -->
+  <section class="hero" aria-label="Hero">
+    <div class="container">
+      <h1><span class="accent">Red Grid</span> Tactical</h1>
+      <p class="tagline">OFFLINE-FIRST TACTICAL NAVIGATION</p>
+      <p class="pitch">Military-grade navigation and team coordination tools that work where cell towers don't. Built for SAR teams, hunters, and anyone who operates beyond cell service.</p>
+      <div class="cta-row">
+        <a href="link.html" class="btn btn-primary btn-lg">Red Grid Link &mdash; Team Coordination</a>
+        <a href="mgrs.html" class="btn btn-secondary btn-lg">Red Grid MGRS &mdash; Solo Navigation</a>
+      </div>
     </div>
-    <div class="feature-card">
-      <div class="icon">&#127759;</div>
-      <h4>Offline MGRS Maps</h4>
-      <p>Download USGS Topo and OpenTopoMap packs. MGRS grid overlay at all zoom levels. Full offline operation with MBTiles.</p>
-    </div>
-    <div class="feature-card">
-      <div class="icon">&#129517;</div>
-      <h4>11 Tactical Tools</h4>
-      <p>Dead reckoning, resection, pace count, bearing calculator, coordinate converter, range estimation, slope calculator, and more.</p>
-    </div>
-    <div class="feature-card">
-      <div class="icon">&#127919;</div>
-      <h4>4 Operational Modes</h4>
-      <p>SAR, Backcountry, Hunting, Training. UI adapts terminology, icons, and quick actions to your mission context.</p>
-    </div>
-    <div class="feature-card">
-      <div class="icon">&#128123;</div>
-      <h4>Ghost Markers &amp; Time-Decay</h4>
-      <p>See last-known positions when teammates go out of range. Opacity fades over 30 minutes with velocity vectors.</p>
-    </div>
-    <div class="feature-card">
-      <div class="icon">&#128274;</div>
-      <h4>Zero Footprint Privacy</h4>
-      <p>No accounts, no cloud, no analytics. Field Link data is ephemeral. Location data never leaves your device.</p>
+  </section>
+
+  <!-- SOCIAL PROOF STRIP -->
+  <div class="proof-strip" aria-label="Social proof">
+    <div class="container">
+      <span>49 pts on Hacker News</span>
+      <span>Open Source</span>
+      <span>986 Tests Passing</span>
+      <span>AES-256 Encrypted</span>
     </div>
   </div>
-</section>
 
-<!-- COMPARISON -->
-<section>
-  <h2>Red Grid Link vs. The Competition</h2>
-  <table class="compare-table">
-    <thead>
-      <tr>
-        <th>Feature</th>
-        <th class="highlight-col">Red Grid Link</th>
-        <th>ATAK</th>
-        <th>goTenna</th>
-        <th>Garmin inReach</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td>Price</td>
-        <td class="highlight-col"><strong>Free / $5.99/mo</strong></td>
-        <td>Free (gov)</td>
-        <td>$179+ hardware</td>
-        <td>$349+ hardware</td>
-      </tr>
-      <tr>
-        <td>Requires server</td>
-        <td class="highlight-col check">&#10007; No</td>
-        <td>Yes (TAK Server)</td>
-        <td class="cross">No</td>
-        <td>Satellite network</td>
-      </tr>
-      <tr>
-        <td>Cross-platform</td>
-        <td class="highlight-col check">&#10003; iOS + Android</td>
-        <td>Android only</td>
-        <td>iOS + Android</td>
-        <td>Proprietary</td>
-      </tr>
-      <tr>
-        <td>Encryption</td>
-        <td class="highlight-col check">&#10003; AES-256-GCM</td>
-        <td>TLS</td>
-        <td>AES-256</td>
-        <td>Proprietary</td>
-      </tr>
-      <tr>
-        <td>MGRS native</td>
-        <td class="highlight-col check">&#10003; Yes</td>
-        <td class="check">&#10003; Yes</td>
-        <td class="cross">&#10007; No</td>
-        <td class="cross">&#10007; No</td>
-      </tr>
-      <tr>
-        <td>Offline maps</td>
-        <td class="highlight-col check">&#10003; Yes (MBTiles)</td>
-        <td class="check">&#10003; Yes</td>
-        <td class="cross">&#10007; No</td>
-        <td>Limited</td>
-      </tr>
-      <tr>
-        <td>Max team size</td>
-        <td class="highlight-col">8 (Pro+Link)</td>
-        <td>Unlimited</td>
-        <td>6</td>
-        <td>Unlimited</td>
-      </tr>
-      <tr>
-        <td>Accounts required</td>
-        <td class="highlight-col check">&#10007; No</td>
-        <td>Yes</td>
-        <td>Yes</td>
-        <td>Yes</td>
-      </tr>
-    </tbody>
-  </table>
-</section>
-
-<!-- PRIVACY STRIP -->
-<div class="privacy-strip">
-  <h2>Zero Footprint Architecture</h2>
-  <p>Red Grid Link collects no data. Your position never touches a server. Field Link sessions are ephemeral.</p>
-  <div class="privacy-grid">
-    <div class="privacy-item">
-      <div class="icon">&#128274;</div>
-      <strong>AES-256-GCM</strong>
-      <span>Military-grade encryption on every packet.</span>
+  <!-- ECOSYSTEM -->
+  <section class="section fade-in" aria-label="Our apps">
+    <div class="container">
+      <div class="ecosystem-grid">
+        <div class="ecosystem-card">
+          <img src="images/icon.png" alt="Red Grid Link icon" class="ecosystem-icon" width="64" height="64">
+          <h2>Red Grid Link</h2>
+          <p class="ecosystem-subtitle">Team Coordinator</p>
+          <p>Encrypted Bluetooth team sync with real-time position sharing, waypoint coordination, and after-action reports. BLE + WiFi Direct proximity sync keeps your team on the map without cell towers or servers.</p>
+          <a href="link.html" class="btn btn-primary">Learn More</a>
+          <div class="app-badges">
+            <a href="https://apps.apple.com/app/id6760084718" aria-label="Download Red Grid Link on the App Store">
+              <img src="images/badge-app-store.svg" alt="Download on the App Store" height="40">
+            </a>
+          </div>
+        </div>
+        <div class="ecosystem-card">
+          <img src="images/icon-mgrs.png" alt="Red Grid MGRS icon" class="ecosystem-icon" width="64" height="64">
+          <h2>Red Grid MGRS</h2>
+          <p class="ecosystem-subtitle">Solo Navigator</p>
+          <p>DAGR-level MGRS precision in your pocket. 10-digit Military Grid Reference System coordinates with 1-meter accuracy. The same coordinate system used by NATO forces worldwide.</p>
+          <a href="mgrs.html" class="btn btn-primary">Learn More</a>
+          <div class="app-badges">
+            <a href="https://apps.apple.com/app/id6504465834" aria-label="Download Red Grid MGRS on the App Store">
+              <img src="images/badge-app-store.svg" alt="Download on the App Store" height="40">
+            </a>
+          </div>
+        </div>
+      </div>
     </div>
-    <div class="privacy-item">
-      <div class="icon">&#128100;</div>
-      <strong>No Accounts</strong>
-      <span>No sign-up. No login. No passwords.</span>
+  </section>
+
+  <!-- USE CASES -->
+  <section class="section fade-in" aria-label="Use cases">
+    <div class="container">
+      <h2 class="section-title">Built For Teams In The Field</h2>
+      <div class="grid-4">
+        <div class="card">
+          <h3>Search &amp; Rescue</h3>
+          <p>Assign sectors, track team members, mark clues, generate after-action reports. All without cell service.</p>
+        </div>
+        <div class="card">
+          <h3>Hunting</h3>
+          <p>Know where your hunting party is. Share stand locations, track movement, coordinate without radio chatter.</p>
+        </div>
+        <div class="card">
+          <h3>Backcountry</h3>
+          <p>Keep eyes on your hiking group without shouting distance. Share waypoints and track positions over Bluetooth.</p>
+        </div>
+        <div class="card">
+          <h3>Training</h3>
+          <p>Run land navigation courses, set objectives, track performance, and review with detailed AARs.</p>
+        </div>
+      </div>
     </div>
-    <div class="privacy-item">
-      <div class="icon">&#128225;</div>
-      <strong>No Cloud / No Servers</strong>
-      <span>Nothing leaves your device.</span>
+  </section>
+
+  <!-- HOW IT WORKS -->
+  <section class="section fade-in" aria-label="How it works">
+    <div class="container">
+      <h2 class="section-title">How Field Link Works</h2>
+      <div class="grid-3">
+        <div class="step-card">
+          <div class="step-number">1</div>
+          <h3>Start a Session</h3>
+          <p>Open Red Grid Link and create a Field Link session. No accounts, no configuration.</p>
+        </div>
+        <div class="step-card">
+          <div class="step-number">2</div>
+          <h3>Teammates Appear</h3>
+          <p>Anyone nearby with the app auto-discovers over Bluetooth. Encrypted positions sync in real time.</p>
+        </div>
+        <div class="step-card">
+          <div class="step-number">3</div>
+          <h3>Coordinate</h3>
+          <p>See your team on the map, share waypoints, set boundaries, and track movement. All offline.</p>
+        </div>
+      </div>
     </div>
-    <div class="privacy-item">
-      <div class="icon">&#9200;</div>
-      <strong>Ephemeral Sessions</strong>
-      <span>Field Link data disappears when you disconnect.</span>
+  </section>
+
+  <!-- TECHNOLOGY -->
+  <section class="section fade-in" aria-label="Technology">
+    <div class="container">
+      <h2 class="section-title">The Technology Behind Red Grid</h2>
+      <div class="grid-2">
+        <div class="card">
+          <h3>Field Link Protocol</h3>
+          <p>Custom BLE + WiFi Direct proximity sync with CRDT-based state management. Delta-encoded updates under 200 bytes each.</p>
+        </div>
+        <div class="card">
+          <h3>Military-Grade Encryption</h3>
+          <p>AES-256-GCM with ECDH P-256 ephemeral key exchange. New session keys every connection. No pre-shared secrets.</p>
+        </div>
+        <div class="card">
+          <h3>MGRS Navigation Engine</h3>
+          <p>10-digit Military Grid Reference System precision. 1-meter accuracy. The same coordinate system used by NATO forces worldwide.</p>
+        </div>
+        <div class="card">
+          <h3>Offline Maps</h3>
+          <p>MBTiles-based offline maps with USGS Topo and OpenTopoMap. Download regions over WiFi, use offline forever.</p>
+        </div>
+      </div>
     </div>
-  </div>
-</div>
+  </section>
 
-<!-- PRICING -->
-<section>
-  <h2>Pricing</h2>
-  <div class="pricing-cards">
-    <div class="price-card">
-      <div class="tier-label">Free</div>
-      <div class="price">$0</div>
-      <div class="price-label">Forever</div>
-      <ul>
-        <li>All 4 operational modes</li>
-        <li>2-device Field Link</li>
-        <li>1 offline map region</li>
-        <li>11 tactical tools</li>
-        <li>Red Light theme</li>
-      </ul>
+  <!-- PRIVACY STRIP -->
+  <section class="privacy-strip fade-in" aria-label="Privacy">
+    <div class="container">
+      <h2>Zero Footprint Architecture</h2>
+      <p class="privacy-subtitle">Red Grid apps collect no data. Your position never touches a server.</p>
+      <div class="privacy-grid">
+        <div class="privacy-item">
+          <div class="privacy-icon">&#128274;</div>
+          <strong>AES-256-GCM</strong>
+          <span>Military-grade encryption on every packet.</span>
+        </div>
+        <div class="privacy-item">
+          <div class="privacy-icon">&#128100;</div>
+          <strong>No Accounts</strong>
+          <span>No sign-up. No login. No passwords.</span>
+        </div>
+        <div class="privacy-item">
+          <div class="privacy-icon">&#128225;</div>
+          <strong>No Cloud / No Servers</strong>
+          <span>Nothing leaves your device.</span>
+        </div>
+        <div class="privacy-item">
+          <div class="privacy-icon">&#9200;</div>
+          <strong>Ephemeral Sessions</strong>
+          <span>Field Link data disappears when you disconnect.</span>
+        </div>
+      </div>
     </div>
-    <div class="price-card">
-      <div class="tier-label">Pro</div>
-      <div class="price">$3.99<span style="font-size:0.85rem;font-weight:400;color:var(--gray-light)">/mo</span></div>
-      <div class="price-label">or $29.99/year</div>
-      <ul>
-        <li>All 4 display themes</li>
-        <li>Unlimited map downloads</li>
-        <li>AAR export</li>
-        <li>2-device Field Link</li>
-      </ul>
+  </section>
+
+  <!-- CONTACT -->
+  <section class="section fade-in" id="contact" aria-label="Contact">
+    <div class="container">
+      <h2 class="section-title">Get In Touch</h2>
+      <p class="section-subtitle">Bug reports, feature requests, partnership inquiries, or just want to say hello.</p>
+      <form class="contact-form" action="https://formspree.io/f/placeholder" method="POST">
+        <div class="form-row">
+          <div class="form-group">
+            <label for="contact-name">Name</label>
+            <input type="text" id="contact-name" name="name" required placeholder="Your name">
+          </div>
+          <div class="form-group">
+            <label for="contact-email">Email</label>
+            <input type="email" id="contact-email" name="email" required placeholder="you@example.com">
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="contact-category">Category</label>
+          <select id="contact-category" name="category">
+            <option value="general">General</option>
+            <option value="bug">Bug Report</option>
+            <option value="feature">Feature Request</option>
+            <option value="partnership">Partnership</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="contact-message">Message</label>
+          <textarea id="contact-message" name="message" required rows="5" placeholder="What's on your mind?"></textarea>
+        </div>
+        <button type="submit" class="btn btn-primary btn-lg">Send Message</button>
+      </form>
     </div>
-    <div class="price-card featured">
-      <div class="featured-badge">Most Popular</div>
-      <div class="tier-label">Pro+Link</div>
-      <div class="price">$5.99<span style="font-size:0.85rem;font-weight:400;color:var(--gray-light)">/mo</span></div>
-      <div class="price-label">or $44.99/year</div>
-      <ul>
-        <li>Everything in Pro</li>
-        <li>Full 8-device Field Link</li>
-        <li>Team coordination</li>
-        <li>Ghost markers &amp; time-decay</li>
-      </ul>
-    </div>
-    <div class="price-card">
-      <div class="tier-label">Lifetime</div>
-      <div class="price">$99.99</div>
-      <div class="price-label">One-time purchase</div>
-      <ul>
-        <li>Pro+Link forever</li>
-        <li>All future updates</li>
-        <li>No subscription. Ever.</li>
-      </ul>
-    </div>
-  </div>
-</section>
+  </section>
 
-<!-- FAQ -->
-<section>
-  <h2>Frequently Asked Questions</h2>
-
-  <div class="faq-item">
-    <h4>How does Field Link work?</h4>
-    <p>Field Link uses Bluetooth Low Energy and WiFi Direct to auto-discover nearby teammates and share encrypted position data. No pairing, no configuration. Turn it on and your team appears on the map. All communication is AES-256-GCM encrypted with ECDH ephemeral session keys.</p>
-  </div>
-
-  <div class="faq-item">
-    <h4>Does it work without cell service?</h4>
-    <p>Yes. Red Grid Link uses GPS satellites for positioning and Bluetooth for team sync. No cell towers, no WiFi, no internet required. Download maps ahead of time for full offline operation.</p>
-  </div>
-
-  <div class="faq-item">
-    <h4>What data do you collect?</h4>
-    <p>None. No accounts, no analytics, no cloud sync, no tracking, no ads. Location data stays on your device. Field Link session data is ephemeral and disappears when the session ends.</p>
-  </div>
-
-  <div class="faq-item">
-    <h4>How is this different from ATAK?</h4>
-    <p>Red Grid Link is lighter, cross-platform (iOS + Android), requires no TAK Server, and is designed for civilian teams. ATAK is a powerful military tool but requires Android, server infrastructure, and significant setup time. Red Grid Link gets your team on the map in 30 seconds.</p>
-  </div>
-
-  <div class="faq-item">
-    <h4>Can I use it for hunting?</h4>
-    <p>Yes. Hunting mode adapts the UI with hunting-specific terminology, stand locations, and party tracking. Share positions with your hunting party over Bluetooth without cell service.</p>
-  </div>
-
-  <div class="faq-item">
-    <h4>When is Android coming?</h4>
-    <p>Red Grid Link is built with Flutter, a cross-platform framework. The Android build is functional and launch is coming soon. Star the <a href="https://github.com/RedGridTactical/RedGridLink" style="color:var(--red)">GitHub repo</a> to stay updated.</p>
-  </div>
-</section>
+</main>
 
 <!-- FOOTER -->
-<footer>
-  <div class="footer-links">
-    <a href="https://apps.apple.com/app/id6760084718">App Store</a>
-    <a href="https://redgridtactical.com/privacy.html">Privacy Policy</a>
-    <a href="https://redgridtactical.com/terms.html">Terms of Use</a>
-    <a href="https://github.com/RedGridTactical/RedGridLink">GitHub</a>
-    <a href="https://github.com/RedGridTactical/RedGridLink/issues">Support</a>
-    <a href="mailto:support@redgridtactical.com">Contact</a>
+<footer class="footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-col">
+        <h4>Products</h4>
+        <a href="link.html">Red Grid Link</a>
+        <a href="mgrs.html">Red Grid MGRS</a>
+      </div>
+      <div class="footer-col">
+        <h4>Company</h4>
+        <a href="about.html">About</a>
+        <a href="roadmap.html">Roadmap</a>
+        <a href="#contact">Contact</a>
+      </div>
+      <div class="footer-col">
+        <h4>Legal</h4>
+        <a href="privacy.html">Privacy Policy</a>
+        <a href="terms.html">Terms of Use</a>
+      </div>
+      <div class="footer-col">
+        <h4>Community</h4>
+        <a href="https://github.com/RedGridTactical/RedGridLink">GitHub</a>
+        <a href="https://buymeacoffee.com/redgridtactical">Buy Me a Coffee</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>&copy; 2026 Red Grid Tactical. All rights reserved.</p>
+    </div>
   </div>
-  <p>&copy; 2026 Red Grid Tactical. All rights reserved.</p>
 </footer>
 
+<script src="script.js"></script>
 </body>
 </html>
