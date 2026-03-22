@@ -12,7 +12,7 @@
 [![MGRS Native](https://img.shields.io/badge/MGRS-Native-CC0000)]()
 [![AES-256](https://img.shields.io/badge/Encryption-AES--256--GCM-8B0000)]()
 [![Flutter](https://img.shields.io/badge/Built%20with-Flutter-CC0000?logo=flutter)]()
-[![Tests](https://img.shields.io/badge/Tests-783%20Passing-brightgreen)]()
+[![Tests](https://img.shields.io/badge/Tests-986%20Passing-brightgreen)]()
 [![Platform](https://img.shields.io/badge/Platform-iOS-8B0000)]()
 [![PRs Welcome](https://img.shields.io/badge/PRs-Welcome-CC0000)](https://github.com/RedGridTactical/RedGridLink/pulls)
 [![Buy Me a Coffee](https://img.shields.io/badge/Buy%20Me%20a%20Coffee-Support-FFDD00?logo=buymeacoffee&logoColor=black)](https://buymeacoffee.com/redgridtac0)
@@ -68,8 +68,11 @@ One engine, four presentation layers. Terminology, icons, and quick actions adap
 ### 11 Tactical Tools
 Dead Reckoning, Resection, Pace Count, Bearing/Back Azimuth, Coordinate Converter (MGRS/Lat-Lon/DMS/UTM), Range Estimation, Slope Calculator, ETA/Speed Calculator, Magnetic Declination, Celestial Navigation, MGRS Precision Reference.
 
+### Team Coordination (V1.3)
+Assign roles (Lead, Scout, Medic, Comms, custom) with callsigns. Lead controls the session like a group admin. Share waypoints with the whole team or save them privately. Draw tap-to-place annotations visible to all peers. Set boundary geofences with automatic alerts when someone crosses. NATO phonetic voice callouts announce teammate positions hands-free. Export and import sessions as versioned JSON for backup and review.
+
 ### After-Action Reports
-One-tap PDF export: map snapshot, mission timeline, track data, timestamps, team roster, markers, and session log. Share via AirDrop, file share, or any local transfer.
+One-tap PDF export: map snapshot, mission timeline, track data, timestamps, team roster with roles, per-member tracks, boundary events, markers, and session log. Share via AirDrop, file share, or any local transfer.
 
 ### 4 Tactical Themes
 Red Light (night vision, free), NVG Green (Pro), Day White (Pro), Blue Force (Pro).
@@ -156,11 +159,12 @@ Full roadmap with feature checklists: [ROADMAP.md](ROADMAP.md)
 | **V1.0** | **Complete** | Foundation | MGRS nav, Field Link (BLE+WiFi Direct), 11 tools, AAR PDF, offline maps, 4 themes, IAP |
 | **V1.1** | **Complete** | Field Hardening | Kalman filter, step detector, Peer HUD, Ultra Expedition, auto-reconnect, map downloads, Sentry, l10n, Help/About |
 | **V1.2.1** | **Complete** | Reliability | Field Link session fix, waypoint persistence, relative bearing arrow, demo mode |
-| **V1.3** | Q3 2026 | Team Features | Team roles, waypoint sharing, route planning, boundary alerts, shared annotations |
-| **V2.0** | Q4 2026 | Intelligence | Elevation profiles, line-of-sight, weather overlay, terrain analysis, contour lines |
-| **V2.1** | Q1 2027 | Advanced Nav | Track recording, GPX import/export, navigate-to-waypoint, coordinate formats |
+| **V1.3** | **Complete** | Team Features | Team roles (Lead/Scout/Medic/Comms), waypoint sharing, shared annotations, boundary alerts, NATO voice callouts, session export/import |
+| **V1.4** | Q3 2026 | Extended Range | BLE Long Range (Coded PHY), signal strength indicator, basic mesh relay, range test mode |
+| **V2.0** | Q4 2026 | Intelligence + Interop | ATAK/CoT interop, Meshtastic BLE bridge, elevation profiles, terrain analysis, weather overlay |
+| **V2.1** | Q1 2027 | Advanced Nav | Route planning, freehand annotations, track recording, GPX import/export, timeline replay |
 | **V3.0** | Q2 2027 | Connected Ops | Cloud relay, web dashboard, mesh networking, session scheduling, API |
-| **V3.1** | Q3 2027 | Sensors | Garmin inReach, ATAK interop, external GPS, drone overlay |
+| **V3.1** | Q3 2027 | Sensors | Garmin inReach, external GPS, drone overlay, heart rate monitoring |
 | **V4.0** | Q4 2027 | Training | Scenario builder, instructor mode, scoring, AR compass, certification tracking |
 
 ### Ongoing
