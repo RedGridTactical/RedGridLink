@@ -1,5 +1,5 @@
 /**
- * Red Grid Tactical — Site Script
+ * Red Grid Tactical — Site Script v2
  * Vanilla JS, no dependencies.
  * Runs on all pages; guards against missing elements.
  */

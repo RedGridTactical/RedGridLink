@@ -49,7 +49,7 @@
 }
 </script>
 
-<link rel="stylesheet" href="styles.css">
+<link rel="stylesheet" href="styles.css?v=2">
 </head>
 <body>
 
@@ -92,10 +92,32 @@
     <div class="container">
       <img src="images/icon-mgrs.png" alt="Red Grid MGRS app icon" width="80" height="80" style="border-radius: 18px; margin-bottom: 24px;">
       <h1><span class="accent">Red Grid</span> MGRS</h1>
-      <span class="badge badge-red" style="margin-bottom: 16px;">V2.5 — Pro Features</span>
+      <span class="badge badge-red" style="margin-bottom: 16px;">V2.3 — Subscriptions + i18n</span>
       <p class="pitch">DAGR-class MGRS precision in your pocket. Nine tactical tools, six radio-ready report templates, zero network dependency.</p>
       <div class="cta-row">
         <a href="https://apps.apple.com/app/red-grid-mgrs/id6738044702" class="btn btn-primary btn-lg">Download on App Store</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- SCREENSHOTS CAROUSEL -->
+  <section class="section" aria-label="App screenshots" style="padding-top: 40px; padding-bottom: 40px;">
+    <div class="container">
+      <div class="carousel" style="position: relative; display: flex; align-items: center; justify-content: center; gap: 24px; max-width: 500px; margin: 0 auto;">
+        <button class="carousel-prev" aria-label="Previous screenshot" style="background: var(--bg-tertiary); border: 1px solid var(--border); color: var(--text-primary); width: 44px; height: 44px; border-radius: 50%; cursor: pointer; font-size: 1.2rem; display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: background 0.2s;">&larr;</button>
+        <div class="carousel-track" style="position: relative; width: 280px; height: 500px; flex-shrink: 0;">
+          <img src="images/mgrs_1_grid.png" alt="Live 10-digit MGRS grid display" class="carousel-slide active" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: contain; border-radius: 16px; transition: opacity 0.4s ease; opacity: 1;">
+          <img src="images/mgrs_2_tools.png" alt="9 tactical tools including dead reckoning and resection" class="carousel-slide" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: contain; border-radius: 16px; transition: opacity 0.4s ease; opacity: 0;">
+          <img src="images/mgrs_3_report.png" alt="SALUTE and MEDEVAC report templates" class="carousel-slide" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: contain; border-radius: 16px; transition: opacity 0.4s ease; opacity: 0;">
+          <img src="images/mgrs_4_landscape.png" alt="Landscape mode with compass and wayfinder" class="carousel-slide" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: contain; border-radius: 16px; transition: opacity 0.4s ease; opacity: 0;">
+        </div>
+        <button class="carousel-next" aria-label="Next screenshot" style="background: var(--bg-tertiary); border: 1px solid var(--border); color: var(--text-primary); width: 44px; height: 44px; border-radius: 50%; cursor: pointer; font-size: 1.2rem; display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: background 0.2s;">&rarr;</button>
+      </div>
+      <div class="carousel-dots" style="display: flex; justify-content: center; gap: 8px; margin-top: 16px;">
+        <span class="carousel-dot active" style="width: 8px; height: 8px; border-radius: 50%; background: var(--accent); cursor: pointer; transition: background 0.2s;"></span>
+        <span class="carousel-dot" style="width: 8px; height: 8px; border-radius: 50%; background: var(--border); cursor: pointer; transition: background 0.2s;"></span>
+        <span class="carousel-dot" style="width: 8px; height: 8px; border-radius: 50%; background: var(--border); cursor: pointer; transition: background 0.2s;"></span>
+        <span class="carousel-dot" style="width: 8px; height: 8px; border-radius: 50%; background: var(--border); cursor: pointer; transition: background 0.2s;"></span>
       </div>
     </div>
   </section>
@@ -222,16 +244,36 @@
             <li>Basic themes</li>
           </ul>
         </div>
-        <div class="price-card featured">
-          <div class="tier">Pro</div>
-          <div class="amount">$9.99</div>
-          <div class="period">one-time purchase</div>
+        <div class="price-card">
+          <div class="tier">Pro Monthly</div>
+          <div class="amount">$3.99</div>
+          <div class="period">per month</div>
           <ul>
             <li>HUD mode</li>
             <li>Photo geostamp</li>
             <li>Haptic alerts</li>
             <li>All 4 tactical themes</li>
+            <li>All coordinate formats</li>
+          </ul>
+        </div>
+        <div class="price-card featured">
+          <div class="tier">Pro Annual</div>
+          <div class="amount">$29.99</div>
+          <div class="period">per year &mdash; save 37%</div>
+          <ul>
+            <li>Everything in Pro</li>
+            <li>Best value</li>
             <li>Support development</li>
+          </ul>
+        </div>
+        <div class="price-card">
+          <div class="tier">Pro Lifetime</div>
+          <div class="amount">$49.99</div>
+          <div class="period">one-time purchase</div>
+          <ul>
+            <li>Everything in Pro</li>
+            <li>Pay once, own forever</li>
+            <li>Grandfathered into updates</li>
           </ul>
         </div>
       </div>
@@ -278,6 +320,6 @@
   </div>
 </footer>
 
-<script src="script.js"></script>
+<script src="script.js?v=2"></script>
 </body>
 </html>
