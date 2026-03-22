@@ -5,7 +5,7 @@
 <h1 align="center">Red Grid Link</h1>
 
 [![Download on App Store](https://img.shields.io/badge/App%20Store-Download-0D96F6?logo=apple&logoColor=white)](https://apps.apple.com/app/red-grid-link/id6760084718)
-[![Get it on Google Play](https://img.shields.io/badge/Google%20Play-Coming%20Soon-CC0000?logo=googleplay)](https://github.com/RedGridTactical/RedGridLink)
+[![Get it on Google Play](https://img.shields.io/badge/Google%20Play-Beta%20Testing-CC0000?logo=googleplay)](https://play.google.com/apps/testing/com.redgrid.red_grid_link)
 [![License](https://img.shields.io/badge/License-MIT%20%2B%20Commons%20Clause-8B0000)](LICENSE)
 [![No Tracking](https://img.shields.io/badge/Tracking-None-CC0000)](PRIVACY.md)
 [![Offline First](https://img.shields.io/badge/Offline-First-8B0000)]()
@@ -23,7 +23,7 @@ Built on the MGRS engine from [Red Grid MGRS](https://github.com/RedGridTactical
 
 > **Solo navigator?** [Red Grid MGRS](https://github.com/RedGridTactical/RedGridMGRS) gives you the same MGRS engine as a standalone tool with DAGR-class precision, 9 tactical tools, and 6 radio-ready report templates. Part of the [Red Grid Tactical](https://redgridtactical.com) ecosystem.
 
-> **Available now on iOS.** Android version coming soon.
+> **Available now on iOS.** Android version in [closed beta testing](https://play.google.com/apps/testing/com.redgrid.red_grid_link).
 
 ---
 
