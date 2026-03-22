@@ -321,6 +321,21 @@ ul, ol {
   margin-bottom: 12px;
 }
 
+.card .card-emoji {
+  font-size: 2rem;
+  margin-bottom: 12px;
+  display: block;
+}
+
+.app-badges {
+  margin-top: 16px;
+}
+
+.app-badges .btn {
+  font-size: 0.85rem;
+  padding: 10px 20px;
+}
+
 .card-title {
   font-size: 1rem;
   font-weight: 600;
@@ -625,7 +640,8 @@ ul, ol {
   max-width: 180px;
 }
 
-.privacy-item .icon {
+.privacy-item .icon,
+.privacy-item .privacy-icon {
   font-size: 2rem;
   margin-bottom: 8px;
 }
@@ -893,6 +909,32 @@ ul, ol {
   border-bottom: 1px solid var(--border);
 }
 
+.proof-strip .container {
+  display: flex;
+  justify-content: center;
+  gap: 0;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.proof-strip .container > span {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  padding: 0 24px;
+  border-right: 1px solid var(--border-light);
+}
+
+.proof-strip .container > span:last-child {
+  border-right: none;
+}
+
+.proof-strip .container > span strong {
+  color: var(--text-primary);
+}
+
 .proof-items {
   display: flex;
   justify-content: center;
@@ -941,7 +983,8 @@ ul, ol {
   margin-bottom: 8px;
 }
 
-.ecosystem-card .subtitle {
+.ecosystem-card .subtitle,
+.ecosystem-card .ecosystem-subtitle {
   font-size: 0.9rem;
   color: var(--accent);
   margin-bottom: 16px;
@@ -1076,49 +1119,7 @@ ul, ol {
     grid-template-columns: repeat(2, 1fr);
   }
 
-  /* Desktop nav */
-  .nav-hamburger {
-    display: none;
-  }
-
-  .nav-menu {
-    position: static;
-    display: flex;
-    align-items: center;
-    transform: none;
-    background: transparent;
-    width: auto;
-    height: auto;
-    padding-top: 0;
-    overflow-y: visible;
-    gap: 4px;
-  }
-
-  .nav-menu a {
-    display: inline-flex;
-    padding: 8px 16px;
-    border-bottom: none;
-    font-size: 0.9rem;
-    border-radius: var(--radius-sm);
-  }
-
-  .nav-menu a:hover {
-    background: var(--bg-tertiary);
-  }
-
-  .nav-menu .submenu {
-    padding-left: 0;
-  }
-
-  .nav-menu .submenu a {
-    font-size: 0.85rem;
-    color: var(--text-secondary);
-  }
-
-  .nav-overlay {
-    display: none;
-  }
-
+  /* Desktop: keep nav-cta visible */
   .nav-cta {
     display: inline-flex;
     align-items: center;
