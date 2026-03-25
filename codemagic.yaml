@@ -75,7 +75,6 @@ workflows:
       <<: *flutter_env
       groups:
         - android_credentials    # CM_KEYSTORE, CM_KEY_ALIAS, CM_KEY_PASSWORD, CM_KEYSTORE_PASSWORD
-        - google_play            # GOOGLE_PLAY_SERVICE_ACCOUNT_JSON
     scripts:
       - *pub_get
       - *code_gen
@@ -102,10 +101,12 @@ workflows:
       - build/app/outputs/mapping/release/mapping.txt
       - flutter_drive.log
     publishing:
-      google_play:
-        credentials: $GOOGLE_PLAY_SERVICE_ACCOUNT_JSON
-        track: internal
-        submit_as_draft: true
+      email:
+        recipients:
+          - redgridtactical@gmail.com
+        notify:
+          success: true
+          failure: true
 
   # ===========================================================================
   # iOS Release — Build IPA and publish to TestFlight
