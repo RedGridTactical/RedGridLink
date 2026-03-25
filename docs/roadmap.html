@@ -132,7 +132,6 @@
             <li>NATO phonetic voice callouts</li>
             <li>Session export/import</li>
             <li>New marker categories</li>
-            <li>986 tests passing</li>
           </ul>
         </div>
 
@@ -205,15 +204,13 @@
           <div class="timeline-version">V1.0 — Foundation</div>
           <div class="timeline-date">February 2026</div>
           <ul class="timeline-features">
-            <li>Live 10-digit MGRS coordinates with tap-to-copy</li>
-            <li>DMA-based MGRS conversion engine</li>
-            <li>Compass heading with magnetic declination</li>
-            <li>9 tactical tools (dead reckoning, resection, pace count, back azimuth...)</li>
-            <li>6 radio-ready report templates (SALUTE, 9-Line MEDEVAC, CFF...)</li>
-            <li>NATO phonetic voice readout</li>
-            <li>Waypoint save/load and navigation</li>
+            <li>Real-time MGRS coordinates (1m precision) with tap-to-copy</li>
+            <li>DMA MGRS algorithm with Vincenty formula</li>
             <li>Wayfinder arrow with bearing and distance</li>
-            <li>4 tactical themes (OD Green, Coyote, NVG, Desert)</li>
+            <li>8 tactical tools (back azimuth, dead reckoning, declination, pace count, precision, resection, solar, TDS)</li>
+            <li>3 report templates (SALUTE, MEDEVAC, SPOT)</li>
+            <li>Red-on-black display for light discipline</li>
+            <li>Single waypoint storage</li>
             <li>Zero network, zero tracking architecture</li>
           </ul>
         </div>
@@ -222,50 +219,87 @@
           <div class="timeline-version">V2.0 — Pro Launch</div>
           <div class="timeline-date">March 2026</div>
           <ul class="timeline-features">
-            <li>In-app purchase (Pro tier)</li>
-            <li>HUD mode for night/tactical use</li>
-            <li>Photo geostamp with MGRS + DTG overlay</li>
-            <li>Haptic grid crossing alerts</li>
-            <li>Shake-to-speak NATO voice</li>
-            <li>Coordinate format selector (MGRS, UTM, Lat/Lon, DMS)</li>
-            <li>Text scaling and accessibility improvements</li>
-            <li>GPS FIX quality indicator</li>
+            <li>Pro in-app purchase unlock</li>
+            <li>4 themes (Red Lens, NVG Green, Day White, Blue Force)</li>
+            <li>6 report templates (+CFF, ICS-201, SPOTREP)</li>
+            <li>Unlimited waypoint lists</li>
+            <li>Coordinate format selector (MGRS, UTM, DD, DMS)</li>
+            <li>Magnetic declination (WMM)</li>
+            <li>7 haptic types, accessibility, animations</li>
           </ul>
         </div>
 
         <div class="timeline-item completed">
           <div class="timeline-version">V2.1 — Polish</div>
-          <div class="timeline-date">2026</div>
+          <div class="timeline-date">March 2026</div>
           <ul class="timeline-features">
-            <li>OLED dark mode</li>
-            <li>SF Pro typography</li>
-            <li>6-tab navigation</li>
-            <li>Coordinate format selector</li>
+            <li>Custom grid input and compass heading autofill</li>
+            <li>Waypoint coordinate editing (edit MGRS after save)</li>
+            <li>Copy-to-clipboard on all fields</li>
+            <li>Font scaling fix and review prompt</li>
           </ul>
         </div>
 
         <div class="timeline-item completed">
-          <div class="timeline-version">V2.2 — Global Expansion</div>
+          <div class="timeline-version">V2.2 — Pro Features</div>
           <div class="timeline-date">March 2026</div>
           <ul class="timeline-features">
-            <li>26-language App Store localization</li>
-            <li>In-app i18n (UI translations)</li>
-            <li>Subscription pricing ($3.99/mo, $29.99/yr, $49.99 lifetime)</li>
+            <li>HUD mode (full-screen tactical display with compass/wayfinder)</li>
+            <li>Photo geostamp (burn MGRS + DTG onto any photo)</li>
+            <li>Shake-to-speak (NATO phonetic grid readout)</li>
+            <li>Grid crossing alerts (1km/100m haptic boundaries)</li>
+            <li>In-app help and support screen</li>
+          </ul>
+        </div>
+
+        <div class="timeline-item completed">
+          <div class="timeline-version">V2.3 — Global Expansion</div>
+          <div class="timeline-date">March 2026</div>
+          <ul class="timeline-features">
+            <li>3-tier subscription pricing ($3.99/mo, $29.99/yr, $49.99 lifetime)</li>
+            <li>ProGate paywall redesign with tier selector</li>
+            <li>6-language in-app UI (EN, FR, DE, ES, JA, KO)</li>
+            <li>26-locale App Store listings</li>
             <li>Android closed testing on Google Play</li>
             <li>Apple Search Ads campaigns</li>
-            <li>Wayfinder arrow layout fixes</li>
+            <li>Startup crash fix and HUD layout improvements</li>
+          </ul>
+        </div>
+
+        <div class="timeline-item planned">
+          <div class="timeline-version">V2.5 — Interoperability</div>
+          <div class="timeline-date">April 2026</div>
+          <ul class="timeline-features">
+            <li>FixPhrase integration (open-source, patent-free What3Words alternative)</li>
+            <li>GPX/KML waypoint export via Share sheet</li>
+            <li>Elevation and slope calculator tool</li>
+            <li>OLED true black theme (pure #000000 for power savings)</li>
+            <li>Web-based MGRS Tactical Toolkit (single HTML file, zero dependencies)</li>
+            <li>Reproducible build documentation</li>
+          </ul>
+        </div>
+
+        <div class="timeline-item planned">
+          <div class="timeline-version">V2.6 — Open Source Library</div>
+          <div class="timeline-date">May 2026</div>
+          <ul class="timeline-features">
+            <li>@redgrid/mgrs npm package (DMA TM 8358.1 compliant)</li>
+            <li>Standalone MGRS/UTM/FixPhrase conversion library</li>
+            <li>Bearing, distance, dead reckoning utilities</li>
+            <li>Zero dependencies, ~15 KB</li>
           </ul>
         </div>
 
         <div class="timeline-item planned">
           <div class="timeline-version">V3.0 — Tactical Map</div>
-          <div class="timeline-date">Fall 2026</div>
+          <div class="timeline-date">Summer 2026</div>
           <ul class="timeline-features">
-            <li>MGRS grid overlay map</li>
-            <li>Mission planning tools</li>
-            <li>Photo geostamp insets</li>
-            <li>GPX/KML import/export</li>
-            <li>External GPS support (Garmin GLO, Bad Elf)</li>
+            <li>Offline OpenStreetMap tiles (no API key, fully local)</li>
+            <li>MGRS grid overlay on map</li>
+            <li>Mission planning (waypoints on map, routes)</li>
+            <li>GPX/KML import</li>
+            <li>External GPS support (Garmin GLO, Bad Elf via BLE)</li>
+            <li>Meshtastic/LoRa off-grid position sharing</li>
           </ul>
         </div>
 
@@ -273,10 +307,11 @@
           <div class="timeline-version">V3.5 — Platform Ecosystem</div>
           <div class="timeline-date">2027</div>
           <ul class="timeline-features">
+            <li>iOS Live Activity and Dynamic Island</li>
+            <li>iOS StandBy mode</li>
             <li>Apple Watch companion</li>
-            <li>iOS Live Activity / Dynamic Island</li>
+            <li>Home Screen widgets</li>
             <li>Siri Shortcuts</li>
-            <li>Android launch</li>
           </ul>
         </div>
 
