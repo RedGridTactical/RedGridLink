@@ -76,8 +76,6 @@ workflows:
       groups:
         - android_credentials    # CM_KEYSTORE, CM_KEY_ALIAS, CM_KEY_PASSWORD, CM_KEYSTORE_PASSWORD
         - google_play            # GOOGLE_PLAY_SERVICE_ACCOUNT_JSON
-      android_signing:
-        - red_grid_link_keystore # Reference name for the keystore in Codemagic UI
     scripts:
       - *pub_get
       - *code_gen
