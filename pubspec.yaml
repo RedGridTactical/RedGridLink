@@ -40,6 +40,7 @@ dependencies:
   wakelock_plus: ^1.2.5
   sensors_plus: ^5.0.1
   sentry_flutter: ^8.3.0
+  in_app_review: ^2.0.10
   url_launcher: ^6.3.2
 
 dev_dependencies:

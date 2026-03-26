@@ -5,6 +5,7 @@ import '../../../core/theme/tactical_colors.dart';
 import '../../../core/theme/tactical_text_styles.dart';
 import '../../../core/utils/haptics.dart';
 import '../../../providers/field_link_provider.dart';
+import '../../../services/review/review_service.dart';
 import '../../../providers/mode_provider.dart';
 import '../../../providers/theme_provider.dart';
 import '../../common/dialogs/confirm_dialog.dart';
@@ -216,6 +217,9 @@ class _ActiveSessionView extends ConsumerWidget {
       tapHeavy();
       final service = ref.read(fieldLinkServiceProvider);
       await service.leaveSession();
+      // Prompt for review after first completed session.
+      final reviewService = ref.read(reviewServiceProvider);
+      await reviewService.maybePromptReview();
     }
   }
 }
