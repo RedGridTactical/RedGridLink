@@ -1,3 +1,5 @@
+import 'dart:io' show Platform;
+
 import 'package:flutter/material.dart';
 import 'package:permission_handler/permission_handler.dart';
 
@@ -23,7 +25,8 @@ class PermissionsPage extends StatefulWidget {
   State<PermissionsPage> createState() => _PermissionsPageState();
 }
 
-class _PermissionsPageState extends State<PermissionsPage> {
+class _PermissionsPageState extends State<PermissionsPage>
+    with WidgetsBindingObserver {
   bool _locationGranted = false;
   bool _bluetoothGranted = false;
   bool _locationChecked = false;
@@ -34,24 +37,47 @@ class _PermissionsPageState extends State<PermissionsPage> {
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     _checkPermissions();
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    // Re-check permissions when user returns from Settings
+    if (state == AppLifecycleState.resumed) {
+      _checkPermissions();
+    }
   }
 
   Future<void> _checkPermissions() async {
     try {
       final locationStatus = await Permission.locationWhenInUse.status;
-      final btScanStatus = await Permission.bluetoothScan.status;
+
+      // iOS uses Permission.bluetooth; Android uses granular BT permissions
+      PermissionStatus btStatus;
+      if (Platform.isIOS) {
+        btStatus = await Permission.bluetooth.status;
+      } else {
+        btStatus = await Permission.bluetoothScan.status;
+      }
 
       if (mounted) {
         setState(() {
           _locationGranted = locationStatus.isGranted;
-          _bluetoothGranted = btScanStatus.isGranted;
+          _bluetoothGranted = btStatus.isGranted;
           _locationChecked = true;
           _bluetoothChecked = true;
         });
       }
-    } catch (_) {
-      // Permission handler may not be available on all platforms.
+    } catch (e) {
+      debugPrint('Permission check error: $e');
+      // Ensure buttons are shown even if check fails
       if (mounted) {
         setState(() {
           _locationChecked = true;
@@ -61,64 +87,125 @@ class _PermissionsPageState extends State<PermissionsPage> {
     }
   }
 
+  bool _locationRequesting = false;
+  bool _bluetoothRequesting = false;
+
   Future<void> _requestLocation() async {
+    if (_locationRequesting) return;
+    setState(() => _locationRequesting = true);
+
     try {
-      // Check current status first — if permanently denied, open settings
       final current = await Permission.locationWhenInUse.status;
+      debugPrint('Location permission status before request: $current');
+
       if (current.isPermanentlyDenied) {
         await openAppSettings();
+        if (mounted) setState(() => _locationRequesting = false);
+        // Re-check after returning from settings
+        _recheckAfterDelay();
         return;
       }
 
       final status = await Permission.locationWhenInUse.request();
+      debugPrint('Location permission status after request: $status');
+
       if (mounted) {
-        setState(() => _locationGranted = status.isGranted);
+        setState(() {
+          _locationGranted = status.isGranted;
+          _locationRequesting = false;
+        });
       }
+
       if (status.isGranted) {
         notifySuccess();
       } else if (status.isPermanentlyDenied) {
-        // User denied with "Don't Allow" — must go to Settings
-        if (mounted) {
-          _showSettingsSnackbar('Location');
-        }
+        if (mounted) _showSettingsSnackbar('Location');
       }
     } catch (e) {
       debugPrint('Location permission error: $e');
-      // Fallback: try opening settings directly
+      if (mounted) setState(() => _locationRequesting = false);
       await openAppSettings();
     }
   }
 
   Future<void> _requestBluetooth() async {
+    if (_bluetoothRequesting) return;
+    setState(() => _bluetoothRequesting = true);
+
     try {
-      // Check if already permanently denied
-      final current = await Permission.bluetoothScan.status;
-      if (current.isPermanentlyDenied) {
-        await openAppSettings();
-        return;
-      }
+      if (Platform.isIOS) {
+        // iOS: single bluetooth permission
+        final current = await Permission.bluetooth.status;
+        debugPrint('BT permission status before request (iOS): $current');
 
-      final statuses = await [
-        Permission.bluetoothScan,
-        Permission.bluetoothConnect,
-        Permission.bluetoothAdvertise,
-      ].request();
+        if (current.isPermanentlyDenied) {
+          await openAppSettings();
+          if (mounted) setState(() => _bluetoothRequesting = false);
+          _recheckAfterDelay();
+          return;
+        }
 
-      final allGranted = statuses.values.every((s) => s.isGranted);
-      if (mounted) {
-        setState(() => _bluetoothGranted = allGranted);
-      }
-      if (allGranted) {
-        notifySuccess();
-      } else if (statuses.values.any((s) => s.isPermanentlyDenied)) {
+        final status = await Permission.bluetooth.request();
+        debugPrint('BT permission status after request (iOS): $status');
+
         if (mounted) {
-          _showSettingsSnackbar('Bluetooth');
+          setState(() {
+            _bluetoothGranted = status.isGranted;
+            _bluetoothRequesting = false;
+          });
+        }
+
+        if (status.isGranted) {
+          notifySuccess();
+        } else if (status.isPermanentlyDenied) {
+          if (mounted) _showSettingsSnackbar('Bluetooth');
+        }
+      } else {
+        // Android: granular bluetooth permissions
+        final current = await Permission.bluetoothScan.status;
+        debugPrint('BT permission status before request (Android): $current');
+
+        if (current.isPermanentlyDenied) {
+          await openAppSettings();
+          if (mounted) setState(() => _bluetoothRequesting = false);
+          _recheckAfterDelay();
+          return;
+        }
+
+        final statuses = await [
+          Permission.bluetoothScan,
+          Permission.bluetoothConnect,
+          Permission.bluetoothAdvertise,
+        ].request();
+
+        final allGranted = statuses.values.every((s) => s.isGranted);
+        debugPrint('BT permissions after request (Android): $statuses');
+
+        if (mounted) {
+          setState(() {
+            _bluetoothGranted = allGranted;
+            _bluetoothRequesting = false;
+          });
+        }
+
+        if (allGranted) {
+          notifySuccess();
+        } else if (statuses.values.any((s) => s.isPermanentlyDenied)) {
+          if (mounted) _showSettingsSnackbar('Bluetooth');
         }
       }
     } catch (e) {
       debugPrint('Bluetooth permission error: $e');
+      if (mounted) setState(() => _bluetoothRequesting = false);
       await openAppSettings();
     }
+  }
+
+  /// Re-check permissions after a short delay (user returning from Settings)
+  void _recheckAfterDelay() {
+    Future.delayed(const Duration(seconds: 1), () {
+      if (mounted) _checkPermissions();
+    });
   }
 
   void _showSettingsSnackbar(String permission) {
@@ -180,6 +267,7 @@ class _PermissionsPageState extends State<PermissionsPage> {
                 'and sharing your location with nearby team members.',
             isGranted: _locationGranted,
             isChecked: _locationChecked,
+            isRequesting: _locationRequesting,
             colors: colors,
             onRequest: _requestLocation,
           ),
@@ -195,6 +283,7 @@ class _PermissionsPageState extends State<PermissionsPage> {
                 'discovery and communication with nearby devices.',
             isGranted: _bluetoothGranted,
             isChecked: _bluetoothChecked,
+            isRequesting: _bluetoothRequesting,
             colors: colors,
             onRequest: _requestBluetooth,
           ),
@@ -236,6 +325,7 @@ class _PermissionCard extends StatelessWidget {
     required this.description,
     required this.isGranted,
     required this.isChecked,
+    required this.isRequesting,
     required this.colors,
     required this.onRequest,
   });
@@ -245,6 +335,7 @@ class _PermissionCard extends StatelessWidget {
   final String description;
   final bool isGranted;
   final bool isChecked;
+  final bool isRequesting;
   final TacticalColorScheme colors;
   final VoidCallback onRequest;
 
@@ -271,13 +362,28 @@ class _PermissionCard extends StatelessWidget {
           Text(description, style: TacticalTextStyles.caption(colors)),
           if (isChecked && !isGranted) ...[
             const SizedBox(height: 12),
-            TacticalButton(
-              label: 'Grant',
-              icon: Icons.shield,
-              colors: colors,
-              isCompact: true,
-              onPressed: onRequest,
-            ),
+            if (isRequesting)
+              SizedBox(
+                height: 44,
+                child: Center(
+                  child: SizedBox(
+                    width: 24,
+                    height: 24,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2,
+                      color: colors.accent,
+                    ),
+                  ),
+                ),
+              )
+            else
+              TacticalButton(
+                label: 'Grant',
+                icon: Icons.shield,
+                colors: colors,
+                isCompact: true,
+                onPressed: onRequest,
+              ),
           ],
         ],
       ),
