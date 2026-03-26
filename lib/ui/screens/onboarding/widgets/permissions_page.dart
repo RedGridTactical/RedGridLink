@@ -63,20 +63,41 @@ class _PermissionsPageState extends State<PermissionsPage> {
 
   Future<void> _requestLocation() async {
     try {
+      // Check current status first — if permanently denied, open settings
+      final current = await Permission.locationWhenInUse.status;
+      if (current.isPermanentlyDenied) {
+        await openAppSettings();
+        return;
+      }
+
       final status = await Permission.locationWhenInUse.request();
       if (mounted) {
         setState(() => _locationGranted = status.isGranted);
       }
       if (status.isGranted) {
         notifySuccess();
+      } else if (status.isPermanentlyDenied) {
+        // User denied with "Don't Allow" — must go to Settings
+        if (mounted) {
+          _showSettingsSnackbar('Location');
+        }
       }
-    } catch (_) {
-      // Graceful fallthrough — user can proceed anyway.
+    } catch (e) {
+      debugPrint('Location permission error: $e');
+      // Fallback: try opening settings directly
+      await openAppSettings();
     }
   }
 
   Future<void> _requestBluetooth() async {
     try {
+      // Check if already permanently denied
+      final current = await Permission.bluetoothScan.status;
+      if (current.isPermanentlyDenied) {
+        await openAppSettings();
+        return;
+      }
+
       final statuses = await [
         Permission.bluetoothScan,
         Permission.bluetoothConnect,
@@ -89,10 +110,32 @@ class _PermissionsPageState extends State<PermissionsPage> {
       }
       if (allGranted) {
         notifySuccess();
+      } else if (statuses.values.any((s) => s.isPermanentlyDenied)) {
+        if (mounted) {
+          _showSettingsSnackbar('Bluetooth');
+        }
       }
-    } catch (_) {
-      // Graceful fallthrough.
+    } catch (e) {
+      debugPrint('Bluetooth permission error: $e');
+      await openAppSettings();
     }
+  }
+
+  void _showSettingsSnackbar(String permission) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          '$permission was previously denied. Tap to open Settings.',
+          style: TextStyle(color: colors.text),
+        ),
+        backgroundColor: colors.card,
+        action: SnackBarAction(
+          label: 'SETTINGS',
+          textColor: colors.accent,
+          onPressed: () => openAppSettings(),
+        ),
+      ),
+    );
   }
 
   @override

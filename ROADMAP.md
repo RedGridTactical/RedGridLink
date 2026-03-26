@@ -1,6 +1,6 @@
 # Red Grid Link — Product Roadmap
 
-> **Platform:** iOS available on the App Store. Android version planned.
+> **Platform:** iOS on the App Store. Android in closed beta (Play Store).
 
 ## V1.0 — Foundation Release
 
@@ -85,105 +85,143 @@ Enhanced team coordination for larger groups.
 
 ---
 
-## V1.4 — Android Launch + Extended Range
+## V1.3.2 — Critical Fixes & Revenue Enablers
+
+**Target: April 2026** — PRIORITY: Ship before any new features
+
+Fix the blockers preventing user acquisition and revenue.
+
+### P0 — Onboarding (ship this week)
+- [ ] Fix permission request flow: Location and Bluetooth buttons must trigger native OS permission dialogs
+- [ ] Add NSPhotoLibraryUsageDescription to Info.plist (Apple rejection fix)
+- [ ] Verify permissions work on fresh install (iOS 16+ and Android 13+)
+
+### User Acquisition
+- [ ] In-app review prompt: trigger StoreKit/Play review dialog after first successful Field Link session
+- [ ] 3-screen quick start tutorial: Create Session → Share Code → See Teammates
+- [ ] QR code session join: generate QR containing session ID + PIN, scan to join instantly (zero typing)
+
+### Free Tier Adjustment
+- [ ] Free: 1 peer connection (2 devices total), 1 map region, Red Light theme
+- [ ] Pro unlocks 2-7 peer connections (3-8 devices total)
+- [ ] This creates upgrade pressure for the most common use case (groups of 3+)
+
+### UI Polish
+- [ ] Fix tool titles: spell out completely (no truncation)
+- [ ] Fix Backcountry mode label truncation in Settings
+- [ ] Screenshot carousel on product pages (single image + arrows)
+
+---
+
+## V1.4 — Extended Range + Android Launch
 
 **Target: Q3 2026**
 
-Android release, BLE Long Range, and new features driven by community feedback.
+Address the #1 user objection (range) and launch Android publicly.
+
+### BLE Long Range
+- [ ] BLE Long Range (Coded PHY S=8): 3-4x range (~400m-1km) via `setPreferredPhy` (Android-only)
+- [ ] Adaptive PHY selection: auto-fallback to 1M PHY when Coded PHY unavailable or on iOS
+- [ ] PHY indicator on peer markers (1M vs Coded)
+- [ ] Connection quality indicator (RSSI-based, color-coded green/yellow/red)
+- [ ] Range test mode: RSSI, current PHY, estimated distance between two devices
 
 ### Android Launch
-- [ ] Android QA: test BLE transport, Nearby Connections, foreground service on physical devices
-- [ ] Play Store listing: keystore, screenshots, privacy policy, content rating
-- [ ] Codemagic android-release workflow verification and Play Store publishing
-- [ ] F-Droid submission with reproducible build configuration (pinned SDK versions, Gradle config)
-
-### BLE Long Range (Android-only — Apple removed Coded PHY support in iOS 14)
-- [ ] BLE Long Range (Coded PHY S=8): 3-4x range improvement (~400m-1km) via `flutter_blue_plus` `setPreferredPhy`
-- [ ] Adaptive PHY selection: auto-fallback to 1M PHY when Coded PHY unavailable or on iOS
-- [ ] PHY indicator on peer markers showing current connection type (1M vs Coded)
-
-### Connectivity
-- [ ] Connection quality indicator (RSSI-based signal strength on peer markers, color-coded green/yellow/red)
-- [ ] Range test mode: built-in tool showing RSSI, current PHY, estimated distance between two devices
-
-### FixPhrase — Location in Four Words
-- [ ] Port FixPhrase algorithm to Dart (open source, patent-free what3words alternative)
-- [ ] Display FixPhrase alongside MGRS coordinates on grid view
-- [ ] FixPhrase search input: type four words to navigate to a location
-- [ ] Fully offline: word list bundled as asset, no network required
+- [ ] Android QA on physical devices (Pixel, Samsung, OnePlus minimum)
+- [ ] Play Store production release (promote from closed beta)
+- [ ] F-Droid submission with reproducible builds
 
 ### Map Sources
-- [ ] Add vanilla OpenStreetMap as tile source option (alongside USGS Topo + OpenTopoMap)
+- [ ] Add vanilla OpenStreetMap tile source
 - [ ] Tile source selector in map settings
 
 ---
 
-## V2.0 — Intelligence Layer + ATAK Interop
+## V1.5 — Meshtastic Bridge
 
 **Target: Q4 2026**
 
-Terrain analysis, environmental awareness, Cursor on Target (CoT) interoperability, and Meshtastic integration.
+Turn the biggest competitor into a feature. Capture the Meshtastic community.
 
-- [ ] Meshtastic BLE bridge: detect nearby Meshtastic radios and route Field Link traffic through LoRa mesh for multi-kilometer range
-- [ ] Meshtastic auto-discovery: scan for Meshtastic GATT service UUID, offer bridge mode when detected
-- [ ] ATAK interoperability layer (CoT XML message format — send/receive)
-- [ ] CoT SA (Situational Awareness) message support (position, callsign, team)
-- [ ] CoT bridge: translate Field Link CRDT positions to/from CoT events on local network
-- [ ] Multicast UDP listener for CoT traffic on shared WiFi/mesh radio networks
-- [ ] Elevation profile along planned routes (from DEM data)
-- [ ] Slope and aspect analysis for terrain assessment
+- [ ] Meshtastic BLE bridge: detect nearby Meshtastic radios via GATT service UUID
+- [ ] Route Field Link CRDT traffic through LoRa mesh for multi-kilometer range
+- [ ] Meshtastic auto-discovery: offer bridge mode when radio detected
+- [ ] Fallback behavior: BLE direct when no radio available, LoRa when available
+- [ ] Show bridge status on session info card (BLE-only vs LoRa-bridged)
+
+---
+
+## V2.0 — SAR Mode Pro + Enterprise
+
+**Target: Q1 2027**
+
+Revenue multiplier. Target SAR teams, outfitters, and military training units.
+
+### SAR Mode Pro ($199/yr per team, up to 20 devices)
+- [ ] Sector assignment: Lead divides map into named search sectors, assigns members
+- [ ] Check-in scheduling: configurable timed check-ins with missed-check-in alerts
+- [ ] Hasty search patterns: auto-generate parallel track patterns for a defined area
+- [ ] Clue logging: timestamped, geotagged clue entries with photo attachment
+- [ ] ICS-compliant form generation: ICS 201, 202, 204 auto-populated from session data
+
+### Outfitter / Guide License ($499/yr)
+- [ ] Guide mode: pre-configure sessions for clients before trip starts
+- [ ] Client devices covered under guide's license (no individual Pro required)
+- [ ] Branded session screen (outfitter name/logo)
+- [ ] Post-trip AAR auto-emailed to clients
+
+### Intelligence Tools
+- [ ] Elevation profile along planned routes (DEM data)
 - [ ] Line-of-sight calculator between two MGRS positions
-- [ ] Weather overlay integration (offline-cached NOAA data)
 - [ ] Sunrise/sunset/moonrise with bearing overlays
-- [ ] Magnetic declination auto-calculation by position and date
 - [ ] Terrain difficulty scoring for route segments
-- [ ] Offline gazetteer (search by place name, peak, trail)
-- [ ] Contour line generation from DEM tiles
-- [ ] Print-ready topographic map export (PDF at specified scale)
+
+### ATAK Interop
+- [ ] CoT XML message format (send/receive)
+- [ ] CoT SA position/callsign/team support
+- [ ] CoT bridge: translate CRDT positions to/from CoT events
+- [ ] Multicast UDP listener for CoT on shared WiFi/mesh networks
 
 ---
 
 ## V2.1 — Advanced Navigation
 
-**Target: Q1 2027**
+**Target: Q2 2027**
 
 Professional-grade navigation tools.
 
-- [ ] Route planning with MGRS waypoint sequences (moved from V1.3)
-- [ ] Freehand annotation drawing mode (complements V1.3 tap-to-place)
-- [ ] Interactive team movement replay with timeline scrubber (deferred from V1.3)
+- [ ] Route planning with MGRS waypoint sequences
+- [ ] Freehand annotation drawing mode
+- [ ] Interactive team movement replay with timeline scrubber
 - [ ] Track recording with breadcrumb trail
 - [ ] Navigate-to-waypoint with bearing/distance compass
 - [ ] Track statistics: distance, elevation gain/loss, moving time, pace
-- [ ] GPX import/export (interoperability with Garmin, Gaia, etc.)
-- [ ] KML/KMZ import for boundary and area overlays
+- [ ] GPX import/export (Garmin, Gaia, etc.)
+- [ ] KML/KMZ import for boundary/area overlays
 - [ ] Coordinate format flexibility (UTM, USNG, DD, DMS alongside MGRS)
-- [ ] Configurable map datum support
-- [ ] Offline reverse geocoding
-- [ ] Multi-waypoint route optimization (traveling salesman)
 
 ---
 
 ## V3.0 — Connected Operations
 
-**Target: Q2 2027**
+**Target: Q3 2027**
 
-Optional cloud features for teams that need them (offline-first principles preserved).
+Optional cloud features for teams that need them (offline-first preserved).
 
 - [ ] Cloud session relay for non-proximate team members (encrypted relay server)
-- [ ] Web dashboard for team leads (view team positions on desktop browser)
+- [ ] Web dashboard for team leads (desktop browser)
 - [ ] Session scheduling and pre-planned operations
 - [ ] Post-session cloud AAR sharing (encrypted link, expiring)
 - [ ] Team management portal (invite members, manage seats)
 - [ ] Push notifications for session invites
-- [ ] Mesh networking support (relay position data through intermediate peers)
+- [ ] Mesh networking support (relay through intermediate peers)
 - [ ] Integration API for third-party tools (webhook on position update)
 
 ---
 
 ## V3.1 — Sensor Integration
 
-**Target: Q3 2027**
+**Target: Q4 2027**
 
 External hardware and sensor support.
 
@@ -191,14 +229,12 @@ External hardware and sensor support.
 - [ ] External GPS receiver support (Bluetooth NMEA devices)
 - [ ] Barometric altimeter calibration (phone sensor fusion)
 - [ ] Heart rate monitor integration for SAR team health monitoring
-- [ ] Radio frequency scanning integration (SDR metadata tagging)
-- [ ] Drone position overlay (MAVLink telemetry display)
 
 ---
 
 ## V4.0 — Training & Simulation
 
-**Target: Q4 2027**
+**Target: Q1 2028**
 
 Structured training and after-action capabilities.
 
@@ -208,39 +244,63 @@ Structured training and after-action capabilities.
 - [ ] Instructor mode (observe all teams, inject events, grade performance)
 - [ ] Historical session replay with annotations
 - [ ] Performance analytics dashboard (accuracy, timing, route efficiency)
-- [ ] Certification tracking for SAR/military land nav courses
-- [ ] Scenario library (share training scenarios between teams)
-- [ ] AR compass overlay (camera-based bearing visualization)
+
+---
+
+## Deferred (revisit based on user demand)
+
+These features were deprioritized to focus on revenue-generating work:
+
+- FixPhrase location encoding (open source what3words alternative)
+- Offline gazetteer (search by place name)
+- Contour line generation from DEM tiles
+- Print-ready topographic map export
+- Configurable map datum support
+- Offline reverse geocoding
+- Multi-waypoint route optimization
+- Radio frequency scanning integration
+- Drone position overlay (MAVLink)
+- AR compass overlay
+- Certification tracking for SAR/military courses
+- Scenario library sharing
 
 ---
 
 ## Ongoing
 
-These items are continuously improved across all versions:
+Continuously improved across all versions:
 
 - Security audits and cryptographic library updates
 - Battery performance optimization
-- Map tile source expansion (Mapbox, custom tile servers)
+- Map tile source expansion
 - Platform updates (Android API level, iOS SDK)
-- Test coverage expansion (target 90%+ line coverage)
-- Store listing optimization (screenshots, ASO keywords, A/B testing)
+- Test coverage expansion
+- Store listing optimization (screenshots, ASO, reviews)
 - User feedback integration
-- Documentation and onboarding improvements
 
 ---
 
-## Pricing Evolution
+## Revenue Model
 
-| Version | Free | Pro | Pro+Link | Team | Lifetime |
-|---------|------|-----|----------|------|----------|
-| V1.0 | All modes, 2 devices | $3.99/mo | $5.99/mo | $199.99/yr | $99.99 |
-| V2.0+ | Same | +Intelligence tools | +Intelligence tools | +Web dashboard | Same |
-| V3.0+ | Same | Same | +Cloud relay | +Management portal | +Cloud relay |
+### Consumer
+| Tier | Price | Includes |
+|------|-------|----------|
+| Free | $0 | All modes, 1 peer (2 devices), 1 map region, Red Light theme |
+| Pro Monthly | $3.99/mo | All themes, 7 peers (8 devices), unlimited maps, AAR |
+| Pro Annual | $29.99/yr | Same as monthly, 37% savings |
+| Lifetime | $99.99 | All Pro features forever |
+
+### Enterprise (contact for pricing)
+| Tier | Price | Includes |
+|------|-------|----------|
+| SAR Team | $199/yr | Up to 20 devices, ICS forms, sector management, check-in scheduling |
+| Outfitter/Guide | $499/yr | Pre-configured sessions, client coverage, branded experience |
+| Military Training | Custom | Instructor mode, scoring, scenario builder, volume licensing |
 
 ---
 
 ## Contributing
 
-Red Grid Link is developed by Red Grid. Feature requests and bug reports can be submitted via GitHub Issues.
+Red Grid Link is developed by Red Grid Tactical. Feature requests and bug reports can be submitted via GitHub Issues.
 
-For partnership or integration inquiries: contact via GitHub.
+For partnership, enterprise, or integration inquiries: [redgridtactical.com](https://redgridtactical.com)
