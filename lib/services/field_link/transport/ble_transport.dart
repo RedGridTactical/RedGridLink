@@ -89,6 +89,9 @@ class BleTransport implements TransportService {
   /// services on every send).
   final Map<String, BluetoothCharacteristic> _writableCharCache = {};
 
+  /// Periodic RSSI polling timer for connection quality monitoring.
+  Timer? _rssiPollTimer;
+
   /// Reconnection attempt counts (for exponential back-off).
   final Map<String, int> _reconnectAttempts = {};
 
@@ -177,6 +180,7 @@ class BleTransport implements TransportService {
   @override
   Future<void> dispose() async {
     _disposed = true;
+    stopRssiPolling();
     await stopDiscovery();
     await disconnectAll();
     _writableCharCache.clear();
@@ -708,6 +712,31 @@ class BleTransport implements TransportService {
     } catch (_) {
       return null;
     }
+  }
+
+  /// Start periodic RSSI polling for all connected devices.
+  ///
+  /// Calls [onRssi] with (deviceId, rssi) every [interval] for each
+  /// connected device. Used to feed [ConnectionQualityNotifier].
+  void startRssiPolling({
+    required void Function(String deviceId, int rssi) onRssi,
+    Duration interval = const Duration(seconds: 5),
+  }) {
+    stopRssiPolling();
+    _rssiPollTimer = Timer.periodic(interval, (_) async {
+      for (final deviceId in _connectedDevices.keys.toList()) {
+        final rssi = await readRssi(deviceId);
+        if (rssi != null) {
+          onRssi(deviceId, rssi);
+        }
+      }
+    });
+  }
+
+  /// Stop periodic RSSI polling.
+  void stopRssiPolling() {
+    _rssiPollTimer?.cancel();
+    _rssiPollTimer = null;
   }
 
   // ---------------------------------------------------------------------------
