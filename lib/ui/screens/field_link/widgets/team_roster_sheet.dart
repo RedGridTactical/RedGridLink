@@ -2,8 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:red_grid_link/data/models/peer.dart';
 import 'package:red_grid_link/data/models/team_role.dart';
+import 'package:red_grid_link/providers/connection_quality_provider.dart';
 import 'package:red_grid_link/providers/field_link_provider.dart';
 import 'package:red_grid_link/ui/common/role_icon.dart';
+import 'package:red_grid_link/ui/common/widgets/signal_bars.dart';
 
 import 'role_selector_dialog.dart';
 
@@ -24,6 +26,7 @@ class TeamRosterSheet extends ConsumerWidget {
     final localDeviceId = ref.watch(localDeviceIdProvider);
     final service = ref.watch(fieldLinkServiceProvider);
     final localCallsign = service.roleManager.callsign;
+    final qualityMap = ref.watch(connectionQualityProvider);
 
     return Container(
       decoration: BoxDecoration(
@@ -102,12 +105,15 @@ class TeamRosterSheet extends ConsumerWidget {
                       ? peer.customRoleLabel!
                       : peer.role.displayName;
 
+                  final quality = qualityMap[peer.id];
+
                   return _PeerRow(
                     icon: iconForRole(peer.role),
                     name: label,
                     roleLabel: roleLabel,
                     isLocal: false,
                     theme: theme,
+                    quality: quality,
                     trailing: isLead
                         ? _ManageButton(
                             peer: peer,
@@ -143,6 +149,7 @@ class _PeerRow extends StatelessWidget {
   final String roleLabel;
   final bool isLocal;
   final ThemeData theme;
+  final ConnectionQuality? quality;
   final Widget? trailing;
 
   const _PeerRow({
@@ -151,6 +158,7 @@ class _PeerRow extends StatelessWidget {
     required this.roleLabel,
     required this.isLocal,
     required this.theme,
+    this.quality,
     this.trailing,
   });
 
@@ -182,6 +190,23 @@ class _PeerRow extends StatelessWidget {
               ],
             ),
           ),
+          if (quality != null) ...[
+            if (quality!.isWarning)
+              Padding(
+                padding: const EdgeInsets.only(right: 4),
+                child: Icon(
+                  Icons.warning_amber_rounded,
+                  size: 16,
+                  color: Colors.red.withValues(alpha: 0.8),
+                ),
+              ),
+            SignalBars(
+              bars: quality!.bars,
+              tier: quality!.tier,
+              size: 16,
+            ),
+            const SizedBox(width: 8),
+          ],
           if (trailing != null) trailing!,
         ],
       ),

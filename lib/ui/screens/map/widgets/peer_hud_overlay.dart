@@ -13,7 +13,9 @@ import 'package:red_grid_link/core/theme/tactical_colors.dart';
 import 'package:red_grid_link/core/theme/tactical_text_styles.dart';
 import 'package:red_grid_link/core/utils/geo_utils.dart';
 import 'package:red_grid_link/data/models/peer.dart';
+import 'package:red_grid_link/providers/connection_quality_provider.dart';
 import 'package:red_grid_link/providers/theme_provider.dart';
+import 'package:red_grid_link/ui/common/widgets/signal_bars.dart';
 
 /// Floating HUD overlay displaying peer distance and bearing info.
 ///
@@ -81,8 +83,8 @@ class PeerHudOverlay extends ConsumerWidget {
   }
 }
 
-/// Compact chip showing peer callsign, distance, and bearing.
-class _PeerChip extends StatelessWidget {
+/// Compact chip showing peer callsign, distance, bearing, and signal quality.
+class _PeerChip extends ConsumerWidget {
   const _PeerChip({
     required this.peer,
     required this.myLat,
@@ -96,12 +98,24 @@ class _PeerChip extends StatelessWidget {
   final TacticalColorScheme colors;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final qualityMap = ref.watch(connectionQualityProvider);
+    final quality = qualityMap[peer.id];
+
     final pos = peer.position;
     if (pos == null) {
-      return Text(
-        peer.displayName.toUpperCase(),
-        style: TacticalTextStyles.dim(colors),
+      return Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          if (quality != null) ...[
+            SignalBars(bars: quality.bars, tier: quality.tier, size: 12),
+            const SizedBox(width: 4),
+          ],
+          Text(
+            peer.displayName.toUpperCase(),
+            style: TacticalTextStyles.dim(colors),
+          ),
+        ],
       );
     }
 
@@ -115,17 +129,22 @@ class _PeerChip extends StatelessWidget {
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
-        // Connection indicator dot
-        Container(
-          width: 6,
-          height: 6,
-          decoration: BoxDecoration(
-            shape: BoxShape.circle,
-            color: peer.isConnected
-                ? Colors.green
-                : Colors.orange,
+        // Signal bars indicator (replaces simple dot when quality data exists)
+        if (quality != null) ...[
+          SignalBars(bars: quality.bars, tier: quality.tier, size: 12),
+        ] else ...[
+          // Fallback connection indicator dot
+          Container(
+            width: 6,
+            height: 6,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: peer.isConnected
+                  ? Colors.green
+                  : Colors.orange,
+            ),
           ),
-        ),
+        ],
         const SizedBox(width: 4),
         Text(
           peer.displayName.toUpperCase(),
