@@ -44,6 +44,7 @@ class PeerHudOverlay extends ConsumerWidget {
     if (peers.isEmpty) return const SizedBox.shrink();
 
     final colors = ref.watch(currentThemeProvider);
+    final isLrSupported = ref.watch(isCodedPhySupportedProvider).valueOrNull ?? false;
 
     return Positioned(
       top: 8,
@@ -72,6 +73,7 @@ class PeerHudOverlay extends ConsumerWidget {
                       myLat: myLat,
                       myLon: myLon,
                       colors: colors,
+                      isLrSupported: isLrSupported,
                     ),
                   );
                 }),
@@ -91,12 +93,14 @@ class _PeerChip extends ConsumerWidget {
     required this.myLat,
     required this.myLon,
     required this.colors,
+    required this.isLrSupported,
   });
 
   final Peer peer;
   final double myLat;
   final double myLon;
   final TacticalColorScheme colors;
+  final bool isLrSupported;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -112,23 +116,18 @@ class _PeerChip extends ConsumerWidget {
             SignalBars(bars: quality.bars, tier: quality.tier, size: 12),
           ],
           // Long Range badge when Coded PHY is supported
-          ref.watch(isCodedPhySupportedProvider).when(
-            data: (supported) => supported
-                ? const Padding(
-                    padding: EdgeInsets.only(left: 2),
-                    child: Text(
-                      'LR',
-                      style: TextStyle(
-                        fontSize: 9,
-                        color: Colors.cyan,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  )
-                : const SizedBox.shrink(),
-            loading: () => const SizedBox.shrink(),
-            error: (_, __) => const SizedBox.shrink(),
-          ),
+          if (isLrSupported)
+            const Padding(
+              padding: EdgeInsets.only(left: 2),
+              child: Text(
+                'LR',
+                style: TextStyle(
+                  fontSize: 9,
+                  color: Colors.cyan,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
           const SizedBox(width: 4),
           Text(
             peer.displayName.toUpperCase(),
@@ -165,23 +164,18 @@ class _PeerChip extends ConsumerWidget {
           ),
         ],
         // Long Range badge when Coded PHY is supported
-        ref.watch(isCodedPhySupportedProvider).when(
-          data: (supported) => supported
-              ? const Padding(
-                  padding: EdgeInsets.only(left: 2),
-                  child: Text(
-                    'LR',
-                    style: TextStyle(
-                      fontSize: 9,
-                      color: Colors.cyan,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                )
-              : const SizedBox.shrink(),
-          loading: () => const SizedBox.shrink(),
-          error: (_, __) => const SizedBox.shrink(),
-        ),
+        if (isLrSupported)
+          const Padding(
+            padding: EdgeInsets.only(left: 2),
+            child: Text(
+              'LR',
+              style: TextStyle(
+                fontSize: 9,
+                color: Colors.cyan,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
         const SizedBox(width: 4),
         Text(
           peer.displayName.toUpperCase(),

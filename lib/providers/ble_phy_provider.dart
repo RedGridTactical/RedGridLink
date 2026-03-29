@@ -6,6 +6,6 @@ final blePhyServiceProvider = Provider<BlePhyService>((ref) => BlePhyService());
 
 /// Whether the current device supports BLE Coded PHY (Long Range).
 final isCodedPhySupportedProvider = FutureProvider<bool>((ref) async {
-  final service = ref.read(blePhyServiceProvider);
+  final service = ref.watch(blePhyServiceProvider);
   return service.isCodedPhySupported();
 });

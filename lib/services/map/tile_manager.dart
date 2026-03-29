@@ -68,7 +68,7 @@ class TileManager {
               receiveTimeout: const Duration(seconds: 10),
               responseType: ResponseType.bytes,
               headers: {
-                'User-Agent': 'com.redgridlink.app',
+                'User-Agent': 'RedGridLink/1.4 (https://redgridtactical.com)',
               },
             ));
 
@@ -288,7 +288,6 @@ class TileManager {
   /// Cancel an in-progress download.
   Future<void> cancelDownload() async {
     _cancelCompleter?.complete();
-    _cancelCompleter = null;
   }
 
   /// Delete a downloaded region's MBTiles file and database entry.

@@ -19,6 +19,7 @@ import 'package:red_grid_link/services/field_link/ghost/ghost_manager.dart';
 import 'package:red_grid_link/services/field_link/role_manager.dart';
 import 'package:red_grid_link/services/field_link/sync/crdt/crdt_state.dart';
 import 'package:red_grid_link/services/field_link/sync/sync_engine.dart';
+import 'package:red_grid_link/services/field_link/transport/ble_transport.dart';
 import 'package:red_grid_link/services/field_link/transport/transport_service.dart';
 
 /// Connection status for the Field Link service.
@@ -87,6 +88,13 @@ class FieldLinkService {
       StreamController<BoundaryEvent>.broadcast();
 
   FieldLinkStatus _status = FieldLinkStatus.idle;
+
+  /// Optional callback invoked with (deviceId, rssi) readings from BLE RSSI
+  /// polling. Set by the provider layer to feed [ConnectionQualityNotifier].
+  void Function(String deviceId, int rssi)? onRssiReading;
+
+  /// Callback invoked when RSSI data should be cleared (e.g., session end).
+  void Function()? onRssiClear;
 
   FieldLinkService({
     required TransportService transport,
@@ -247,6 +255,7 @@ class FieldLinkService {
     _reconnectAttempts = 0;
 
     // Stop sub-services in order.
+    _stopRssiPolling();
     await _syncEngine.stop();
     await _transport.disconnectAll();
     await _transport.stopDiscovery();
@@ -488,6 +497,7 @@ class FieldLinkService {
     await _syncStateSub?.cancel();
     _reconnectTimer?.cancel();
     _reconnectTimer = null;
+    _stopRssiPolling();
     _stopBatteryPolling();
     _syncEngine.dispose();
     _ghostManager.dispose();
@@ -512,6 +522,8 @@ class FieldLinkService {
         _reconnectTimer?.cancel();
         _reconnectTimer = null;
         _setStatus(FieldLinkStatus.connected);
+        // Start RSSI polling if transport is BLE.
+        _startRssiPolling();
         break;
       case TransportState.discovering:
         if (_status != FieldLinkStatus.connected) {
@@ -718,5 +730,23 @@ class FieldLinkService {
   void _stopBatteryPolling() {
     _batteryPollTimer?.cancel();
     _batteryPollTimer = null;
+  }
+
+  /// Start RSSI polling if transport is BLE and a callback is registered.
+  void _startRssiPolling() {
+    final transport = _transport;
+    final callback = onRssiReading;
+    if (transport is BleTransport && callback != null) {
+      transport.startRssiPolling(onRssi: callback);
+    }
+  }
+
+  /// Stop RSSI polling and clear quality data.
+  void _stopRssiPolling() {
+    final transport = _transport;
+    if (transport is BleTransport) {
+      transport.stopRssiPolling();
+    }
+    onRssiClear?.call();
   }
 }

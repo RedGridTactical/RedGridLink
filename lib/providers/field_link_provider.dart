@@ -6,6 +6,7 @@ import 'package:red_grid_link/data/models/marker.dart' as model;
 import 'package:red_grid_link/data/models/peer.dart';
 import 'package:red_grid_link/data/models/session.dart';
 import 'package:red_grid_link/data/models/team_role.dart';
+import 'package:red_grid_link/providers/connection_quality_provider.dart';
 import 'package:red_grid_link/services/field_link/battery/battery_manager.dart';
 import 'package:red_grid_link/services/field_link/field_link_service.dart';
 
@@ -22,6 +23,31 @@ final fieldLinkServiceProvider = Provider<FieldLinkService>((ref) {
   throw UnimplementedError(
     'fieldLinkServiceProvider must be overridden in the root ProviderScope.',
   );
+});
+
+/// Wires RSSI polling callbacks from [FieldLinkService] to
+/// [ConnectionQualityNotifier] so that signal bars update in real time.
+///
+/// Watch this provider early (e.g., in the app shell) to ensure the
+/// callbacks are registered before the first BLE session starts.
+/// Safe to watch even when [fieldLinkServiceProvider] is not overridden.
+final rssiWiringProvider = Provider<void>((ref) {
+  final FieldLinkService service;
+  try {
+    service = ref.watch(fieldLinkServiceProvider);
+  } on UnimplementedError {
+    // Service not overridden (e.g., in widget tests). Nothing to wire.
+    return;
+  }
+  final notifier = ref.watch(connectionQualityProvider.notifier);
+
+  service.onRssiReading = notifier.updateRssi;
+  service.onRssiClear = notifier.clear;
+
+  ref.onDispose(() {
+    service.onRssiReading = null;
+    service.onRssiClear = null;
+  });
 });
 
 // ---------------------------------------------------------------------------

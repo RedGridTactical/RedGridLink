@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:red_grid_link/l10n/app_localizations.dart';
 
 import 'core/theme/app_theme.dart';
+import 'providers/field_link_provider.dart';
 import 'providers/settings_provider.dart';
 import 'providers/theme_provider.dart';
 import 'ui/screens/home/home_screen.dart';
@@ -21,6 +22,8 @@ class RedGridLinkApp extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final colors = ref.watch(currentThemeProvider);
     final hasCompletedOnboarding = ref.watch(hasCompletedOnboardingProvider);
+    // Wire RSSI polling callbacks so signal bars work during BLE sessions.
+    ref.watch(rssiWiringProvider);
 
     return MaterialApp(
       title: 'Red Grid Link',

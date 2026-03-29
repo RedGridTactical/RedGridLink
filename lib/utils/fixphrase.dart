@@ -38,7 +38,7 @@ class FixPhrase {
   /// Decode a FixPhrase back to lat/lon.
   /// Words can be in any order (ranges are non-overlapping).
   /// Accepts hyphen or space separated.
-  ({double lat, double lon}) decode(String phrase) {
+  ({double lat, double lon, int wordsUsed}) decode(String phrase) {
     final words = phrase.toLowerCase().replaceAll('-', ' ').trim().split(RegExp(r'\s+'));
     if (words.length < 2) {
       throw ArgumentError('Need at least 2 words');
@@ -65,6 +65,11 @@ class FixPhrase {
       throw ArgumentError('Cannot determine location from supplied words');
     }
 
+    // Count how many valid word groups were found (2, 3, or 4).
+    int wordsUsed = 2;
+    if (indexes[2] != -1) wordsUsed = 3;
+    if (indexes[2] != -1 && indexes[3] != -1) wordsUsed = 4;
+
     double divby = 10.0;
     var latStr = indexes[0].toString().padLeft(4, '0');
     var lonStr = indexes[1].toString().padLeft(4, '0');
@@ -87,7 +92,7 @@ class FixPhrase {
     final latFinal = (((int.parse(latStr) / divby) - 90.0) * 10000).round() / 10000;
     final lonFinal = (((int.parse(lonStr) / divby) - 180.0) * 10000).round() / 10000;
 
-    return (lat: latFinal, lon: lonFinal);
+    return (lat: latFinal, lon: lonFinal, wordsUsed: wordsUsed);
   }
 
   /// Format lat/lon as a FixPhrase, returning 'ERROR' on failure.

@@ -35,6 +35,7 @@ void main() {
         final result = fixPhrase.decode(phrase);
         expect((result.lat - lat).abs(), lessThanOrEqualTo(0.0001));
         expect((result.lon - lon).abs(), lessThanOrEqualTo(0.0001));
+        expect(result.wordsUsed, 4);
       });
     }
   });
@@ -49,6 +50,7 @@ void main() {
 
       expect(fromReversed.lat, original.lat);
       expect(fromReversed.lon, original.lon);
+      expect(fromReversed.wordsUsed, 4);
     });
 
     test('space-separated words work', () {
@@ -57,6 +59,7 @@ void main() {
       final result = fixPhrase.decode(spaced);
       expect((result.lat - 51.5074).abs(), lessThanOrEqualTo(0.0001));
       expect((result.lon - (-0.1278)).abs(), lessThanOrEqualTo(0.0001));
+      expect(result.wordsUsed, 4);
     });
   });
 
