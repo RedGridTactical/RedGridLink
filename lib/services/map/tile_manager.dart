@@ -155,7 +155,7 @@ class TileManager {
   /// 2. Downloads each tile from the OSM tile server using Dio.
   /// 3. Writes tiles into a local MBTiles (SQLite) file via the mbtiles package.
   /// 4. Updates [MapRepository] with the file path and actual size.
-  Stream<double> downloadRegion(MapRegion region) async* {
+  Stream<double> downloadRegion(MapRegion region, {String tileSource = 'osm'}) async* {
     // Prevent concurrent downloads from corrupting MBTiles.
     if (_isDownloading) {
       throw StateError('A download is already in progress');
@@ -205,7 +205,7 @@ class TileManager {
         defaultZoom: region.minZoom.toDouble(),
         minZoom: region.minZoom.toDouble(),
         maxZoom: region.maxZoom.toDouble(),
-        attributionHtml: MapConstants.osmAttribution,
+        attributionHtml: MapConstants.attributionFor(tileSource),
         description: 'Red Grid Link offline region: ${region.name}',
         type: TileLayerType.baseLayer,
         version: 1.0,
@@ -223,9 +223,12 @@ class TileManager {
         }
 
         try {
-          // Download tile from OSM
-          final url =
-              'https://tile.openstreetmap.org/${tile.z}/${tile.x}/${tile.y}.png';
+          // Download tile from selected source
+          final templateUrl = MapConstants.tileUrlFor(tileSource);
+          final url = templateUrl
+              .replaceAll('{z}', '${tile.z}')
+              .replaceAll('{x}', '${tile.x}')
+              .replaceAll('{y}', '${tile.y}');
 
           final response = await _dio.get<List<int>>(url);
 

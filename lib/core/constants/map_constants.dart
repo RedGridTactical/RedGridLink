@@ -29,4 +29,26 @@ class MapConstants {
   static const String osmAttribution = '© OpenStreetMap contributors';
   static const String openTopoAttribution = '© OpenTopoMap (CC-BY-SA)';
   static const String usgsAttribution = 'USGS National Map (Public Domain)';
+
+  /// Returns the tile URL template for the given source identifier.
+  static String tileUrlFor(String sourceId) {
+    switch (sourceId) {
+      case 'topo':
+        return openTopoUrl;
+      case 'osm':
+      default:
+        return osmTileUrl;
+    }
+  }
+
+  /// Returns the attribution string for the given source identifier.
+  static String attributionFor(String sourceId) {
+    switch (sourceId) {
+      case 'topo':
+        return openTopoAttribution;
+      case 'osm':
+      default:
+        return osmAttribution;
+    }
+  }
 }
