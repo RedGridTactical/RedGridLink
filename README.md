@@ -12,8 +12,8 @@
 [![MGRS Native](https://img.shields.io/badge/MGRS-Native-CC0000)]()
 [![AES-256](https://img.shields.io/badge/Encryption-AES--256--GCM-8B0000)]()
 [![Flutter](https://img.shields.io/badge/Built%20with-Flutter-CC0000?logo=flutter)]()
-[![Tests](https://img.shields.io/badge/Tests-986%20Passing-brightgreen)]()
-[![Platform](https://img.shields.io/badge/Platform-iOS%20%7C%20Android%20Q3%202026-8B0000)]()
+[![Tests](https://img.shields.io/badge/Tests-1034%20Passing-brightgreen)]()
+[![Platform](https://img.shields.io/badge/Platform-iOS%20%7C%20Android%20Beta-8B0000)]()
 [![PRs Welcome](https://img.shields.io/badge/PRs-Welcome-CC0000)](https://github.com/RedGridTactical/RedGridLink/pulls)
 [![Buy Me a Coffee](https://img.shields.io/badge/Buy%20Me%20a%20Coffee-Support-FFDD00?logo=buymeacoffee&logoColor=black)](https://buymeacoffee.com/redgridtac0)
 
@@ -73,6 +73,9 @@ Dead Reckoning, Resection, Pace Count, Bearing/Back Azimuth, Coordinate Converte
 ### Team Coordination (V1.3)
 Assign roles (Lead, Scout, Medic, Comms, custom) with callsigns. Lead controls the session like a group admin. Share waypoints with the whole team or save them privately. Draw tap-to-place annotations visible to all peers. Set boundary geofences with automatic alerts when someone crosses. NATO phonetic voice callouts announce teammate positions hands-free. Export and import sessions as versioned JSON for backup and review.
 
+### Extended Range + Navigation (V1.4)
+BLE Long Range (Coded PHY) extends range from ~100m to 400m-1km on supported devices. Live RSSI signal bars show connection quality for each teammate with warnings when signal weakens. FixPhrase encodes any location as 4 easy-to-remember words (~11m accuracy, order-independent). Choose between OpenStreetMap or OpenTopoMap when downloading offline regions. Coordinate bar cycles between MGRS and FixPhrase display.
+
 ### After-Action Reports
 One-tap PDF export: map snapshot, mission timeline, track data, timestamps, team roster with roles, per-member tracks, boundary events, markers, and session log. Share via AirDrop, file share, or any local transfer.
 
@@ -89,7 +92,7 @@ Open Red Grid Link and your MGRS position appears on the offline map. Navigate u
 ### Field Link (Team Mode)
 1. **Start a session** -- tap one button to begin broadcasting over BLE
 2. **Set security** -- choose Open, PIN, or QR code authentication
-3. **Teammates appear** -- any device running Red Grid Link within range (~50-100m open, 20-60m woods) is automatically discovered
+3. **Teammates appear** -- any device running Red Grid Link within range (~100-300m standard, up to 1km with BLE Long Range) is automatically discovered
 4. **Positions sync** -- AES-256-GCM encrypted delta updates flow between all devices at configurable intervals
 5. **Ghosting** -- if a teammate moves out of range, their last-known position remains on your map with time-decay opacity (100% to outline over 30 minutes)
 6. **Reconnect** -- when a ghost comes back in range, their marker snaps to live position
