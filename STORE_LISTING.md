@@ -4,7 +4,7 @@
 Red Grid Link
 
 ## Subtitle (iOS, max 30 chars)
-Offline Team Tracker & MGRS Nav
+Offline Team GPS & Map Tracker
 
 ## App Icon
 Source: `docs/images/icon_1024.png` (1024x1024)
@@ -14,96 +14,63 @@ All iOS and Android sizes auto-generated in `ios/Runner/Assets.xcassets/AppIcon.
 Navigation (primary), Utilities (secondary)
 
 ## Short Description (Play Store, max 80 chars)
-ATAK alternative: encrypted Bluetooth team tracking + offline MGRS maps.
+Track your team offline over Bluetooth. Encrypted GPS sharing, no cell needed.
 
 ## Full Description
 
-Your team. Your grid. No cell towers required.
+Track your team anywhere -- no cell service, no internet, no accounts.
 
-Inspired by military blue force tracking systems like ATAK, Red Grid Link brings encrypted team coordination to civilian and professional teams -- without cell towers, accounts, or servers. Track your team's positions in real time over Bluetooth, navigate with military-grade MGRS precision, and operate completely offline.
+Red Grid Link turns nearby phones into a private team GPS network using Bluetooth and WiFi Direct. See everyone's position on a shared map, drop waypoints, set boundaries, and coordinate -- all without cell towers or internet. Your data never leaves your devices.
 
-Red Grid Link is an offline-first, MGRS-native coordination platform for small teams (2-8 people) operating beyond reliable cell service. It combines precision land navigation with Field Link -- zero-config proximity sync over Bluetooth and WiFi Direct. Lightweight where ATAK is complex. Cross-platform where ATAK is Android-only. Zero infrastructure where ATAK requires TAK Server.
+Built by an active duty Army officer for the people who actually need it: search & rescue volunteers, hunting parties, backcountry hiking groups, and field training teams.
 
-FIELD LINK -- TEAM SYNC WITHOUT INFRASTRUCTURE:
-Field Link is what sets Red Grid Link apart. Devices within proximity automatically discover each other and share encrypted position and marker data -- no internet, no configuration, no pairing codes. Just turn it on and your team appears on the map.
-- BLE + WiFi Direct/AWDL proximity transport (cross-platform Android and iOS)
-- AES-256-GCM encrypted sync with ECDH ephemeral session keys
-- Compact delta payloads (<200 bytes per position update)
-- Tiered session security: Open (auto-join), PIN (4-digit), or QR code
-- Ghost markers: see last-known positions when teammates move out of range
-- Time-decay visualization: full opacity fades to outline over 30 minutes
-- Velocity vectors project teammate movement direction at disconnect
-- Snap-to-live animation on reconnect
-- Expedition Mode: <3% battery per hour (BLE-only, 30-second updates)
-- Ultra Expedition Mode: <2% battery per hour (BLE-only, 60-second updates)
-- Auto-reconnect with exponential backoff on disconnect
+WHO IT'S FOR:
+- Search & Rescue teams tracking searchers across sectors
+- Hunting groups monitoring stand positions and property lines
+- Backcountry hikers keeping tabs on a spread-out group
+- Training teams running field exercises without military infrastructure
 
-MGRS-NATIVE NAVIGATION:
-Built on the proven MGRS engine from Red Grid MGRS -- the same coordinate system used by NATO forces worldwide.
-- Live MGRS coordinates (4/6/8/10-digit precision)
-- MGRS grid overlay on offline maps (GZD to 100m resolution)
-- Bearing, distance, and dead reckoning tools
-- Magnetic declination (WMM model)
-- NATO phonetic voice readout for hands-free grid calls
+HOW IT WORKS:
+Open the app, start a session, and every teammate within Bluetooth range appears on your map. No pairing, no configuration, no internet required.
 
-11 TACTICAL TOOLS:
-- Dead Reckoning plotter
-- Two-point Resection
-- Pace Count tracker
-- Bearing calculator with back azimuth
-- Coordinate Converter (MGRS, lat/lon, DMS, UTM)
-- Range Estimation (mil-relation formula)
-- Slope Calculator (percentage and angle)
-- ETA / Speed Calculator
-- Magnetic Declination converter
-- Celestial Navigation (sun/moon bearing reference)
-- MGRS Precision Reference
+- Devices discover each other automatically over Bluetooth and WiFi Direct
+- Positions update every few seconds with military-grade AES-256 encryption
+- Works on both iPhone and Android in the same session
+- Battery-saver modes last all day (<2% per hour in Expedition mode)
+- Ghost markers show last-known positions when someone moves out of range
 
-OFFLINE MAP SYSTEM:
-- Downloadable map packs from USGS Topo (public domain) and OpenTopoMap
-- Full offline operation -- maps cached locally as MBTiles
-- MGRS grid lines rendered as a dynamic overlay at all zoom levels
+OFFLINE MAPS:
+Download topographic maps before you leave service. Full USGS Topo and OpenTopoMap coverage, stored on your phone. Navigate with MGRS grid overlay -- the same military grid system used by NATO.
 
-4 OPERATIONAL MODES:
-One engine, four presentation layers. Terminology, icons, and quick actions adapt to your mission:
-- Search & Rescue -- sector assignments, clue markers, search patterns
-- Backcountry -- camp, waypoint, and trail navigation
-- Hunting -- stand locations, game sightings, property boundaries
-- Training -- exercise objectives, rally points, phase lines
+TEAM COORDINATION:
+- Assign roles: Lead, Scout, Medic, Comms, or custom
+- Share waypoints with the whole team or keep them private
+- Draw boundaries and get alerted if anyone crosses them
+- Drop markers for hazards, rally points, objectives, or caches
+- Hands-free NATO voice callouts announce position updates
+
+11 NAVIGATION TOOLS:
+Dead reckoning, two-point resection, pace counter, bearing calculator, coordinate converter (MGRS/lat-lon/DMS/UTM), range estimation, slope calculator, ETA calculator, magnetic declination, celestial navigation, and precision reference.
 
 AFTER-ACTION REPORTS:
-One-tap PDF export containing map snapshot, mission timeline, track data, timestamps, team roster, markers, and session log. Share via AirDrop, file share, or any local transfer method.
+One tap generates a PDF with your team's tracks, timeline, markers, roster, and boundary events. Share it on the spot via AirDrop or Nearby Share.
 
-4 TACTICAL DISPLAY THEMES:
-- Red Light: preserve night-adapted vision (free)
-- NVG Green: night observation device compatibility (Pro)
-- Day White: high-contrast for daylight (Pro)
-- Blue Force: tactical blue display (Pro)
+4 DISPLAY THEMES:
+Red Light (night vision safe), NVG Green, Day White, and Blue Force. All designed for field readability with glove-friendly controls.
 
-BUILT FOR THE FIELD:
-- Glove-friendly UI with 44px+ minimum touch targets
-- 3-tap maximum to any primary action
-- Haptic feedback on key interactions
-- Accelerometer-based step detection for hands-free pace counting
-- Landscape and portrait support
-- Background location updates with battery drain projection
-
-ZERO FOOTPRINT PRIVACY:
-- No accounts. No sign-up. No login.
-- No cloud sync. No analytics. No tracking.
-- No ads. No third-party data SDKs.
-- Location data stays on your device.
-- Field Link data is ephemeral -- nothing persists after the session ends.
-- All Field Link communication encrypted with AES-256-GCM.
-- In-app purchases processed by Apple/Google only.
-- Zero data collection. Zero tracking. 100% offline capable.
+PRIVACY BY DESIGN:
+- No accounts, no sign-up, no login
+- No cloud, no servers, no tracking, no ads
+- All data stays on your device
+- Session data is ephemeral -- gone when the session ends
+- AES-256-GCM encryption on all team communication
+- In-app purchases handled by Apple/Google only
 
 PRICING:
-- Free: All modes, 2-device Field Link, 1 map region, Red Light theme
-- Pro ($3.99/mo or $29.99/yr): All themes, unlimited map downloads, AAR export (2 devices)
-- Pro+Link ($5.99/mo or $44.99/yr): Pro + full 8-device Field Link
-- Team ($199.99/yr): Pro+Link for 8 seats
-- Lifetime ($99.99): Pro+Link forever, one-time purchase
+- Free: All 4 modes, 2-device team sync, 1 offline map region, Red Light theme
+- Pro ($3.99/mo or $29.99/yr): All themes, unlimited maps, After-Action Reports
+- Pro+Link ($5.99/mo or $44.99/yr): Everything in Pro + 8-device team sync
+- Lifetime ($99.99): Full Pro+Link features, one-time purchase
 
 Subscriptions auto-renew unless cancelled at least 24 hours before the end of the current period. Payment will be charged to your Apple ID account at confirmation of purchase. Manage or cancel subscriptions in your device's Settings > Apple ID > Subscriptions.
 
@@ -111,10 +78,29 @@ Terms of Use: https://redgridtactical.com/terms.html
 Privacy Policy: https://redgridtactical.com/privacy.html
 
 ## Promotional Text (iOS, max 170 chars)
-Lightweight ATAK alternative: encrypted Bluetooth team tracking + offline MGRS maps. No servers, no accounts. Built for SAR, hunting, and backcountry teams.
+Track your team offline over Bluetooth -- no cell service needed. Encrypted GPS sharing with offline topo maps for SAR, hunting, and backcountry teams.
 
 ## Keywords (iOS, max 100 chars)
-ATAK,blue force tracking,team tracker,offline map,mgrs,tactical,military,gps,sar,hunting,mesh,topo
+offline tracker,team gps,blue force,walkie talkie,hunting gps,sar,mgrs,topo map,hiking,group track
+
+## What's New (v1.4.0)
+Extended range and navigation update:
+- BLE Long Range: up to 1km range on supported devices (BLE 5.0 Coded PHY)
+- Signal strength indicator for each connected teammate
+- FixPhrase: share your location as 4 easy-to-remember words (~11m accuracy)
+- Download OpenStreetMap or OpenTopoMap tiles for offline use
+- Coordinate bar now cycles between MGRS and FixPhrase display
+
+## What's New (v1.3.1)
+Team coordination update:
+- Assign team roles: Lead, Scout, Medic, Comms, or custom with callsigns
+- Share waypoints with your team or keep them private
+- Draw boundaries -- get alerted if anyone crosses
+- Drop markers for hazards, rally points, objectives, and caches
+- Hands-free NATO voice callouts for position updates
+- Enhanced After-Action Report with per-member tracks
+- Session export/import for backup and review
+- 6 annotation colors with undo and delete
 
 ## What's New (v1.2.2)
 Red Grid Link v1.2.2 -- navigation accuracy and usability update:
@@ -182,7 +168,7 @@ https://redgridtactical.com/privacy.html
 https://redgridtactical.com/terms.html
 
 ## Support URL
-https://github.com/RedGridTactical/RedGridLink/issues
+https://redgridtactical.com/about.html
 
 ## Age Rating
 4+ / Everyone

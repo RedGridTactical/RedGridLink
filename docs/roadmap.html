@@ -135,16 +135,26 @@
           </ul>
         </div>
 
-        <div class="timeline-item current">
+        <div class="timeline-item completed">
           <div class="timeline-version">V1.4 — Android Launch + Extended Range</div>
-          <div class="timeline-date">Q3 2026</div>
+          <div class="timeline-date">March 2026</div>
           <ul class="timeline-features">
             <li>Android release on Google Play</li>
-            <li>F-Droid submission</li>
             <li>BLE Long Range (Coded PHY) for 400m-1km range</li>
-            <li>Connection quality indicator (RSSI-based)</li>
-            <li>FixPhrase: 4-word location encoding (patent-free what3words alternative)</li>
-            <li>OpenStreetMap tile source option</li>
+            <li>Connection quality indicator (RSSI signal bars)</li>
+            <li>FixPhrase: 4-word location encoding (~11m accuracy)</li>
+            <li>OpenStreetMap offline tile downloads</li>
+          </ul>
+        </div>
+
+        <div class="timeline-item current">
+          <div class="timeline-version">V1.5 — Distribution + F-Droid</div>
+          <div class="timeline-date">Q2 2026</div>
+          <ul class="timeline-features">
+            <li>Android production release on Google Play</li>
+            <li>F-Droid submission</li>
+            <li>Firebase Analytics integration</li>
+            <li>App Store Optimization (ASO) improvements</li>
           </ul>
         </div>
 
@@ -256,7 +266,7 @@
           <div class="timeline-version">V2.3 — Global Expansion</div>
           <div class="timeline-date">March 2026</div>
           <ul class="timeline-features">
-            <li>3-tier subscription pricing ($3.99/mo, $29.99/yr, $49.99 lifetime)</li>
+            <li>3-tier subscription pricing (monthly, annual, lifetime options)</li>
             <li>ProGate paywall redesign with tier selector</li>
             <li>6-language in-app UI (EN, FR, DE, ES, JA, KO)</li>
             <li>26-locale App Store listings</li>
@@ -266,22 +276,21 @@
           </ul>
         </div>
 
-        <div class="timeline-item planned">
+        <div class="timeline-item shipped">
           <div class="timeline-version">V2.5 — Interoperability</div>
-          <div class="timeline-date">April 2026</div>
+          <div class="timeline-date">March 2026</div>
           <ul class="timeline-features">
             <li>FixPhrase integration (open-source, patent-free What3Words alternative)</li>
             <li>GPX/KML waypoint export via Share sheet</li>
             <li>Elevation and slope calculator tool</li>
-            <li>OLED true black theme (pure #000000 for power savings)</li>
+            <li>OLED true black themes (pure #000000 for power savings)</li>
             <li>Web-based MGRS Tactical Toolkit (single HTML file, zero dependencies)</li>
-            <li>Reproducible build documentation</li>
           </ul>
         </div>
 
-        <div class="timeline-item planned">
+        <div class="timeline-item shipped">
           <div class="timeline-version">V2.6 — Open Source Library</div>
-          <div class="timeline-date">May 2026</div>
+          <div class="timeline-date">March 2026</div>
           <ul class="timeline-features">
             <li>@redgrid/mgrs npm package (DMA TM 8358.1 compliant)</li>
             <li>Standalone MGRS/UTM/FixPhrase conversion library</li>
@@ -290,16 +299,24 @@
           </ul>
         </div>
 
-        <div class="timeline-item planned">
+        <div class="timeline-item shipped">
           <div class="timeline-version">V3.0 — Tactical Map</div>
-          <div class="timeline-date">Summer 2026</div>
+          <div class="timeline-date">March 2026</div>
           <ul class="timeline-features">
             <li>Offline OpenStreetMap tiles (no API key, fully local)</li>
             <li>MGRS grid overlay on map</li>
-            <li>Mission planning (waypoints on map, routes)</li>
+            <li>Mission planning (waypoints on map, routes, nearest-neighbor optimization)</li>
             <li>GPX/KML import</li>
             <li>External GPS support (Garmin GLO, Bad Elf via BLE)</li>
             <li>Meshtastic/LoRa off-grid position sharing</li>
+          </ul>
+        </div>
+
+        <div class="timeline-item shipped">
+          <div class="timeline-version">V3.2 — Polish &amp; Scale</div>
+          <div class="timeline-date">March 2026</div>
+          <ul class="timeline-features">
+            <li>Adjustable grid display scale</li>
           </ul>
         </div>
 
@@ -307,6 +324,7 @@
           <div class="timeline-version">V3.5 — Platform Ecosystem</div>
           <div class="timeline-date">2027</div>
           <ul class="timeline-features">
+            <li>Android public release on Google Play</li>
             <li>iOS Live Activity and Dynamic Island</li>
             <li>iOS StandBy mode</li>
             <li>Apple Watch companion</li>
