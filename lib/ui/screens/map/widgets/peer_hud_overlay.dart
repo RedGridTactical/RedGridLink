@@ -13,6 +13,7 @@ import 'package:red_grid_link/core/theme/tactical_colors.dart';
 import 'package:red_grid_link/core/theme/tactical_text_styles.dart';
 import 'package:red_grid_link/core/utils/geo_utils.dart';
 import 'package:red_grid_link/data/models/peer.dart';
+import 'package:red_grid_link/providers/ble_phy_provider.dart';
 import 'package:red_grid_link/providers/connection_quality_provider.dart';
 import 'package:red_grid_link/providers/theme_provider.dart';
 import 'package:red_grid_link/ui/common/widgets/signal_bars.dart';
@@ -109,8 +110,26 @@ class _PeerChip extends ConsumerWidget {
         children: [
           if (quality != null) ...[
             SignalBars(bars: quality.bars, tier: quality.tier, size: 12),
-            const SizedBox(width: 4),
           ],
+          // Long Range badge when Coded PHY is supported
+          ref.watch(isCodedPhySupportedProvider).when(
+            data: (supported) => supported
+                ? const Padding(
+                    padding: EdgeInsets.only(left: 2),
+                    child: Text(
+                      'LR',
+                      style: TextStyle(
+                        fontSize: 9,
+                        color: Colors.cyan,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  )
+                : const SizedBox.shrink(),
+            loading: () => const SizedBox.shrink(),
+            error: (_, __) => const SizedBox.shrink(),
+          ),
+          const SizedBox(width: 4),
           Text(
             peer.displayName.toUpperCase(),
             style: TacticalTextStyles.dim(colors),
@@ -145,6 +164,24 @@ class _PeerChip extends ConsumerWidget {
             ),
           ),
         ],
+        // Long Range badge when Coded PHY is supported
+        ref.watch(isCodedPhySupportedProvider).when(
+          data: (supported) => supported
+              ? const Padding(
+                  padding: EdgeInsets.only(left: 2),
+                  child: Text(
+                    'LR',
+                    style: TextStyle(
+                      fontSize: 9,
+                      color: Colors.cyan,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                )
+              : const SizedBox.shrink(),
+          loading: () => const SizedBox.shrink(),
+          error: (_, __) => const SizedBox.shrink(),
+        ),
         const SizedBox(width: 4),
         Text(
           peer.displayName.toUpperCase(),
