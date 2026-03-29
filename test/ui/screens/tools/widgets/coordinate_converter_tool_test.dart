@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:red_grid_link/core/theme/tactical_colors.dart';
 import 'package:red_grid_link/ui/screens/tools/widgets/coordinate_converter_tool.dart';
@@ -7,8 +8,10 @@ void main() {
   final colors = getTacticalColors('red');
 
   Widget buildTool() {
-    return MaterialApp(
-      home: CoordinateConverterTool(colors: colors),
+    return ProviderScope(
+      child: MaterialApp(
+        home: CoordinateConverterTool(colors: colors),
+      ),
     );
   }
 

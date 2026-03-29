@@ -1,32 +1,36 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/theme/tactical_colors.dart';
 import '../../../../core/theme/tactical_text_styles.dart';
 import '../../../../core/utils/geo_utils.dart';
 import '../../../../core/utils/haptics.dart';
 import '../../../../core/utils/mgrs.dart';
+import '../../../../providers/fixphrase_provider.dart';
 import '../../../common/widgets/section_header.dart';
 import '../../../common/widgets/tactical_button.dart';
 import '../../../common/widgets/tactical_card.dart';
 
-/// Coordinate Converter: converts between MGRS, Lat/Lon DD, DMS, and UTM.
+/// Coordinate Converter: converts between MGRS, Lat/Lon DD, DMS, UTM,
+/// and FixPhrase.
 ///
 /// Input format is selected via dropdown. Results show all other formats
 /// with tap-to-copy support.
-class CoordinateConverterTool extends StatefulWidget {
+class CoordinateConverterTool extends ConsumerStatefulWidget {
   const CoordinateConverterTool({super.key, required this.colors});
 
   final TacticalColorScheme colors;
 
   @override
-  State<CoordinateConverterTool> createState() =>
+  ConsumerState<CoordinateConverterTool> createState() =>
       _CoordinateConverterToolState();
 }
 
-enum _InputFormat { mgrs, latLonDD, latLonDMS }
+enum _InputFormat { mgrs, latLonDD, latLonDMS, fixPhrase }
 
-class _CoordinateConverterToolState extends State<CoordinateConverterTool> {
+class _CoordinateConverterToolState
+    extends ConsumerState<CoordinateConverterTool> {
   _InputFormat _format = _InputFormat.mgrs;
 
   // MGRS input
@@ -40,6 +44,9 @@ class _CoordinateConverterToolState extends State<CoordinateConverterTool> {
   final _latDmsController = TextEditingController();
   final _lonDmsController = TextEditingController();
 
+  // FixPhrase input
+  final _fixPhraseController = TextEditingController();
+
   // Results
   String? _resultMGRS;
   String? _resultMGRSFormatted;
@@ -48,6 +55,7 @@ class _CoordinateConverterToolState extends State<CoordinateConverterTool> {
   String? _resultLatDMS;
   String? _resultLonDMS;
   String? _resultUTM;
+  String? _resultFixPhrase;
   String? _error;
 
   TacticalColorScheme get colors => widget.colors;
@@ -59,6 +67,7 @@ class _CoordinateConverterToolState extends State<CoordinateConverterTool> {
     _lonController.dispose();
     _latDmsController.dispose();
     _lonDmsController.dispose();
+    _fixPhraseController.dispose();
     super.dispose();
   }
 
@@ -120,7 +129,34 @@ class _CoordinateConverterToolState extends State<CoordinateConverterTool> {
           return;
         }
         break;
+
+      case _InputFormat.fixPhrase:
+        final fpAsync = ref.read(fixPhraseProvider);
+        final fp = fpAsync.valueOrNull;
+        if (fp == null) {
+          setState(() {
+            _error = 'FixPhrase wordlist not loaded yet';
+            _clearResults();
+          });
+          return;
+        }
+        try {
+          final result = fp.decode(_fixPhraseController.text);
+          lat = result.lat;
+          lon = result.lon;
+        } catch (e) {
+          setState(() {
+            _error = 'Invalid FixPhrase: ${e.toString().replaceFirst('Invalid argument(s): ', '')}';
+            _clearResults();
+          });
+          return;
+        }
+        break;
     }
+
+    // Compute FixPhrase result (if provider is loaded)
+    final fpAsync = ref.read(fixPhraseProvider);
+    final fixPhraseResult = fpAsync.valueOrNull?.format(lat, lon);
 
     // Now convert lat/lon to all formats
     final mgrsRaw = toMGRS(lat, lon, 5);
@@ -137,6 +173,7 @@ class _CoordinateConverterToolState extends State<CoordinateConverterTool> {
       _resultLatDMS = latDMS;
       _resultLonDMS = lonDMS;
       _resultUTM = utm;
+      _resultFixPhrase = fixPhraseResult;
     });
     notifySuccess();
   }
@@ -149,6 +186,7 @@ class _CoordinateConverterToolState extends State<CoordinateConverterTool> {
     _resultLatDMS = null;
     _resultLonDMS = null;
     _resultUTM = null;
+    _resultFixPhrase = null;
   }
 
   void _copyResult(String text, String label) {
@@ -212,6 +250,10 @@ class _CoordinateConverterToolState extends State<CoordinateConverterTool> {
                     DropdownMenuItem(
                       value: _InputFormat.latLonDMS,
                       child: Text('Lat/Lon (DMS)'),
+                    ),
+                    DropdownMenuItem(
+                      value: _InputFormat.fixPhrase,
+                      child: Text('FixPhrase'),
                     ),
                   ],
                   onChanged: (v) {
@@ -284,6 +326,16 @@ class _CoordinateConverterToolState extends State<CoordinateConverterTool> {
                 colors: colors,
                 onCopy: () => _copyResult(_resultUTM!, 'UTM'),
               ),
+              if (_resultFixPhrase != null) ...[
+                const SizedBox(height: 8),
+                _ResultRow(
+                  label: 'FIXPHRASE',
+                  value: _resultFixPhrase!,
+                  colors: colors,
+                  onCopy: () =>
+                      _copyResult(_resultFixPhrase!, 'FIXPHRASE'),
+                ),
+              ],
             ],
           ],
         ),
@@ -339,6 +391,18 @@ class _CoordinateConverterToolState extends State<CoordinateConverterTool> {
             controller: _lonDmsController,
             label: 'LONGITUDE (DMS)',
             hint: 'e.g., W 77 02 11.4',
+            colors: colors,
+            onSubmitted: (_) => _convert(),
+            isText: true,
+          ),
+        ];
+
+      case _InputFormat.fixPhrase:
+        return [
+          _InputField(
+            controller: _fixPhraseController,
+            label: 'FIXPHRASE (4 words)',
+            hint: 'e.g., alpha-bravo-charlie-delta',
             colors: colors,
             onSubmitted: (_) => _convert(),
             isText: true,
