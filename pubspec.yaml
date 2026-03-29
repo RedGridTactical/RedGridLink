@@ -69,3 +69,5 @@ flutter_launcher_icons:
 flutter:
   generate: true
   uses-material-design: true
+  assets:
+    - assets/fixphrase_wordlist.json
