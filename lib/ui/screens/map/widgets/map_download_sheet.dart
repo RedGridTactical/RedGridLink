@@ -13,6 +13,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:red_grid_link/core/constants/map_constants.dart';
 import 'package:red_grid_link/core/theme/tactical_colors.dart';
+import 'package:red_grid_link/services/map/tile_manager.dart' show TileSources;
 import 'package:red_grid_link/core/theme/tactical_text_styles.dart';
 import 'package:red_grid_link/core/utils/haptics.dart';
 import 'package:red_grid_link/data/models/entitlement.dart';
@@ -41,6 +42,9 @@ class _MapDownloadSheet extends ConsumerStatefulWidget {
 
 class _MapDownloadSheetState extends ConsumerState<_MapDownloadSheet> {
   final _nameController = TextEditingController(text: 'My Region');
+
+  /// Selected tile source for downloads.
+  String _selectedSource = TileSources.osm;
 
   /// Current download progress (null = not downloading).
   double? _downloadProgress;
@@ -367,6 +371,23 @@ class _MapDownloadSheetState extends ConsumerState<_MapDownloadSheet> {
           ),
           const SizedBox(height: 12),
 
+          // Tile source selector
+          Row(
+            children: [
+              for (final source in TileSources.all)
+                Padding(
+                  padding: const EdgeInsets.only(right: 8),
+                  child: ChoiceChip(
+                    label: Text(TileSources.labelFor(source)),
+                    selected: _selectedSource == source,
+                    onSelected: (_) =>
+                        setState(() => _selectedSource = source),
+                  ),
+                ),
+            ],
+          ),
+          const SizedBox(height: 12),
+
           // Download button
           SizedBox(
             width: double.infinity,
@@ -547,7 +568,7 @@ class _MapDownloadSheetState extends ConsumerState<_MapDownloadSheet> {
     tapMedium();
 
     try {
-      _downloadSub = tileManager.downloadRegion(region).listen(
+      _downloadSub = tileManager.downloadRegion(region, tileSource: _selectedSource).listen(
         (progress) {
           if (mounted) {
             setState(() => _downloadProgress = progress);
