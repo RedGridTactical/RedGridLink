@@ -27,5 +27,8 @@ import UIKit
         // Register Battery platform channel
         batteryChannel = BatteryChannel()
         batteryChannel?.register(with: messenger)
+
+        // Register BLE PHY platform channel (Coded PHY / Long Range)
+        BlePhyChannel.register(with: messenger)
     }
 }
