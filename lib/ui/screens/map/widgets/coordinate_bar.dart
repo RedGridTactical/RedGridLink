@@ -1,8 +1,8 @@
 // Bottom coordinate display bar for the map screen.
 //
-// Shows the current map center in MGRS, the zoom level, and bearing
-// to the last GPS fix (if available). Tapping the MGRS coordinate
-// copies it to the clipboard.
+// Shows the current map center in MGRS or FixPhrase format, the zoom level,
+// and bearing to the last GPS fix (if available). Tapping the coordinate
+// cycles the display format; long-pressing copies to clipboard.
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -10,15 +10,28 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:red_grid_link/core/extensions/latlng_ext.dart';
 import 'package:red_grid_link/core/theme/tactical_colors.dart';
+import 'package:red_grid_link/providers/fixphrase_provider.dart';
 import 'package:red_grid_link/providers/map_provider.dart';
 
-class CoordinateBar extends ConsumerWidget {
+/// Coordinate display formats for the bottom bar.
+enum _CoordFormat { mgrs, fixPhrase }
+
+class CoordinateBar extends ConsumerStatefulWidget {
   final TacticalColorScheme colors;
 
   const CoordinateBar({super.key, required this.colors});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<CoordinateBar> createState() => _CoordinateBarState();
+}
+
+class _CoordinateBarState extends ConsumerState<CoordinateBar> {
+  _CoordFormat _format = _CoordFormat.mgrs;
+
+  TacticalColorScheme get colors => widget.colors;
+
+  @override
+  Widget build(BuildContext context) {
     final center = ref.watch(mapCenterProvider);
     final zoom = ref.watch(mapZoomProvider);
     final service = ref.read(mapControllerServiceProvider);
@@ -26,6 +39,20 @@ class CoordinateBar extends ConsumerWidget {
 
     // Compute MGRS for display
     final mgrsStr = center.toFormattedMGRS();
+
+    // Compute FixPhrase (if provider loaded)
+    final fpAsync = ref.watch(fixPhraseProvider);
+    final fixPhraseStr = fpAsync.valueOrNull?.format(
+      center.latitude,
+      center.longitude,
+    );
+
+    // Determine which string to display
+    final bool showFixPhrase =
+        _format == _CoordFormat.fixPhrase && fixPhraseStr != null;
+    final displayStr = showFixPhrase ? fixPhraseStr : mgrsStr;
+    final formatLabel = showFixPhrase ? 'FP' : 'MGRS';
+    final copyLabel = showFixPhrase ? 'FIXPHRASE' : 'MGRS';
 
     // Compute bearing to last GPS fix (if we have one and it differs)
     String bearingStr = '---';
@@ -50,16 +77,41 @@ class CoordinateBar extends ConsumerWidget {
         top: false,
         child: Row(
           children: [
-            // MGRS coordinate (tappable to copy)
+            // Format indicator chip
+            GestureDetector(
+              onTap: () {
+                setState(() {
+                  _format = _format == _CoordFormat.mgrs
+                      ? _CoordFormat.fixPhrase
+                      : _CoordFormat.mgrs;
+                });
+              },
+              child: _InfoChip(
+                label: formatLabel,
+                colors: colors,
+                icon: Icons.swap_horiz,
+              ),
+            ),
+
+            const SizedBox(width: 6),
+
+            // Coordinate display (tap to cycle, long-press to copy)
             Expanded(
               flex: 3,
               child: GestureDetector(
                 onTap: () {
-                  Clipboard.setData(ClipboardData(text: mgrsStr));
+                  setState(() {
+                    _format = _format == _CoordFormat.mgrs
+                        ? _CoordFormat.fixPhrase
+                        : _CoordFormat.mgrs;
+                  });
+                },
+                onLongPress: () {
+                  Clipboard.setData(ClipboardData(text: displayStr));
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
                       content: Text(
-                        'MGRS COPIED',
+                        '$copyLabel COPIED',
                         style: TextStyle(
                           fontFamily: 'monospace',
                           color: colors.text,
@@ -73,7 +125,7 @@ class CoordinateBar extends ConsumerWidget {
                   );
                 },
                 child: Text(
-                  mgrsStr,
+                  displayStr,
                   style: TextStyle(
                     fontFamily: 'monospace',
                     fontSize: 13,
