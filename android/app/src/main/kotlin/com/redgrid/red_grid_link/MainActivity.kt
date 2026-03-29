@@ -16,6 +16,7 @@ class MainActivity : FlutterActivity() {
     private var nearbyConnectionsChannel: NearbyConnectionsChannel? = null
     private var batteryChannel: BatteryChannel? = null
     private var mainMethodChannel: MethodChannel? = null
+    private var blePhyChannel: MethodChannel? = null
 
     override fun configureFlutterEngine(flutterEngine: FlutterEngine) {
         super.configureFlutterEngine(flutterEngine)
@@ -28,6 +29,14 @@ class MainActivity : FlutterActivity() {
         // Register Battery platform channel
         batteryChannel = BatteryChannel(this).also {
             it.register(flutterEngine)
+        }
+
+        // Register BLE PHY platform channel (Coded PHY / Long Range)
+        blePhyChannel = MethodChannel(
+            flutterEngine.dartExecutor.binaryMessenger,
+            BlePhyChannel.CHANNEL_NAME,
+        ).also {
+            it.setMethodCallHandler(BlePhyChannel(this))
         }
 
         // Register main method channel (foreground service control)
@@ -50,6 +59,9 @@ class MainActivity : FlutterActivity() {
 
         mainMethodChannel?.setMethodCallHandler(null)
         mainMethodChannel = null
+
+        blePhyChannel?.setMethodCallHandler(null)
+        blePhyChannel = null
 
         super.cleanUpFlutterEngine(flutterEngine)
     }
