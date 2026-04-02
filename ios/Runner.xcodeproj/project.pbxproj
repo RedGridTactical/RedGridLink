@@ -18,6 +18,7 @@
 		97C147011CF9000F007C117D /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 97C146FF1CF9000F007C117D /* LaunchScreen.storyboard */; };
 		7884E86A2EC3CD0100C636F2 /* MultipeerChannel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7884E8692EC3CD0100C636F2 /* MultipeerChannel.swift */; };
 		7884E86C2EC3CD0200C636F2 /* BatteryChannel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7884E86B2EC3CD0200C636F2 /* BatteryChannel.swift */; };
+		7884E8702EC3CE0300C636F2 /* BlePhyChannel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7884E86F2EC3CE0200C636F2 /* BlePhyChannel.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -54,6 +55,7 @@
 		7884E8672EC3CC0400C636F2 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
 		7884E8692EC3CD0100C636F2 /* MultipeerChannel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MultipeerChannel.swift; sourceTree = "<group>"; };
 		7884E86B2EC3CD0200C636F2 /* BatteryChannel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BatteryChannel.swift; sourceTree = "<group>"; };
+		7884E86F2EC3CE0200C636F2 /* BlePhyChannel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BlePhyChannel.swift; sourceTree = "<group>"; };
 		7AFA3C8E1D35360C0083082E /* Release.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; name = Release.xcconfig; path = Flutter/Release.xcconfig; sourceTree = "<group>"; };
 		9740EEB21CF90195004384FC /* Debug.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; name = Debug.xcconfig; path = Flutter/Debug.xcconfig; sourceTree = "<group>"; };
 		9740EEB31CF90195004384FC /* Generated.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; name = Generated.xcconfig; path = Flutter/Generated.xcconfig; sourceTree = "<group>"; };
@@ -128,6 +130,7 @@
 				7884E8672EC3CC0400C636F2 /* SceneDelegate.swift */,
 				7884E8692EC3CD0100C636F2 /* MultipeerChannel.swift */,
 				7884E86B2EC3CD0200C636F2 /* BatteryChannel.swift */,
+				7884E86F2EC3CE0200C636F2 /* BlePhyChannel.swift */,
 				74858FAD1ED2DC5600515810 /* Runner-Bridging-Header.h */,
 			);
 			path = Runner;
@@ -286,6 +289,7 @@
 				7884E8682EC3CC0700C636F2 /* SceneDelegate.swift in Sources */,
 				7884E86A2EC3CD0100C636F2 /* MultipeerChannel.swift in Sources */,
 				7884E86C2EC3CD0200C636F2 /* BatteryChannel.swift in Sources */,
+				7884E8702EC3CE0300C636F2 /* BlePhyChannel.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
