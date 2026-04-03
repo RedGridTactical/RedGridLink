@@ -24,6 +24,8 @@ class RedGridLinkApp extends ConsumerWidget {
     final hasCompletedOnboarding = ref.watch(hasCompletedOnboardingProvider);
     // Wire RSSI polling callbacks so signal bars work during BLE sessions.
     ref.watch(rssiWiringProvider);
+    // Wire remote emergency state so alert overlay shows for remote SOS.
+    ref.watch(emergencyWiringProvider);
 
     return MaterialApp(
       title: 'Red Grid Link',

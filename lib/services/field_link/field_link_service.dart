@@ -110,6 +110,11 @@ class FieldLinkService {
   /// Callback invoked when RSSI data should be cleared (e.g., session end).
   void Function()? onRssiClear;
 
+  /// Callback invoked when the emergency state changes (remote SOS
+  /// received or cancelled). Set by the provider layer to feed
+  /// [emergencyActiveProvider].
+  void Function(bool active)? onEmergencyStateChanged;
+
   FieldLinkService({
     required TransportService transport,
     required SyncEngine syncEngine,
@@ -284,7 +289,7 @@ class FieldLinkService {
     await _sessionRepository.deactivateAll();
 
     _emergencyBeacon.dispose();
-    _messageService.clear();
+    _messageService.reset();
     _roleManager.reset();
     _boundaryManager.clearBoundary();
     _keyExchangeManager.reset();
@@ -665,16 +670,13 @@ class FieldLinkService {
 
   /// Broadcast the local ECDH public key to all connected peers.
   ///
-  /// Initializes the key exchange manager (generating a key pair) if it
-  /// hasn't been done yet, then broadcasts a `key_exchange` control
-  /// message containing the local public key.
+  /// If the key exchange manager has not been initialized (no active
+  /// session), this is a no-op. We intentionally avoid calling
+  /// `initialize()` here because that would regenerate the private key,
+  /// invalidating all previously derived peer secrets.
   void _broadcastPublicKey() {
-    if (_keyExchangeManager.localPublicKey == null) {
-      _keyExchangeManager.initialize();
-    }
-
     final pubKey = _keyExchangeManager.localPublicKey;
-    if (pubKey == null) return;
+    if (pubKey == null) return; // session not active
 
     _syncEngine.broadcastControl({
       'evt': 'key_exchange',
@@ -703,9 +705,11 @@ class FieldLinkService {
         break;
       case 'emergency':
         _emergencyBeacon.handleRemoteEmergency(event.senderId, event.data);
+        onEmergencyStateChanged?.call(true);
         break;
       case 'emergency_cancel':
         _emergencyBeacon.handleRemoteCancel(event.senderId);
+        onEmergencyStateChanged?.call(false);
         break;
       case 'message':
         final callsign = _roleManager.callsignForPeer(event.senderId);
@@ -727,7 +731,10 @@ class FieldLinkService {
   ///
   /// Derives a shared secret from the peer's public key via
   /// [KeyExchangeManager] and sends our public key back so the peer
-  /// can also derive the shared secret.
+  /// can also derive the shared secret. If the local key pair has not
+  /// been initialized (no active session), the message is silently
+  /// dropped — we never call `initialize()` defensively because that
+  /// would regenerate the private key and invalidate existing secrets.
   void _handleKeyExchange(String peerId, Map<String, dynamic> data) {
     final peerPubKey = data['pub'] as String?;
     if (peerPubKey == null || peerPubKey.isEmpty) return;
@@ -735,10 +742,8 @@ class FieldLinkService {
     // If we already have a shared key for this peer, skip derivation.
     if (_keyExchangeManager.hasKeyForPeer(peerId)) return;
 
-    // Ensure we have a local key pair.
-    if (_keyExchangeManager.localPublicKey == null) {
-      _keyExchangeManager.initialize();
-    }
+    // Not initialized — session not active, drop the message.
+    if (_keyExchangeManager.localPublicKey == null) return;
 
     // Derive the shared secret from the peer's public key.
     _keyExchangeManager.handlePeerPublicKey(peerId, peerPubKey);

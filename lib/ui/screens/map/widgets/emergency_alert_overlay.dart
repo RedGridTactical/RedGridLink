@@ -30,6 +30,13 @@ class _EmergencyAlertOverlayState extends ConsumerState<EmergencyAlertOverlay> {
 
   @override
   Widget build(BuildContext context) {
+    // Re-arm overlay when a new emergency arrives after acknowledgement.
+    ref.listen<bool>(emergencyActiveProvider, (previous, next) {
+      if (previous == false && next == true) {
+        setState(() => _acknowledged = false);
+      }
+    });
+
     final isActive = ref.watch(emergencyActiveProvider);
 
     if (!isActive || _acknowledged) {

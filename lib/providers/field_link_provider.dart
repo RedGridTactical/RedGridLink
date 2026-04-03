@@ -7,6 +7,7 @@ import 'package:red_grid_link/data/models/peer.dart';
 import 'package:red_grid_link/data/models/session.dart';
 import 'package:red_grid_link/data/models/team_role.dart';
 import 'package:red_grid_link/providers/connection_quality_provider.dart';
+import 'package:red_grid_link/providers/emergency_beacon_provider.dart';
 import 'package:red_grid_link/services/field_link/battery/battery_manager.dart';
 import 'package:red_grid_link/services/field_link/field_link_service.dart';
 
@@ -47,6 +48,28 @@ final rssiWiringProvider = Provider<void>((ref) {
   ref.onDispose(() {
     service.onRssiReading = null;
     service.onRssiClear = null;
+  });
+});
+
+/// Wires remote emergency state changes from [FieldLinkService] to
+/// [emergencyActiveProvider] so the alert overlay reacts to remote SOS.
+///
+/// Watch this provider early (e.g., in the app shell) alongside
+/// [rssiWiringProvider]. Safe to watch when the service is not overridden.
+final emergencyWiringProvider = Provider<void>((ref) {
+  final FieldLinkService service;
+  try {
+    service = ref.watch(fieldLinkServiceProvider);
+  } on UnimplementedError {
+    return;
+  }
+
+  service.onEmergencyStateChanged = (active) {
+    ref.read(emergencyActiveProvider.notifier).state = active;
+  };
+
+  ref.onDispose(() {
+    service.onEmergencyStateChanged = null;
   });
 });
 

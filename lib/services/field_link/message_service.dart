@@ -27,6 +27,11 @@ class MessageService {
     _history.clear();
   }
 
+  /// Reset for new session (clears history, keeps controller open).
+  void reset() {
+    _history.clear();
+  }
+
   void dispose() {
     _messageController.close();
   }
