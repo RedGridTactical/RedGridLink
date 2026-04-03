@@ -17,6 +17,7 @@ import 'package:red_grid_link/services/field_link/battery/battery_manager.dart';
 import 'package:red_grid_link/services/field_link/boundary_manager.dart';
 import 'package:red_grid_link/services/field_link/ghost/ghost_manager.dart';
 import 'package:red_grid_link/services/field_link/role_manager.dart';
+import 'package:red_grid_link/services/field_link/security/key_exchange_manager.dart';
 import 'package:red_grid_link/services/field_link/sync/crdt/crdt_state.dart';
 import 'package:red_grid_link/services/field_link/sync/sync_engine.dart';
 import 'package:red_grid_link/services/field_link/transport/ble_transport.dart';
@@ -61,9 +62,17 @@ class FieldLinkService {
   late final RoleManager _roleManager;
   late final BoundaryManager _boundaryManager;
 
+  /// Manages ECDH P-256 key exchange for all connected peers.
+  ///
+  /// Encapsulates key pair generation, per-peer shared secret derivation,
+  /// and key lifecycle. Replaces the previous inline KeyExchange + Map.
+  final KeyExchangeManager _keyExchangeManager = KeyExchangeManager();
+
   Session? _activeSession;
   StreamSubscription<TransportState>? _transportStateSub;
   StreamSubscription<CrdtState>? _syncStateSub;
+  StreamSubscription<({String senderId, Map<String, dynamic> data})>?
+      _controlSub;
   Timer? _batteryPollTimer;
   Timer? _reconnectTimer;
 
@@ -165,6 +174,7 @@ class FieldLinkService {
     await _sessionRepository.createSession(session);
     _activeSession = session;
     _roleManager.initializeAsCreator();
+    _keyExchangeManager.initialize();
     _emitSession();
 
     // Determine sync config from mode.
@@ -225,6 +235,7 @@ class FieldLinkService {
 
     _activeSession = session.copyWith(isActive: true);
     _roleManager.initializeAsJoiner();
+    _keyExchangeManager.initialize();
     _emitSession();
 
     final config = _configForMode(session.operationalMode);
@@ -269,6 +280,7 @@ class FieldLinkService {
 
     _roleManager.reset();
     _boundaryManager.clearBoundary();
+    _keyExchangeManager.reset();
     _activeSession = null;
     _emitSession();
     _setStatus(FieldLinkStatus.idle);
@@ -323,6 +335,15 @@ class FieldLinkService {
 
   /// The boundary manager for geofence alerts.
   BoundaryManager get boundaryManager => _boundaryManager;
+
+  /// Per-peer ECDH-derived shared keys (read-only view).
+  ///
+  /// Returns a map of deviceId -> base64url shared key for all peers
+  /// that have completed the ECDH key exchange handshake.
+  Map<String, String> get peerKeys => _keyExchangeManager.peerKeys;
+
+  /// The key exchange manager for per-peer encryption key derivation.
+  KeyExchangeManager get keyExchangeManager => _keyExchangeManager;
 
   /// Stream of boundary crossing events (local user or peers exiting).
   Stream<BoundaryEvent> get boundaryEventStream =>
@@ -482,6 +503,7 @@ class FieldLinkService {
     // Cancel existing subscriptions to avoid leaking listeners.
     await _transportStateSub?.cancel();
     await _syncStateSub?.cancel();
+    await _controlSub?.cancel();
 
     // Listen for transport state changes.
     _transportStateSub = _transport.stateStream.listen(_onTransportState);
@@ -489,12 +511,16 @@ class FieldLinkService {
     // Listen for CRDT state changes to update peer list and detect
     // disconnections for ghost management.
     _syncStateSub = _syncEngine.stateStream.listen(_onSyncStateChanged);
+
+    // Listen for incoming control messages (key exchange, role, etc.).
+    _controlSub = _syncEngine.controlStream.listen(_onControlMessage);
   }
 
   /// Dispose all resources. The service should not be used after this.
   Future<void> dispose() async {
     await _transportStateSub?.cancel();
     await _syncStateSub?.cancel();
+    await _controlSub?.cancel();
     _reconnectTimer?.cancel();
     _reconnectTimer = null;
     _stopRssiPolling();
@@ -524,6 +550,8 @@ class FieldLinkService {
         _setStatus(FieldLinkStatus.connected);
         // Start RSSI polling if transport is BLE.
         _startRssiPolling();
+        // Broadcast ECDH public key to newly connected peers.
+        _broadcastPublicKey();
         break;
       case TransportState.discovering:
         if (_status != FieldLinkStatus.connected) {
@@ -582,6 +610,75 @@ class FieldLinkService {
         _attemptReconnect();
       }
     });
+  }
+
+  /// Broadcast the local ECDH public key to all connected peers.
+  ///
+  /// Initializes the key exchange manager (generating a key pair) if it
+  /// hasn't been done yet, then broadcasts a `key_exchange` control
+  /// message containing the local public key.
+  void _broadcastPublicKey() {
+    if (_keyExchangeManager.localPublicKey == null) {
+      _keyExchangeManager.initialize();
+    }
+
+    final pubKey = _keyExchangeManager.localPublicKey;
+    if (pubKey == null) return;
+
+    _syncEngine.broadcastControl({
+      'evt': 'key_exchange',
+      'pub': pubKey,
+    });
+  }
+
+  /// Handle an incoming control message from the sync engine.
+  ///
+  /// Dispatches to the appropriate handler based on the `evt` field:
+  /// - `key_exchange`: ECDH public key from a peer
+  /// - `role_assign`, `callsign_update`: forwarded to [RoleManager]
+  /// - `boundary_exit`: boundary crossing notification
+  void _onControlMessage(
+    ({String senderId, Map<String, dynamic> data}) event,
+  ) {
+    final evt = event.data['evt'] as String?;
+
+    switch (evt) {
+      case 'key_exchange':
+        _handleKeyExchange(event.senderId, event.data);
+        break;
+      case 'role_assign':
+      case 'callsign_update':
+        _roleManager.handleControlEvent(event.data, event.senderId);
+        break;
+      default:
+        // Other control events (boundary_exit, join, leave, etc.) are
+        // handled elsewhere or are informational.
+        break;
+    }
+  }
+
+  /// Handle an incoming `key_exchange` control message from a peer.
+  ///
+  /// Derives a shared secret from the peer's public key via
+  /// [KeyExchangeManager] and sends our public key back so the peer
+  /// can also derive the shared secret.
+  void _handleKeyExchange(String peerId, Map<String, dynamic> data) {
+    final peerPubKey = data['pub'] as String?;
+    if (peerPubKey == null || peerPubKey.isEmpty) return;
+
+    // If we already have a shared key for this peer, skip derivation.
+    if (_keyExchangeManager.hasKeyForPeer(peerId)) return;
+
+    // Ensure we have a local key pair.
+    if (_keyExchangeManager.localPublicKey == null) {
+      _keyExchangeManager.initialize();
+    }
+
+    // Derive the shared secret from the peer's public key.
+    _keyExchangeManager.handlePeerPublicKey(peerId, peerPubKey);
+
+    // Send our public key back so the peer can derive the same secret.
+    _broadcastPublicKey();
   }
 
   /// Handle CRDT state changes from the sync engine.
