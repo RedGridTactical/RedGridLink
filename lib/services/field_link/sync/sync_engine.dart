@@ -11,6 +11,13 @@ import 'package:red_grid_link/services/field_link/sync/crdt/crdt_state.dart';
 import 'package:red_grid_link/services/field_link/sync/delta_encoder.dart';
 import 'package:red_grid_link/services/field_link/transport/transport_service.dart';
 
+/// A control message received from a peer via the sync engine.
+class ControlMessage {
+  final String senderId;
+  final Map<String, dynamic> data;
+  const ControlMessage({required this.senderId, required this.data});
+}
+
 /// Main sync orchestrator for Field Link.
 ///
 /// The sync engine sits between the transport layer (BLE / P2P) and the
@@ -45,8 +52,18 @@ class SyncEngine {
   final StreamController<CrdtState> _stateController =
       StreamController<CrdtState>.broadcast();
 
+  final StreamController<ControlMessage> _controlController =
+      StreamController<ControlMessage>.broadcast();
+
   /// Stream of CRDT state updates for UI consumption.
   Stream<CrdtState> get stateStream => _stateController.stream;
+
+  /// Stream of incoming control messages (senderId + data payload).
+  ///
+  /// Emitted for every control-type [SyncPayload] received from a peer.
+  /// Subscribers (e.g., [FieldLinkService]) use this to handle events
+  /// like key_exchange, role_assign, callsign_update, etc.
+  Stream<ControlMessage> get controlStream => _controlController.stream;
 
   /// The current CRDT state snapshot.
   CrdtState get currentState => _state;
@@ -148,6 +165,7 @@ class SyncEngine {
     _heartbeatTimer?.cancel();
     _incomingSub?.cancel();
     _stateController.close();
+    _controlController.close();
     _isRunning = false;
   }
 
@@ -289,6 +307,14 @@ class SyncEngine {
 
       // Persist side-effects to SQLite.
       await _persistDelta(payload);
+
+      // Emit control messages on the dedicated control stream so that
+      // FieldLinkService can handle key_exchange, role_assign, etc.
+      if (payload.type == SyncPayloadType.control &&
+          !_controlController.isClosed) {
+        _controlController
+            .add(ControlMessage(senderId: payload.senderId, data: payload.data));
+      }
 
       _emitState();
     } catch (e) {

@@ -76,8 +76,7 @@ class FieldLinkService {
   Session? _activeSession;
   StreamSubscription<TransportState>? _transportStateSub;
   StreamSubscription<CrdtState>? _syncStateSub;
-  StreamSubscription<({String senderId, Map<String, dynamic> data})>?
-      _controlSub;
+  StreamSubscription<ControlMessage>? _controlSub;
   Timer? _batteryPollTimer;
   Timer? _reconnectTimer;
 
@@ -690,9 +689,7 @@ class FieldLinkService {
   /// - `key_exchange`: ECDH public key from a peer
   /// - `role_assign`, `callsign_update`: forwarded to [RoleManager]
   /// - `boundary_exit`: boundary crossing notification
-  void _onControlMessage(
-    ({String senderId, Map<String, dynamic> data}) event,
-  ) {
+  void _onControlMessage(ControlMessage event) {
     final evt = event.data['evt'] as String?;
 
     switch (evt) {
