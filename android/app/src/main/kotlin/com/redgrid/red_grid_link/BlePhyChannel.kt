@@ -11,6 +11,10 @@ import io.flutter.plugin.common.MethodChannel
  *
  * On Android 8.0+ (API 26), checks if the Bluetooth adapter supports
  * LE Coded PHY for extended range (400m-1km vs ~50m standard BLE).
+ *
+ * NOTE: Actual PHY negotiation (setPreferredPhy) is handled by
+ * flutter_blue_plus on the Dart side via BluetoothDevice.setPreferredPhy().
+ * This channel is only used for checking hardware support.
  */
 class BlePhyChannel(private val context: Context) : MethodChannel.MethodCallHandler {
 

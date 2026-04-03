@@ -8,6 +8,7 @@ import 'package:red_grid_link/core/constants/ble_constants.dart';
 import 'package:red_grid_link/core/constants/sync_constants.dart';
 import 'package:red_grid_link/core/errors/app_exceptions.dart';
 import 'package:red_grid_link/data/models/peer.dart';
+import 'package:red_grid_link/services/field_link/transport/ble_phy_service.dart';
 import 'package:red_grid_link/services/field_link/transport/transport_service.dart';
 
 /// BLE transport implementation using flutter_blue_plus (central mode).
@@ -24,6 +25,13 @@ import 'package:red_grid_link/services/field_link/transport/transport_service.da
 ///
 /// For full mesh advertising a native platform channel is needed (Phase 7).
 class BleTransport implements TransportService {
+  /// Creates a BLE transport.
+  ///
+  /// An optional [BlePhyService] can be provided for testing; defaults to a
+  /// new instance that uses the real platform channel + flutter_blue_plus.
+  BleTransport({BlePhyService? phyService})
+      : _phyService = phyService ?? BlePhyService();
+
   // ---------------------------------------------------------------------------
   // Transport metadata
   // ---------------------------------------------------------------------------
@@ -94,6 +102,16 @@ class BleTransport implements TransportService {
 
   /// Reconnection attempt counts (for exponential back-off).
   final Map<String, int> _reconnectAttempts = {};
+
+  /// BLE PHY service for Coded PHY (Long Range) negotiation.
+  final BlePhyService _phyService;
+
+  /// Whether Coded PHY was requested for a specific peer.
+  bool isPeerCodedPhy(String deviceId) =>
+      _phyService.isCodedPhyRequested(deviceId);
+
+  /// All device IDs with Coded PHY requested.
+  Set<String> get codedPhyPeers => _phyService.codedPhyPeers;
 
   /// Maximum number of consecutive reconnection attempts before giving up.
   static const int _maxReconnectAttempts = 5;
@@ -314,6 +332,14 @@ class BleTransport implements TransportService {
       }
       _negotiatedMtu[deviceId] = mtu;
 
+      // Request Coded PHY for extended range (Android only, iOS auto-negotiates).
+      // This is best-effort — connection works fine on standard LE 1M PHY.
+      try {
+        await _phyService.requestCodedPhyOnDevice(device);
+      } catch (_) {
+        // PHY request is non-fatal.
+      }
+
       // Discover services, cache writable characteristic, and subscribe.
       final services = await device.discoverServices();
       await _subscribeToCharacteristics(deviceId, device, services);
@@ -353,6 +379,7 @@ class BleTransport implements TransportService {
     _reconnectAttempts.remove(deviceId);
     _chunkBuffers.remove(deviceId);
     _writableCharCache.remove(deviceId);
+    _phyService.clearDevice(deviceId);
 
     // Cancel connection state subscription.
     await _connectionStateSubs.remove(deviceId)?.cancel();

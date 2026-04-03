@@ -44,7 +44,7 @@ class PeerHudOverlay extends ConsumerWidget {
     if (peers.isEmpty) return const SizedBox.shrink();
 
     final colors = ref.watch(currentThemeProvider);
-    final isLrSupported = ref.watch(isCodedPhySupportedProvider).valueOrNull ?? false;
+    final codedPhyPeers = ref.watch(peerCodedPhyProvider);
 
     return Positioned(
       top: 8,
@@ -73,7 +73,7 @@ class PeerHudOverlay extends ConsumerWidget {
                       myLat: myLat,
                       myLon: myLon,
                       colors: colors,
-                      isLrSupported: isLrSupported,
+                      isLrSupported: codedPhyPeers.contains(peer.id),
                     ),
                   );
                 }),
@@ -115,7 +115,7 @@ class _PeerChip extends ConsumerWidget {
           if (quality != null) ...[
             SignalBars(bars: quality.bars, tier: quality.tier, size: 12),
           ],
-          // Long Range badge when Coded PHY is supported
+          // Long Range badge when Coded PHY was negotiated for this peer
           if (isLrSupported)
             const Padding(
               padding: EdgeInsets.only(left: 2),
