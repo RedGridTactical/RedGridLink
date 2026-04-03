@@ -50,7 +50,7 @@ definitions:
       script: dart run build_runner build --delete-conflicting-outputs
     - &run_tests
       name: Run tests
-      script: flutter test || echo "WARNING: Some tests failed. Continuing build."
+      script: flutter test
       ignore_failure: true
 
 workflows:
