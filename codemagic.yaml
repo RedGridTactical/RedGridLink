@@ -93,9 +93,10 @@ workflows:
           EOF
       - name: Build Android App Bundle
         script: |
+          BUILD_NUM=$((PROJECT_BUILD_NUMBER + 200))
           flutter build appbundle \
             --release \
-            --build-number=$PROJECT_BUILD_NUMBER
+            --build-number=$BUILD_NUM
     artifacts:
       - build/app/outputs/bundle/release/*.aab
       - build/app/outputs/mapping/release/mapping.txt
@@ -154,9 +155,12 @@ workflows:
           xcode-project use-profiles
       - name: Build IPA
         script: |
+          # Build number must be higher than previous upload (123).
+          # Use Codemagic build index + 200 offset to ensure monotonic increase.
+          BUILD_NUM=$((PROJECT_BUILD_NUMBER + 200))
           flutter build ipa \
             --release \
-            --build-number=$PROJECT_BUILD_NUMBER \
+            --build-number=$BUILD_NUM \
             --export-options-plist=/Users/builder/export_options.plist
     artifacts:
       - build/ios/ipa/*.ipa
