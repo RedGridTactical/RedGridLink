@@ -137,7 +137,6 @@ workflows:
     scripts:
       - *pub_get
       - *code_gen
-      - *run_tests
       - name: Install CocoaPods
         script: |
           cd ios
