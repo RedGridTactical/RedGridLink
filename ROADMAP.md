@@ -19,65 +19,44 @@ BLE Long Range, signal quality, FixPhrase location encoding, OSM offline tiles.
 
 ---
 
-## V1.5 — Security + Communication
+## V1.5 — Security + Communication (COMPLETE)
 
-**Target: April 2026** — PRIORITY: Fix security claims, add communication
+**Status: Complete** — App v1.5.0+64
 
-### P0 — Security (Week 1)
-- [ ] Wire ECDH P-256 key exchange into BLE connection handshake (code exists in key_exchange.dart, never called)
-- [ ] Per-peer session key derivation (replace single pre-shared key)
-- [ ] Wire actual BLE Coded PHY negotiation on Android (setPreferredPhy, not just isSupported)
-- [ ] Track actual negotiated PHY per connection (LR badge only when Coded PHY confirmed)
-- [ ] Audit all documentation claims against codebase reality
+Real ECDH key exchange, actual Coded PHY negotiation, emergency beacon, tactical messaging.
 
-### P1 — Emergency + Messaging (Weeks 2-3)
-- [ ] Emergency beacon: one-tap SOS with GPS, retransmits every 30s until cancelled
-- [ ] Lead receives full-screen distress alert with sender position/distance/bearing
-- [ ] Pre-canned tactical messages (8 messages + 160-char free text)
-- [ ] Message display as notification banner with sender callsign
-- [ ] Route messages through existing CRDT sync (SyncPayloadType.message)
-
-### P2 — Measurement (Week 3)
-- [ ] Firebase Analytics (session events, peer connections, mode usage, tool usage)
-- [ ] Consent mode for EU users (disable collection until consent)
-- [ ] F-Droid build flavor preparation (Firebase-free variant)
-- [ ] Post-session debrief screen (duration, distance, tracks, review prompt)
+- [x] ECDH P-256 key exchange wired into BLE connection handshake (per-peer derived keys)
+- [x] Actual BLE Coded PHY negotiation on Android (setPreferredPhy S8 after connection)
+- [x] Per-connection PHY tracking (LR badge only when Coded PHY confirmed)
+- [x] Emergency beacon: one-tap SOS with GPS, 30s retransmit, full-screen alert on all peers
+- [x] Pre-canned tactical messages (7 types + 160-char free text) over CRDT control system
+- [x] Message notification banners with sender callsign and auto-dismiss
+- [x] 1,088 tests, 0 warnings
 
 ---
 
-## V1.6 — Meshtastic Bridge
+## V1.6 — Meshtastic Bridge + Android Launch
 
-**Target: May 2026** — Range multiplier + community capture
+**Target: May-June 2026** — Range multiplier + Android production
 
+### Meshtastic Bridge
 - [ ] Meshtastic BLE bridge via `meshtastic_flutter` pub.dev package
 - [ ] Auto-detect Meshtastic nodes by GATT service UUID
 - [ ] Translate Field Link positions to/from Meshtastic Position messages
 - [ ] Bridge mode UI: "Extend range via LoRa?" prompt when radio detected
 - [ ] LoRa-relayed peers shown with mesh icon (distinct from BLE peers)
 - [ ] Fallback: BLE direct when no radio, LoRa when available
-- [ ] Show HN post #2: "Red Grid Link now bridges to Meshtastic"
 
----
-
-## V1.7 — Distribution + Production
-
-**Target: June 2026** — Requires LLC business accounts (D-U-N-S pending)
-
-### Store Accounts
-- [ ] Convert Apple ASC to organization account (Estus Holdings LLC)
+### Android Launch + Distribution
+- [ ] Convert Apple ASC to organization account (Estus Holdings LLC, D-U-N-S pending)
 - [ ] Create Google Play organization account
-- [ ] Promote iOS to production (bypasses TestFlight external review)
-- [ ] Promote Android to production track
-
-### Distribution
-- [ ] F-Droid submission (Firebase-free build flavor, FLOSS-compliant)
+- [ ] Promote Android to production track on Play Store
 - [ ] Android QA on physical devices (Pixel, Samsung, OnePlus minimum)
-- [ ] BetaList submission for tester recruitment
-- [ ] Product Hunt launch
-
-### Retention
+- [ ] F-Droid submission (Firebase-free build flavor, FLOSS-compliant)
+- [ ] Firebase Analytics integration
+- [ ] BetaList submission + Product Hunt launch
 - [ ] Session templates (SAR Hasty Search, Hunting Party, Family Hike, Training Exercise)
-- [ ] Session history with stats (creates "training log" effect)
+- [ ] Show HN post #2: "Red Grid Link now bridges to Meshtastic"
 
 ---
 

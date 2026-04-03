@@ -12,7 +12,7 @@
 [![MGRS Native](https://img.shields.io/badge/MGRS-Native-CC0000)]()
 [![AES-256](https://img.shields.io/badge/Encryption-AES--256--GCM-8B0000)]()
 [![Flutter](https://img.shields.io/badge/Built%20with-Flutter-CC0000?logo=flutter)]()
-[![Tests](https://img.shields.io/badge/Tests-1034%20Passing-brightgreen)]()
+[![Tests](https://img.shields.io/badge/Tests-1088%20Passing-brightgreen)]()
 [![Platform](https://img.shields.io/badge/Platform-iOS%20%7C%20Android%20Beta-8B0000)]()
 [![PRs Welcome](https://img.shields.io/badge/PRs-Welcome-CC0000)](https://github.com/RedGridTactical/RedGridLink/pulls)
 [![Buy Me a Coffee](https://img.shields.io/badge/Buy%20Me%20a%20Coffee-Support-FFDD00?logo=buymeacoffee&logoColor=black)](https://buymeacoffee.com/redgridtac0)
@@ -75,6 +75,9 @@ Assign roles (Lead, Scout, Medic, Comms, custom) with callsigns. Lead controls t
 
 ### Extended Range + Navigation (V1.4)
 BLE Long Range (Coded PHY) extends range from ~100m to 400m-1km on supported devices. Live RSSI signal bars show connection quality for each teammate with warnings when signal weakens. FixPhrase encodes any location as 4 easy-to-remember words (~11m accuracy, order-independent). Choose between OpenStreetMap or OpenTopoMap when downloading offline regions. Coordinate bar cycles between MGRS and FixPhrase display.
+
+### Security + Communication (V1.5)
+Real ECDH P-256 key exchange with per-peer derived encryption keys. Actual BLE Coded PHY negotiation for extended range on Android. One-tap emergency beacon sends GPS coordinates to all team members with 30-second retransmission. 7 pre-canned tactical messages (HELP, STOP, RALLY ON ME, ALL CLEAR, FOUND SOMETHING, HEADING BACK, NEED SUPPLIES) plus 160-character free text over encrypted CRDT sync.
 
 ### After-Action Reports
 One-tap PDF export: map snapshot, mission timeline, track data, timestamps, team roster with roles, per-member tracks, boundary events, markers, and session log. Share via AirDrop, file share, or any local transfer.
