@@ -15,6 +15,7 @@ import 'package:red_grid_link/data/repositories/session_repository.dart';
 import 'package:red_grid_link/data/models/team_role.dart';
 import 'package:red_grid_link/services/field_link/battery/battery_manager.dart';
 import 'package:red_grid_link/services/field_link/boundary_manager.dart';
+import 'package:red_grid_link/services/field_link/emergency_beacon_service.dart';
 import 'package:red_grid_link/services/field_link/ghost/ghost_manager.dart';
 import 'package:red_grid_link/services/field_link/role_manager.dart';
 import 'package:red_grid_link/services/field_link/security/key_exchange_manager.dart';
@@ -61,6 +62,7 @@ class FieldLinkService {
   final String _localDeviceId;
   late final RoleManager _roleManager;
   late final BoundaryManager _boundaryManager;
+  final EmergencyBeaconService _emergencyBeacon = EmergencyBeaconService();
 
   /// Manages ECDH P-256 key exchange for all connected peers.
   ///
@@ -278,6 +280,7 @@ class FieldLinkService {
     // Deactivate session.
     await _sessionRepository.deactivateAll();
 
+    _emergencyBeacon.dispose();
     _roleManager.reset();
     _boundaryManager.clearBoundary();
     _keyExchangeManager.reset();
@@ -348,6 +351,33 @@ class FieldLinkService {
   /// Stream of boundary crossing events (local user or peers exiting).
   Stream<BoundaryEvent> get boundaryEventStream =>
       _boundaryEventController.stream;
+
+  /// The emergency beacon service for SOS functionality.
+  EmergencyBeaconService get emergencyBeacon => _emergencyBeacon;
+
+  /// Activate the local emergency beacon.
+  ///
+  /// Broadcasts an emergency distress signal with the given GPS
+  /// coordinates to all connected peers. Retransmits every 30 seconds
+  /// until [deactivateEmergencyBeacon] is called.
+  void activateEmergencyBeacon(double lat, double lon) {
+    _emergencyBeacon.activate(
+      localDeviceId: _localDeviceId,
+      lat: lat,
+      lon: lon,
+      onBroadcast: (payload) => _syncEngine.broadcastControl(payload),
+    );
+  }
+
+  /// Deactivate the local emergency beacon.
+  ///
+  /// Cancels the retransmit timer and broadcasts an emergency_cancel
+  /// control message to all connected peers.
+  void deactivateEmergencyBeacon() {
+    _emergencyBeacon.deactivate(
+      onBroadcast: (payload) => _syncEngine.broadcastControl(payload),
+    );
+  }
 
   /// Check if the local user's position has crossed the boundary.
   ///
@@ -649,6 +679,12 @@ class FieldLinkService {
       case 'role_assign':
       case 'callsign_update':
         _roleManager.handleControlEvent(event.data, event.senderId);
+        break;
+      case 'emergency':
+        _emergencyBeacon.handleRemoteEmergency(event.senderId, event.data);
+        break;
+      case 'emergency_cancel':
+        _emergencyBeacon.handleRemoteCancel(event.senderId);
         break;
       default:
         // Other control events (boundary_exit, join, leave, etc.) are
