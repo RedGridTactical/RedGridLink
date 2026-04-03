@@ -167,6 +167,9 @@ https://redgridtactical.com/privacy.html
 ## Terms of Use (EULA) URL
 https://redgridtactical.com/terms.html
 
+## Marketing URL
+https://redgridtactical.com/link.html
+
 ## Support URL
 https://redgridtactical.com/about.html
 
