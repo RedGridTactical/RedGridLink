@@ -10,6 +10,7 @@ import 'package:red_grid_link/data/models/peer.dart';
 import 'package:red_grid_link/data/models/position.dart';
 import 'package:red_grid_link/data/models/session.dart';
 import 'package:red_grid_link/data/models/session_config.dart';
+import 'package:red_grid_link/data/models/tactical_message.dart';
 import 'package:red_grid_link/data/repositories/peer_repository.dart';
 import 'package:red_grid_link/data/repositories/session_repository.dart';
 import 'package:red_grid_link/data/models/team_role.dart';
@@ -17,6 +18,7 @@ import 'package:red_grid_link/services/field_link/battery/battery_manager.dart';
 import 'package:red_grid_link/services/field_link/boundary_manager.dart';
 import 'package:red_grid_link/services/field_link/emergency_beacon_service.dart';
 import 'package:red_grid_link/services/field_link/ghost/ghost_manager.dart';
+import 'package:red_grid_link/services/field_link/message_service.dart';
 import 'package:red_grid_link/services/field_link/role_manager.dart';
 import 'package:red_grid_link/services/field_link/security/key_exchange_manager.dart';
 import 'package:red_grid_link/services/field_link/sync/crdt/crdt_state.dart';
@@ -63,6 +65,7 @@ class FieldLinkService {
   late final RoleManager _roleManager;
   late final BoundaryManager _boundaryManager;
   final EmergencyBeaconService _emergencyBeacon = EmergencyBeaconService();
+  final MessageService _messageService = MessageService();
 
   /// Manages ECDH P-256 key exchange for all connected peers.
   ///
@@ -281,6 +284,7 @@ class FieldLinkService {
     await _sessionRepository.deactivateAll();
 
     _emergencyBeacon.dispose();
+    _messageService.clear();
     _roleManager.reset();
     _boundaryManager.clearBoundary();
     _keyExchangeManager.reset();
@@ -355,6 +359,9 @@ class FieldLinkService {
   /// The emergency beacon service for SOS functionality.
   EmergencyBeaconService get emergencyBeacon => _emergencyBeacon;
 
+  /// The message service for tactical messaging.
+  MessageService get messageService => _messageService;
+
   /// Activate the local emergency beacon.
   ///
   /// Broadcasts an emergency distress signal with the given GPS
@@ -377,6 +384,20 @@ class FieldLinkService {
     _emergencyBeacon.deactivate(
       onBroadcast: (payload) => _syncEngine.broadcastControl(payload),
     );
+  }
+
+  /// Send a tactical message to all connected peers.
+  ///
+  /// For [TacticalMessageType.custom], provide [customText] (max 160 chars).
+  void sendTacticalMessage(TacticalMessageType type, {String? customText}) {
+    final payload = TacticalMessage(
+      senderId: _localDeviceId,
+      senderCallsign: _roleManager.callsign,
+      type: type,
+      customText: customText,
+      timestamp: DateTime.now(),
+    ).toJson();
+    _syncEngine.broadcastControl(payload);
   }
 
   /// Check if the local user's position has crossed the boundary.
@@ -685,6 +706,15 @@ class FieldLinkService {
         break;
       case 'emergency_cancel':
         _emergencyBeacon.handleRemoteCancel(event.senderId);
+        break;
+      case 'message':
+        final callsign = _roleManager.callsignForPeer(event.senderId);
+        final msg = TacticalMessage.fromControl(
+          event.senderId,
+          callsign.isNotEmpty ? callsign : event.senderId,
+          event.data,
+        );
+        _messageService.addMessage(msg);
         break;
       default:
         // Other control events (boundary_exit, join, leave, etc.) are
