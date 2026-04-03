@@ -120,7 +120,7 @@ No accounts. No servers. No cell service. No configuration. It just works.
 - **Pro** -- $3.99/mo or $29.99/yr
 - **Pro+Link** -- $5.99/mo or $44.99/yr (Pro + full 8-device Field Link)
 - **Team** -- $199.99/yr (8 seats, includes Pro+Link for all members)
-- **Lifetime** -- $99.99 one-time (Pro+Link forever)
+- **Lifetime** -- $149.99 one-time (Pro+Link forever)
 
 ---
 

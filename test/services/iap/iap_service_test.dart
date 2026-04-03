@@ -99,7 +99,7 @@ ProductDetails _makeProductDetails(String id) {
     'pro_link_monthly': '\$5.99',
     'pro_link_annual': '\$44.99',
     'team_annual': '\$199.99',
-    'lifetime': '\$99.99',
+    'lifetime': '\$149.99',
   };
 
   return ProductDetails(
@@ -360,7 +360,7 @@ void main() {
       expect(service.getPrice(IAPProducts.proLinkMonthly), '\$5.99');
       expect(service.getPrice(IAPProducts.proLinkAnnual), '\$44.99');
       expect(service.getPrice(IAPProducts.teamAnnual), '\$199.99');
-      expect(service.getPrice(IAPProducts.lifetime), '\$99.99');
+      expect(service.getPrice(IAPProducts.lifetime), '\$149.99');
     });
 
     test('getPrice returns fallback price when products not loaded', () {
@@ -370,7 +370,7 @@ void main() {
       expect(service.getPrice(IAPProducts.proLinkMonthly), '\$5.99/mo');
       expect(service.getPrice(IAPProducts.proLinkAnnual), '\$44.99/yr');
       expect(service.getPrice(IAPProducts.teamAnnual), '\$199.99/yr');
-      expect(service.getPrice(IAPProducts.lifetime), '\$99.99');
+      expect(service.getPrice(IAPProducts.lifetime), '\$149.99');
     });
 
     test('getPrice returns empty for unknown product', () {

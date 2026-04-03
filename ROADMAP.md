@@ -165,7 +165,7 @@ BLE Long Range, signal quality, FixPhrase location encoding, OSM offline tiles.
 | Free | $0 | All modes, 2 devices, 1 map region, Red Light theme |
 | Pro Monthly | $3.99/mo | All themes, 8 devices, unlimited maps, AAR, messaging |
 | Pro Annual | $29.99/yr | Same as monthly, 37% savings |
-| Lifetime | $99.99 | All Pro features forever |
+| Lifetime | $149.99 | All Pro features forever |
 
 ### Enterprise (contact for pricing)
 | Tier | Price | Includes |

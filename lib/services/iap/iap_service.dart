@@ -317,7 +317,7 @@ class IAPService {
       case IAPProducts.teamAnnual:
         return '\$199.99/yr';
       case IAPProducts.lifetime:
-        return '\$99.99';
+        return '\$149.99';
       default:
         return '';
     }

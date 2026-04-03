@@ -70,7 +70,7 @@ PRICING:
 - Free: All 4 modes, 2-device team sync, 1 offline map region, Red Light theme
 - Pro ($3.99/mo or $29.99/yr): All themes, unlimited maps, After-Action Reports
 - Pro+Link ($5.99/mo or $44.99/yr): Everything in Pro + 8-device team sync
-- Lifetime ($99.99): Full Pro+Link features, one-time purchase
+- Lifetime ($149.99): Full Pro+Link features, one-time purchase
 
 Subscriptions auto-renew unless cancelled at least 24 hours before the end of the current period. Payment will be charged to your Apple ID account at confirmation of purchase. Manage or cancel subscriptions in your device's Settings > Apple ID > Subscriptions.
 
