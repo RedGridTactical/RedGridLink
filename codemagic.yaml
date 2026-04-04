@@ -111,15 +111,7 @@ workflows:
     integrations:
       app_store_connect: Red Grid Link ASC  # Name of the ASC integration in Codemagic UI
     triggering:
-      events:
-        - push
-        - tag
-      branch_patterns:
-        - pattern: master
-          include: true
-      tag_patterns:
-        - pattern: v*
-          include: true
+      events: []
       cancel_previous_builds: true
     environment:
       <<: *flutter_env
