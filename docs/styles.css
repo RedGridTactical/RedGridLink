@@ -567,6 +567,9 @@ ul, ol {
   border-radius: var(--radius-md);
   padding: 32px 24px;
   text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 .price-card.featured {
@@ -575,7 +578,7 @@ ul, ol {
 }
 
 .price-card .tier {
-  font-size: 0.8rem;
+  font-size: clamp(0.7rem, 2vw, 0.8rem);
   text-transform: uppercase;
   letter-spacing: 1.5px;
   color: var(--text-secondary);
@@ -583,13 +586,14 @@ ul, ol {
 }
 
 .price-card .amount {
-  font-size: 2.5rem;
+  font-size: clamp(1.8rem, 5vw, 2.5rem);
   font-weight: 800;
   color: var(--text-primary);
+  white-space: nowrap;
 }
 
 .price-card .period {
-  font-size: 0.85rem;
+  font-size: clamp(0.75rem, 2vw, 0.85rem);
   color: var(--text-muted);
   margin-bottom: 16px;
 }
@@ -598,11 +602,13 @@ ul, ol {
   list-style: none;
   padding: 0;
   text-align: left;
+  flex: 1;
+  width: 100%;
 }
 
 .price-card li {
-  padding: 8px 0;
-  font-size: 0.9rem;
+  padding: 6px 0;
+  font-size: clamp(0.78rem, 2vw, 0.9rem);
   color: var(--text-secondary);
 }
 
