@@ -60,20 +60,32 @@ Real ECDH key exchange, actual Coded PHY negotiation, emergency beacon, tactical
 
 ---
 
-## V2.0 — SAR Mode Pro + ATAK Interop
+## V2.0 — Team Awareness + SAR Mode Pro
 
-**Target: Q3 2026** — Revenue multiplier
+**Target: Q3 2026** — Hard differentiation from MGRS (solo → team)
+
+### Team Awareness (free tier)
+- [ ] Buddy system pairing: assign buddy pairs, alert if buddies separate beyond configurable distance
+- [ ] Check-in timer: Lead sets interval, members tap to confirm, missed check-ins escalate (member → Lead → team)
+- [ ] Status board: one-tap status broadcast (Green/Amber/Red/Black) visible on team roster
+- [ ] Rally point management: designate rally points, "Rally on Bravo" shows distance/bearing/ETA for all members
+
+### Operational Planning (Pro)
+- [ ] Sector assignment: Lead draws named sectors on map, assigns members, crossing alerts
+- [ ] Search pattern generator: parallel track, expanding square, sector search with waypoint sequences per member
+- [ ] Live tactical drawing: Lead draws routes/arrows/circles on map, syncs to all peers in real-time
+- [ ] Photo sharing: snap + broadcast with GPS coordinates, compressed for BLE/LoRa bandwidth
 
 ### SAR Mode Pro ($199/yr per team, up to 20 devices)
-- [ ] Sector assignment: Lead divides map into named search sectors
-- [ ] Check-in scheduling: configurable timed check-ins with missed-check-in alerts
-- [ ] Hasty search patterns: auto-generate parallel track patterns
-- [ ] Clue logging: timestamped, geotagged entries with photo
+- [ ] Hasty search patterns: auto-generate parallel track patterns for defined area
+- [ ] Clue logging: timestamped, geotagged entries with photo attachment
 - [ ] ICS form generation: 201, 202, 204 auto-populated from session data
+- [ ] Track recording per member: breadcrumb trails, coverage analysis, gap detection
+- [ ] Geofence compliance logging: every boundary entry/exit with timestamp and member ID
 
 ### Outfitter / Guide License ($499/yr)
-- [ ] Guide mode: pre-configure sessions for clients
-- [ ] Client devices covered under guide license
+- [ ] Guide mode: pre-configure sessions for clients before trip
+- [ ] Client devices covered under guide license (no individual Pro required)
 - [ ] Post-trip AAR auto-emailed to clients
 
 ### ATAK/CoT Interoperability
@@ -82,6 +94,27 @@ Real ECDH key exchange, actual Coded PHY negotiation, emergency beacon, tactical
 - [ ] ATAK users appear on Red Grid Link maps
 - [ ] Transport via Meshtastic LoRa or shared WiFi (multicast UDP)
 
+---
+
+## V2.1 — Command & Control
+
+**Target: Q4 2026** — Full C2 capability
+
+### Task Management
+- [ ] Task assignment: Lead assigns tasks to specific members with waypoint + instructions
+- [ ] Task completion tracking: member marks done, Lead sees status on roster
+- [ ] Route planning with MGRS waypoint sequences per member
+
+### Communication
+- [ ] Voice clips: 5-second compressed voice notes with GPS stamp, sent over BLE/LoRa
+- [ ] Freehand annotation drawing mode (complements tap-to-place)
+- [ ] Interactive team movement replay with timeline scrubber
+
+### Accountability
+- [ ] Time-on-task tracking: active time, distance covered, average speed per member
+- [ ] Cascading alerts: missed check-in escalates (Lead → buddy → team → external contact)
+- [ ] GPX/KML import/export for pre-planned routes and sector boundaries
+
 ### Intelligence Tools
 - [ ] Elevation profile along planned routes (DEM data)
 - [ ] Line-of-sight calculator between two MGRS positions
@@ -89,28 +122,24 @@ Real ECDH key exchange, actual Coded PHY negotiation, emergency beacon, tactical
 
 ---
 
-## V2.1 — Advanced Navigation
-
-**Target: Q4 2026**
-
-- [ ] Route planning with MGRS waypoint sequences
-- [ ] Track recording with breadcrumb trail and statistics
-- [ ] GPX/KML import/export
-- [ ] Navigate-to-waypoint with bearing/distance compass
-- [ ] Freehand annotation drawing mode
-- [ ] Interactive team movement replay with timeline scrubber
-
----
-
 ## V3.0 — Connected Operations
 
-**Target: Q1 2027**
+**Target: Q1 2027** — Multi-team + cloud capabilities
 
+### Cloud Relay
 - [ ] Cloud session relay (encrypted WebSocket via Cloudflare Workers)
-- [ ] Web dashboard for team leads (browser-based, read-only)
+- [ ] Web dashboard for team leads and incident commanders (browser-based, read-only)
+- [ ] External observer mode: read-only view for ICs or family liaisons
+
+### Multi-Team Coordination
+- [ ] Multi-team bridging: two or more Link sessions with shared Lead overlay
+- [ ] Shift handoff: transfer session to incoming Lead with summary of positions/assignments/tasks
 - [ ] Multi-hop BLE mesh (relay through intermediate peers)
-- [ ] Team management portal (invite, manage seats)
-- [ ] Integration API (webhook on position update)
+
+### Enterprise
+- [ ] Team management portal (invite members, manage seats, billing)
+- [ ] Integration API (webhook on position update, task completion)
+- [ ] Garmin inReach integration (satellite messaging + position relay)
 
 ---
 
@@ -118,10 +147,10 @@ Real ECDH key exchange, actual Coded PHY negotiation, emergency beacon, tactical
 
 **Target: Q2 2027**
 
-- [ ] Garmin inReach integration (satellite messaging + position relay)
 - [ ] External GPS receiver support (Bluetooth NMEA devices)
-- [ ] Barometric altimeter calibration
-- [ ] Heart rate monitor integration for SAR team health
+- [ ] Barometric altimeter calibration (phone sensor fusion)
+- [ ] Heart rate monitor integration for SAR team health monitoring
+- [ ] Environmental sensors (temperature, pressure for weather tracking)
 
 ---
 
@@ -129,10 +158,11 @@ Real ECDH key exchange, actual Coded PHY negotiation, emergency beacon, tactical
 
 **Target: Q3 2027**
 
-- [ ] Training scenario builder
+- [ ] Training scenario builder (define objectives, boundaries, events)
 - [ ] Real-time scoring for land navigation exercises
-- [ ] Instructor mode (observe all teams, inject events)
-- [ ] Performance analytics dashboard
+- [ ] Instructor mode (observe all teams, inject events, grade performance)
+- [ ] Performance analytics dashboard (accuracy, timing, route efficiency)
+- [ ] Simulated peer positions for solo practice
 
 ---
 
