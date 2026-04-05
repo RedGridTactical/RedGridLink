@@ -53,7 +53,6 @@ Real ECDH key exchange, actual Coded PHY negotiation, emergency beacon, tactical
 - [ ] Promote Android to production track on Play Store
 - [ ] Android QA on physical devices (Pixel, Samsung, OnePlus minimum)
 - [ ] F-Droid submission (Firebase-free build flavor, FLOSS-compliant)
-- [ ] Firebase Analytics integration
 - [ ] BetaList submission + Product Hunt launch
 - [ ] Session templates (SAR Hasty Search, Hunting Party, Family Hike, Training Exercise)
 - [ ] Show HN post #2: "Red Grid Link now bridges to Meshtastic"
