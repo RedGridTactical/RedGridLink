@@ -799,6 +799,11 @@ ul, ol {
   box-shadow: 0 0 8px var(--accent-glow);
 }
 
+.timeline-item.shipped::before {
+  background: var(--success);
+  border-color: var(--success);
+}
+
 .timeline-item.planned::before {
   background: var(--bg-tertiary);
   border-color: var(--border);

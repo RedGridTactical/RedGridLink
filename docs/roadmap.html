@@ -178,8 +178,8 @@
             <li>Check-in timer with missed check-in escalation</li>
             <li>Team status board (Green/Amber/Red/Black)</li>
             <li>Sector assignment and search pattern generation</li>
-            <li>Photo sharing with GPS coordinates</li>
-            <li>ATAK/Cursor on Target interoperability</li>
+            <li>Photo sharing with team (GPS-tagged, encrypted)</li>
+            <li>ATAK/CoT team sync (bidirectional team SA)</li>
             <li>ICS form generation (201, 202, 204)</li>
           </ul>
         </div>
@@ -192,8 +192,7 @@
             <li>Voice clips over BLE/LoRa mesh</li>
             <li>Live tactical drawing on shared map</li>
             <li>Cascading alert escalation</li>
-            <li>Elevation profile and line-of-sight calculator</li>
-            <li>GPX/KML import/export</li>
+            <li>Line-of-sight calculator between team members</li>
           </ul>
         </div>
 
@@ -291,60 +290,110 @@
           </ul>
         </div>
 
-        <div class="timeline-item shipped">
+        <div class="timeline-item completed">
           <div class="timeline-version">V2.5 — Interoperability</div>
           <div class="timeline-date">March 2026</div>
           <ul class="timeline-features">
-            <li>FixPhrase integration (open-source, patent-free What3Words alternative)</li>
+            <li>FixPhrase integration (open-source What3Words alternative)</li>
             <li>GPX/KML waypoint export via Share sheet</li>
-            <li>Elevation and slope calculator tool</li>
-            <li>OLED true black themes (pure #000000 for power savings)</li>
-            <li>Web-based MGRS Tactical Toolkit (single HTML file, zero dependencies)</li>
+            <li>Elevation and slope calculator tool (10th tactical tool)</li>
+            <li>OLED true black themes</li>
+            <li>Web-based MGRS Tactical Toolkit</li>
           </ul>
         </div>
 
-        <div class="timeline-item shipped">
+        <div class="timeline-item completed">
           <div class="timeline-version">V2.6 — Open Source Library</div>
           <div class="timeline-date">March 2026</div>
           <ul class="timeline-features">
             <li>@redgrid/mgrs npm package (DMA TM 8358.1 compliant)</li>
             <li>Standalone MGRS/UTM/FixPhrase conversion library</li>
-            <li>Bearing, distance, dead reckoning utilities</li>
             <li>Zero dependencies, ~15 KB</li>
           </ul>
         </div>
 
-        <div class="timeline-item shipped">
+        <div class="timeline-item completed">
           <div class="timeline-version">V3.0 — Tactical Map</div>
           <div class="timeline-date">March 2026</div>
           <ul class="timeline-features">
             <li>Offline OpenStreetMap tiles (no API key, fully local)</li>
             <li>MGRS grid overlay on map</li>
-            <li>Mission planning (waypoints on map, routes, nearest-neighbor optimization)</li>
-            <li>GPX/KML import</li>
+            <li>Mission planning with route overlay and GPX/KML import</li>
             <li>External GPS support (Garmin GLO, Bad Elf via BLE)</li>
-            <li>Meshtastic/LoRa off-grid position sharing</li>
+            <li>Meshtastic/LoRa mesh position awareness</li>
           </ul>
         </div>
 
-        <div class="timeline-item shipped">
-          <div class="timeline-version">V3.2 — Polish &amp; Scale</div>
+        <div class="timeline-item completed">
+          <div class="timeline-version">V3.2 — Scale &amp; Precision</div>
           <div class="timeline-date">March 2026</div>
           <ul class="timeline-features">
             <li>Adjustable grid display scale</li>
+            <li>Offline tile download UI with cache management</li>
+            <li>Free 10-digit MGRS for all users</li>
+            <li>Topographic map layer (OpenTopoMap with contour lines)</li>
+            <li>Map style toggle: Standard, Dark Tactical, Topographic</li>
+            <li>Themed waypoint creation menu (light discipline)</li>
+          </ul>
+        </div>
+
+        <div class="timeline-item completed">
+          <div class="timeline-version">V3.2.4 — Meshtastic Protocol</div>
+          <div class="timeline-date">April 2026</div>
+          <ul class="timeline-features">
+            <li>Complete Meshtastic BLE rewrite using official protobuf protocol</li>
+            <li>iOS BLE permissions fix — mesh networking works on iPhone</li>
+            <li>Correct ToRadio UUID, startConfig handshake, FromNum notifications</li>
+            <li>Shared BLE manager prevents iOS Bluetooth conflicts</li>
+          </ul>
+        </div>
+
+        <div class="timeline-item current">
+          <div class="timeline-version">V3.3 — Field Ready</div>
+          <div class="timeline-date">Q2 2026</div>
+          <ul class="timeline-features">
+            <li>Mesh positions on map (read-only awareness)</li>
+            <li>One-tap mark position on GRID tab</li>
+            <li>Tile download prompt on first map visit</li>
+            <li>Share-to-unlock referral (30-day Pro trial)</li>
+            <li>Waypoint encryption (PIN + SecureStore)</li>
+            <li>Auto dead reckoning from last GPS fix</li>
           </ul>
         </div>
 
         <div class="timeline-item planned">
-          <div class="timeline-version">V3.5 — Platform Ecosystem</div>
+          <div class="timeline-version">V3.5 — Solo Operator</div>
+          <div class="timeline-date">Q3 2026</div>
+          <ul class="timeline-features">
+            <li>Camera-based target acquisition (point camera → get distant MGRS grid)</li>
+            <li>Encrypted Meshtastic channels from app</li>
+            <li>Background position broadcast</li>
+            <li>CoT export (broadcast own position for ATAK interop)</li>
+            <li>Apple Watch companion (grid + bearing on wrist)</li>
+            <li>Route planning with elevation profile</li>
+            <li>Android public launch (satellite-optimized)</li>
+          </ul>
+        </div>
+
+        <div class="timeline-item planned">
+          <div class="timeline-version">V4.0 — Ecosystem</div>
+          <div class="timeline-date">Q4 2026</div>
+          <ul class="timeline-features">
+            <li>Offline voice commands ("Mark position" / "Send grid")</li>
+            <li>Inertial navigation fallback (IMU dead reckoning)</li>
+            <li>Satellite position reporting (iOS + Android NTN)</li>
+            <li>Custom report templates</li>
+            <li>Sensor fusion (barometric + IMU + GPS + external)</li>
+          </ul>
+        </div>
+
+        <div class="timeline-item planned">
+          <div class="timeline-version">V5.0 — Platform</div>
           <div class="timeline-date">2027</div>
           <ul class="timeline-features">
-            <li>Android public release on Google Play</li>
-            <li>iOS Live Activity and Dynamic Island</li>
-            <li>iOS StandBy mode</li>
-            <li>Apple Watch companion</li>
-            <li>Home Screen widgets</li>
-            <li>Siri Shortcuts</li>
+            <li>iOS Live Activity + Dynamic Island</li>
+            <li>Widgets + Siri Shortcuts</li>
+            <li>Integration API for third-party apps</li>
           </ul>
         </div>
 
