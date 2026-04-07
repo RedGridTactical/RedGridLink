@@ -39,7 +39,11 @@ import 'layers/peer_markers_layer.dart';
 import 'layers/synced_markers_layer.dart';
 import 'widgets/annotation_toolbar.dart';
 import 'widgets/coordinate_bar.dart';
+import 'widgets/emergency_alert_overlay.dart';
 import 'widgets/map_controls.dart';
+import 'widgets/message_banner.dart';
+import 'widgets/message_bar.dart';
+import 'widgets/sos_button.dart';
 import 'widgets/waypoint_action_sheet.dart';
 
 class MapScreen extends ConsumerStatefulWidget {
@@ -278,6 +282,18 @@ class _MapScreenState extends ConsumerState<MapScreen> {
               child: AnnotationToolbar(colors: colors),
             ),
 
+          // ── Message bar (above coordinate bar, session-gated) ────────────
+          if (isSessionActive)
+            Positioned(
+              left: 0,
+              right: 0,
+              bottom: 44, // Above coordinate bar
+              child: MessageBar(colors: colors),
+            ),
+
+          // ── SOS button (session-gated; widget self-positions) ─────────────
+          if (isSessionActive) const SosButton(),
+
           // ── Coordinate bar (bottom) ────────────────────────────────────
           Positioned(
             left: 0,
@@ -285,6 +301,17 @@ class _MapScreenState extends ConsumerState<MapScreen> {
             bottom: 0,
             child: CoordinateBar(colors: colors),
           ),
+
+          // ── Message banner (top slide-in notification) ─────────────────
+          Positioned(
+            top: 0,
+            left: 0,
+            right: 0,
+            child: MessageBanner(colors: colors),
+          ),
+
+          // ── Emergency alert overlay (highest z-order) ──────────────────
+          const EmergencyAlertOverlay(),
         ],
       ),
     );

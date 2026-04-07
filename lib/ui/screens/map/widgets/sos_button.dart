@@ -42,7 +42,7 @@ class _SosButtonState extends ConsumerState<SosButton>
   }
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
     final isSessionActive = ref.watch(isSessionActiveProvider);
     if (!isSessionActive) return const SizedBox.shrink();
 

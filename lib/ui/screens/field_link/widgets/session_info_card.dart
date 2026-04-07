@@ -162,20 +162,19 @@ class _SessionInfoContent extends StatelessWidget {
           const SizedBox(height: 12),
           Row(
             children: [
-              // QR code button (if QR mode)
-              if (session.securityMode == SecurityMode.qr)
-                Expanded(
-                  child: _ActionButton(
-                    icon: Icons.qr_code,
-                    label: 'Show QR',
-                    colors: colors,
-                    onTap: () => _showQrSheet(context),
-                  ),
+              // QR code button (always available for easy session sharing)
+              Expanded(
+                child: _ActionButton(
+                  icon: Icons.qr_code,
+                  label: 'Show QR',
+                  colors: colors,
+                  onTap: () => _showQrSheet(context),
                 ),
+              ),
+
+              const SizedBox(width: 8),
 
               // Share button
-              if (session.securityMode == SecurityMode.qr)
-                const SizedBox(width: 8),
               Expanded(
                 child: _ActionButton(
                   icon: Icons.share,
