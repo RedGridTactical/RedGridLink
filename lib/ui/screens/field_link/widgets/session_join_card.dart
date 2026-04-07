@@ -1,5 +1,9 @@
+import 'dart:async';
+import 'dart:io' show Platform;
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 import '../../../../core/constants/app_constants.dart';
 import '../../../../core/theme/tactical_colors.dart';
@@ -35,31 +39,121 @@ class _SessionJoinCardState extends ConsumerState<SessionJoinCard> {
   bool _isJoining = false;
   List<DiscoveredDevice> _discoveredDevices = [];
 
+  Future<bool> _checkBluetoothPermission() async {
+    try {
+      if (Platform.isIOS) {
+        var status = await Permission.bluetooth.status;
+        if (!status.isGranted) {
+          status = await Permission.bluetooth.request();
+        }
+        if (!status.isGranted && mounted) {
+          _showScanError('Bluetooth permission required. Enable in Settings.');
+          return false;
+        }
+      } else {
+        final scanStatus = await Permission.bluetoothScan.status;
+        final connectStatus = await Permission.bluetoothConnect.status;
+        if (!scanStatus.isGranted || !connectStatus.isGranted) {
+          final results = await [
+            Permission.bluetoothScan,
+            Permission.bluetoothConnect,
+          ].request();
+          final allGranted = results.values.every((s) => s.isGranted);
+          if (!allGranted && mounted) {
+            _showScanError('Bluetooth permission required. Enable in Settings.');
+            return false;
+          }
+        }
+      }
+      return true;
+    } catch (_) {
+      return true; // Proceed even if permission check itself fails
+    }
+  }
+
+  void _showScanError(String message) {
+    if (!mounted) return;
+    final colors = ref.read(currentThemeProvider);
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          message,
+          style: TextStyle(color: colors.text),
+        ),
+        backgroundColor: const Color(0xFFCC0000),
+        action: SnackBarAction(
+          label: 'SETTINGS',
+          textColor: colors.accent,
+          onPressed: openAppSettings,
+        ),
+      ),
+    );
+  }
+
   void _startScan() async {
     tapMedium();
+
+    final hasPermission = await _checkBluetoothPermission();
+    if (!hasPermission) return;
+
     setState(() {
       _isScanning = true;
       _discoveredDevices = [];
     });
 
+    StreamSubscription<DiscoveredDevice>? deviceSub;
+
     try {
       final service = ref.read(fieldLinkServiceProvider);
-      await service.initialize();
 
-      // Listen for discovered devices for a scan window.
-      // In production, this listens continuously; here we simulate a timeout.
-      final sub = service.statusStream.listen((_) {});
+      // Subscribe before starting so we don't miss early results.
+      deviceSub = service.discoveredSessionsStream.listen((device) {
+        if (!mounted) return;
+        setState(() {
+          if (!_discoveredDevices.any((d) => d.id == device.id)) {
+            _discoveredDevices.add(device);
+          }
+        });
+      });
 
-      // Simulate collecting devices for 5 seconds.
-      await Future.delayed(const Duration(seconds: 5));
-      sub.cancel();
+      await service.startSessionScan();
+
+      // Scan for 10 seconds, then stop automatically.
+      await Future.delayed(const Duration(seconds: 10));
     } catch (e) {
       notifyError();
+      if (mounted) {
+        final msg = _friendlyError(e);
+        final colors = ref.read(currentThemeProvider);
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(msg, style: TextStyle(color: colors.text)),
+            backgroundColor: const Color(0xFFCC0000),
+          ),
+        );
+      }
     } finally {
+      await deviceSub?.cancel();
+      try {
+        final service = ref.read(fieldLinkServiceProvider);
+        await service.stopSessionScan();
+      } catch (_) {}
       if (mounted) {
         setState(() => _isScanning = false);
       }
     }
+  }
+
+  String _friendlyError(Object e) {
+    final msg = e.toString().toLowerCase();
+    if (msg.contains('bluetooth') &&
+        (msg.contains('off') || msg.contains('unavailable'))) {
+      return 'Bluetooth is off. Enable Bluetooth and try again.';
+    }
+    if (msg.contains('permission')) {
+      return 'Bluetooth permission denied. Enable in Settings.';
+    }
+    return 'Scan failed. Ensure Bluetooth is on and try again.';
   }
 
   Future<void> _joinSession(DiscoveredDevice device) async {
@@ -273,7 +367,8 @@ class _SessionJoinCardState extends ConsumerState<SessionJoinCard> {
               padding: const EdgeInsets.symmetric(vertical: 8),
               child: Center(
                 child: Text(
-                  'No sessions found. Try scanning or use an alternate method.',
+                  'No nearby sessions found. Ask the session host to share'
+                  ' a QR code or Session ID.',
                   style: TacticalTextStyles.dim(colors),
                   textAlign: TextAlign.center,
                 ),

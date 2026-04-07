@@ -77,6 +77,7 @@ class FieldLinkService {
   StreamSubscription<TransportState>? _transportStateSub;
   StreamSubscription<CrdtState>? _syncStateSub;
   StreamSubscription<ControlMessage>? _controlSub;
+  StreamSubscription<DiscoveredDevice>? _autoConnectSub;
   Timer? _batteryPollTimer;
   Timer? _reconnectTimer;
 
@@ -251,6 +252,22 @@ class FieldLinkService {
 
     await _transport.initialize();
     await _transport.startDiscovery(sessionId);
+
+    // Auto-connect to the first discovered device.  The BLE scan starts
+    // immediately above; when a nearby host advertising fieldLinkServiceUuid
+    // is found, we connect without waiting for the user to tap.
+    await _autoConnectSub?.cancel();
+    _autoConnectSub = _transport.discoveredDevices.listen((device) async {
+      final sub = _autoConnectSub;
+      _autoConnectSub = null;
+      await sub?.cancel();
+      try {
+        await _transport.connect(device.id);
+      } catch (_) {
+        // Connection failure is non-fatal; user can retry or use QR/manual entry.
+      }
+    });
+
     await _syncEngine.start(config, sessionId: sessionId);
     await _ghostManager.start();
     _startBatteryPolling();
@@ -269,7 +286,9 @@ class FieldLinkService {
 
     final sessionId = _activeSession!.id;
 
-    // Cancel any reconnect attempts.
+    // Cancel any pending auto-connect and reconnect attempts.
+    await _autoConnectSub?.cancel();
+    _autoConnectSub = null;
     _reconnectTimer?.cancel();
     _reconnectTimer = null;
     _reconnectAttempts = 0;
@@ -542,6 +561,13 @@ class FieldLinkService {
   /// Stream of status changes.
   Stream<FieldLinkStatus> get statusStream => _statusController.stream;
 
+  /// Stream of devices discovered during a passive session scan.
+  ///
+  /// Only active while [startSessionScan] has been called and before
+  /// a session is joined.  Subscribe before calling [startSessionScan].
+  Stream<DiscoveredDevice> get discoveredSessionsStream =>
+      _transport.discoveredDevices;
+
   /// The active transport type.
   TransportType get activeTransport => _transport.type;
 
@@ -571,11 +597,37 @@ class FieldLinkService {
     _controlSub = _syncEngine.controlStream.listen(_onControlMessage);
   }
 
+  /// Start a passive BLE scan for nearby Field Link sessions.
+  ///
+  /// Used by the join UI to populate the nearby-sessions list before a
+  /// session is selected.  Subscribe to [discoveredSessionsStream] before
+  /// calling this.  Has no effect if a session is already active.
+  Future<void> startSessionScan() async {
+    if (_activeSession != null) return;
+    await _transport.initialize();
+    // Use a well-known sentinel ID; the BLE scan filters by service UUID
+    // only, so the session ID here does not affect what devices are found.
+    await _transport.startDiscovery('__field_link_scan__');
+    _setStatus(FieldLinkStatus.discovering);
+  }
+
+  /// Stop a passive session scan started by [startSessionScan].
+  ///
+  /// No-op if a session is currently active (discovery continues for the
+  /// active session in that case).
+  Future<void> stopSessionScan() async {
+    if (_activeSession != null) return;
+    await _transport.stopDiscovery();
+    _setStatus(FieldLinkStatus.idle);
+  }
+
   /// Dispose all resources. The service should not be used after this.
   Future<void> dispose() async {
     await _transportStateSub?.cancel();
     await _syncStateSub?.cancel();
     await _controlSub?.cancel();
+    await _autoConnectSub?.cancel();
+    _autoConnectSub = null;
     _reconnectTimer?.cancel();
     _reconnectTimer = null;
     _stopRssiPolling();
