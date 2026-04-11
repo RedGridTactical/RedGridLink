@@ -83,6 +83,24 @@ Track your team offline over Bluetooth -- no cell service needed. Encrypted GPS 
 ## Keywords (iOS, max 100 chars)
 offline tracker,team gps,blue force,walkie talkie,hunting gps,sar,mgrs,topo map,hiking,group track
 
+## What's New (v1.5.1)
+Red Grid Link v1.5.1 -- critical fixes:
+
+- Emergency Beacon: SOS button now correctly triggers the team alert and emergency overlay on the map screen.
+- Field Link discovery: Scan/Join now actually initiates BLE discovery and surfaces nearby teammates.
+- Hardened ECDH P-256 key exchange and stream cleanup during session teardown.
+- Stability improvements and minor bug fixes.
+
+If you experienced trouble starting a Field Link session or triggering the SOS in v1.5.0, this update resolves it.
+
+## What's New (v1.5.0)
+Security and communication update:
+- ECDH P-256 key exchange (per-peer encryption with forward secrecy)
+- Emergency beacon with one-tap SOS and team alerts
+- Tactical messaging: 8 pre-canned messages + free text
+- Actual BLE Coded PHY negotiation for extended range
+- Hardened stream cleanup and connection quality warnings
+
 ## What's New (v1.4.0)
 Extended range and navigation update:
 - BLE Long Range: up to 1km range on supported devices (BLE 5.0 Coded PHY)

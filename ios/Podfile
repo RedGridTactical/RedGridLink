@@ -54,4 +54,17 @@ post_install do |installer|
       ]
     end
   end
+
+  # Xcode 15+ workaround: DT_TOOLCHAIN_DIR is not allowed in LIBRARY_SEARCH_PATHS.
+  # Rewrite every xcconfig under Pods/Target Support Files/ to replace
+  # DT_TOOLCHAIN_DIR with TOOLCHAIN_DIR.
+  require 'find'
+  pods_dir = File.join(installer.sandbox.root, 'Target Support Files')
+  Find.find(pods_dir) do |path|
+    next unless path.end_with?('.xcconfig')
+    text = File.read(path)
+    if text.include?('DT_TOOLCHAIN_DIR')
+      File.write(path, text.gsub('DT_TOOLCHAIN_DIR', 'TOOLCHAIN_DIR'))
+    end
+  end
 end

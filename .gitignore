@@ -46,3 +46,11 @@ cert_key.pem
 
 # MCP server logs
 .playwright-mcp/
+
+# Local tooling + signing secrets — NEVER commit
+tools/asc-updater/
+tools/certs/
+*.p8
+*.p12
+*.mobileprovision
+*.cer
