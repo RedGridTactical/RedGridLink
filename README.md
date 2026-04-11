@@ -19,7 +19,7 @@
 
 **Offline MGRS navigation and proximity team coordination for small teams (2-8 people). No cell service needed.**
 
-Built on the MGRS engine from [Red Grid MGRS](https://github.com/RedGridTactical/RedGridMGRS). Field Link adds zero-config proximity sync over Bluetooth and WiFi Direct -- your team appears on the map the moment they're in range.
+Built on the MGRS engine from [Red Grid MGRS](https://github.com/RedGridTactical/RedGridMGRS). Field Link adds zero-config proximity sync over Bluetooth and peer-to-peer Wi-Fi -- your team appears on the map the moment they're in range.
 
 > **Solo navigator?** [Red Grid MGRS](https://github.com/RedGridTactical/RedGridMGRS) gives you the same MGRS engine as a standalone tool with DAGR-class precision, 9 tactical tools, and 6 radio-ready report templates. Part of the [Red Grid Tactical](https://redgridtactical.com) ecosystem.
 
@@ -45,7 +45,7 @@ Built on the MGRS engine from [Red Grid MGRS](https://github.com/RedGridTactical
 Live Military Grid Reference System coordinates with 1-meter precision. GPS Kalman filter for smooth, accurate position tracking. MGRS grid overlay on offline maps from GZD down to 100m resolution. Bearing, distance, dead reckoning, resection, pace count (with accelerometer step detection), declination, and coordinate conversion tools. NATO phonetic voice readout for hands-free grid calls.
 
 ### Field Link -- Team Sync Without Infrastructure
-Zero-config proximity sync over BLE + WiFi Direct (Android) / AWDL (iOS). Devices within range automatically discover each other and share encrypted position and marker data. No internet required. No pairing codes. No servers.
+Zero-config proximity sync over BLE + peer-to-peer Wi-Fi (Android) / AWDL (iOS). Devices within range automatically discover each other and share encrypted position and marker data. No internet required. No pairing codes. No servers.
 
 - 2-8 devices per session
 - AES-256-GCM encryption with ECDH P-256 ephemeral session keys
@@ -164,7 +164,7 @@ Full roadmap with feature checklists: [ROADMAP.md](ROADMAP.md)
 
 | Version | Target | Theme | Highlights |
 |---------|--------|-------|------------|
-| **V1.0** | **Complete** | Foundation | MGRS nav, Field Link (BLE+WiFi Direct), 11 tools, AAR PDF, offline maps, 4 themes, IAP |
+| **V1.0** | **Complete** | Foundation | MGRS nav, Field Link (BLE+peer-to-peer Wi-Fi), 11 tools, AAR PDF, offline maps, 4 themes, IAP |
 | **V1.1** | **Complete** | Field Hardening | Kalman filter, step detector, Peer HUD, Ultra Expedition, auto-reconnect, map downloads, Sentry, l10n, Help/About |
 | **V1.2.1** | **Complete** | Reliability | Field Link session fix, waypoint persistence, relative bearing arrow, demo mode |
 | **V1.3** | **Complete** | Team Features | Team roles (Lead/Scout/Medic/Comms), waypoint sharing, shared annotations, boundary alerts, NATO voice callouts, session export/import |

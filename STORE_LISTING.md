@@ -20,7 +20,7 @@ Track your team offline over Bluetooth. Encrypted GPS sharing, no cell needed.
 
 Track your team anywhere -- no cell service, no internet, no accounts.
 
-Red Grid Link turns nearby phones into a private team GPS network using Bluetooth and WiFi Direct. See everyone's position on a shared map, drop waypoints, set boundaries, and coordinate -- all without cell towers or internet. Your data never leaves your devices.
+Red Grid Link turns nearby phones into a private team GPS network using Bluetooth and peer-to-peer Wi-Fi. See everyone's position on a shared map, drop waypoints, set boundaries, and coordinate -- all without cell towers or internet. Your data never leaves your devices.
 
 Built by an active duty Army officer for the people who actually need it: search & rescue volunteers, hunting parties, backcountry hiking groups, and field training teams.
 
@@ -33,7 +33,7 @@ WHO IT'S FOR:
 HOW IT WORKS:
 Open the app, start a session, and every teammate within Bluetooth range appears on your map. No pairing, no configuration, no internet required.
 
-- Devices discover each other automatically over Bluetooth and WiFi Direct
+- Devices discover each other automatically over Bluetooth and peer-to-peer Wi-Fi
 - Positions update every few seconds with military-grade AES-256 encryption
 - Works on both iPhone and Android in the same session
 - Battery-saver modes last all day (<2% per hour in Expedition mode)
@@ -160,7 +160,7 @@ Red Grid Link v1.2 -- field hardening release:
 ## What's New (v1.0)
 Red Grid Link v1.0 -- initial release:
 - Live MGRS navigation with 1-meter precision
-- Field Link proximity sync (BLE + WiFi Direct/AWDL)
+- Field Link proximity sync (BLE + peer-to-peer Wi-Fi)
 - AES-256-GCM encrypted sync with ECDH key exchange
 - Offline map downloads (USGS Topo + OpenTopoMap)
 - Ghost markers with time-decay visualization
@@ -176,7 +176,7 @@ Red Grid Link v1.0 -- initial release:
 - No analytics
 - All data stays on device
 - Location used only when app is in foreground (and for Field Link background sync)
-- Field Link shares position only with nearby peers via encrypted BLE/WiFi Direct
+- Field Link shares position only with nearby peers via encrypted BLE/peer-to-peer Wi-Fi
 - No server communication required for any feature
 
 ## Privacy URL

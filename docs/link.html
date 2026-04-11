@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Red Grid Link — Encrypted Team Coordination Over Bluetooth</title>
-<meta name="description" content="Encrypted Bluetooth team coordination with offline MGRS maps. Track 2-8 team members, share waypoints, set boundaries. No cell towers, no servers. Free on iOS, Android beta available.">
+<meta name="description" content="Encrypted Bluetooth team coordination with offline MGRS maps. Track 2-8 team members, share waypoints, set boundaries. No cell towers, no servers. Free on iOS.">
 <meta name="keywords" content="ATAK alternative, blue force tracking, team tracker, offline map, MGRS, tactical navigation, encrypted team sync, offline GPS, SAR app, hunting app, backcountry navigation, Bluetooth team tracking, goTenna alternative, Field Link, ghost markers">
 <meta name="author" content="Red Grid Tactical">
 <link rel="canonical" href="https://redgridtactical.com/link.html">
@@ -46,11 +46,6 @@
     "@type": "Organization",
     "name": "Red Grid Tactical",
     "url": "https://redgridtactical.com"
-  },
-  "aggregateRating": {
-    "@type": "AggregateRating",
-    "ratingValue": "5",
-    "ratingCount": "1"
   }
 }
 </script>
@@ -66,7 +61,7 @@
       "name": "How does Field Link work?",
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": "Field Link uses Bluetooth Low Energy and WiFi Direct to auto-discover nearby teammates and share encrypted position data. No pairing, no configuration. AES-256-GCM encryption with ECDH P-256 ephemeral session keys. New keys are generated for every session."
+        "text": "Field Link uses Bluetooth Low Energy and peer-to-peer Wi-Fi to auto-discover nearby teammates and share encrypted position data. No pairing, no configuration. AES-256-GCM encryption with ECDH P-256 ephemeral session keys. New keys are generated for every session."
       }
     },
     {
@@ -106,7 +101,7 @@
       "name": "When is Android coming?",
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": "Android is in closed beta now. You can join the beta on Google Play at https://play.google.com/apps/testing/com.redgrid.red_grid_link."
+        "text": "Android parity with the current iOS release is on the roadmap for v1.6. Cross-platform sessions between iPhone and Android will ship with the Android public launch."
       }
     },
     {
@@ -176,7 +171,6 @@
       <p class="pitch">Encrypted team coordination over Bluetooth. No cell towers. No servers. No accounts.</p>
       <div class="cta-row">
         <a href="https://apps.apple.com/app/id6760084718" class="btn btn-primary btn-lg">Download on App Store</a>
-        <a href="https://play.google.com/apps/testing/com.redgrid.red_grid_link" class="btn btn-secondary btn-lg">Join Android Beta</a>
       </div>
     </div>
   </section>
@@ -214,7 +208,7 @@
       <div class="grid-3">
         <div class="card">
           <h3>Field Link — Encrypted Team Sync</h3>
-          <p>Auto-discover teammates via BLE + WiFi Direct. AES-256-GCM encrypted with ECDH ephemeral keys. No servers, no pairing, no configuration. Sync positions with 2-8 team members in real time.</p>
+          <p>Auto-discover teammates via BLE + peer-to-peer Wi-Fi. AES-256-GCM encrypted with ECDH ephemeral keys. No servers, no pairing, no configuration. Sync positions with 2-8 team members in real time.</p>
         </div>
         <div class="card">
           <h3>Offline MGRS Maps</h3>
@@ -284,11 +278,11 @@
           <tbody>
             <tr>
               <td>Price</td>
-              <td class="highlight-col"><strong>Free / $5.99/mo</strong></td>
-              <td>Free</td>
-              <td>$99+ device</td>
-              <td>$299+ device</td>
-              <td>$30+ device</td>
+              <td class="highlight-col"><strong>Free / $3.99/mo</strong></td>
+              <td>Free (software)</td>
+              <td>$849+ device</td>
+              <td>$300+ device + sub</td>
+              <td>$20-$150 radio</td>
             </tr>
             <tr>
               <td>Server required</td>
@@ -301,18 +295,18 @@
             <tr>
               <td>iOS + Android</td>
               <td class="highlight-col"><span class="check">Both</span></td>
-              <td><span class="cross">Android only</span></td>
+              <td><span class="check">Both (iTAK on iOS)</span></td>
               <td><span class="check">Both</span></td>
               <td><span class="check">Both</span></td>
-              <td><span class="cross">Android only</span></td>
+              <td><span class="check">Both</span></td>
             </tr>
             <tr>
               <td>Encryption</td>
-              <td class="highlight-col"><span class="check">AES-256-GCM + ECDH</span></td>
-              <td><span class="check">TLS</span></td>
+              <td class="highlight-col"><span class="check">AES-256-GCM + ECDH P-256</span></td>
+              <td><span class="check">AES-256 + TLS</span></td>
               <td><span class="check">AES-256</span></td>
               <td><span class="cross">Proprietary</span></td>
-              <td><span class="check">AES-256</span></td>
+              <td><span class="check">AES-256-CTR</span></td>
             </tr>
             <tr>
               <td>MGRS native</td>
@@ -448,7 +442,7 @@
       <div style="max-width: 800px; margin: 0 auto;">
         <details class="faq-item">
           <summary>How does Field Link work?</summary>
-          <p>Field Link uses Bluetooth Low Energy and WiFi Direct to auto-discover nearby teammates and share encrypted position data. No pairing, no configuration needed. AES-256-GCM encryption with ECDH P-256 ephemeral session keys means new cryptographic keys are generated for every session. Data syncs peer-to-peer with no servers involved.</p>
+          <p>Field Link uses Bluetooth Low Energy and peer-to-peer Wi-Fi to auto-discover nearby teammates and share encrypted position data. No pairing, no configuration needed. AES-256-GCM encryption with ECDH P-256 ephemeral session keys means new cryptographic keys are generated for every session. Data syncs peer-to-peer with no servers involved.</p>
         </details>
         <details class="faq-item">
           <summary>Does it work without cell service?</summary>
@@ -468,7 +462,7 @@
         </details>
         <details class="faq-item">
           <summary>When is Android coming?</summary>
-          <p>Android is in closed beta right now. You can <a href="https://play.google.com/apps/testing/com.redgrid.red_grid_link">join the Android beta on Google Play</a> and start testing today. Full public launch is coming soon.</p>
+          <p>Android parity with the current iOS release is on the roadmap for v1.6. Cross-platform sessions (iPhone talking to Android) are a core part of Field Link's design and will ship with the Android public launch.</p>
         </details>
         <details class="faq-item">
           <summary>How far does Bluetooth reach?</summary>
@@ -489,7 +483,6 @@
       <p class="mt-2 mb-3" style="max-width: 600px; margin-left: auto; margin-right: auto; font-size: 1.1rem;">Download Red Grid Link and get your team on the map in 30 seconds.</p>
       <div class="cta-row" style="justify-content: center;">
         <a href="https://apps.apple.com/app/id6760084718" class="btn btn-primary btn-lg">Download on App Store</a>
-        <a href="https://play.google.com/apps/testing/com.redgrid.red_grid_link" class="btn btn-secondary btn-lg">Join Android Beta</a>
       </div>
     </div>
   </section>
