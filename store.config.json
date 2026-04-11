@@ -58,7 +58,7 @@
         {
           "id": "lifetime",
           "name": "Lifetime Pro+Link",
-          "price": 99.99,
+          "price": 149.99,
           "type": "non_consumable",
           "description": "Pro+Link forever, one-time purchase"
         }
@@ -114,7 +114,7 @@
         {
           "id": "lifetime",
           "name": "Lifetime Pro+Link",
-          "price": 99.99,
+          "price": 149.99,
           "type": "in_app_product",
           "description": "Pro+Link forever, one-time purchase"
         }

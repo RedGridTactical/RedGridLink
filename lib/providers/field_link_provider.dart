@@ -7,7 +7,9 @@ import 'package:red_grid_link/data/models/peer.dart';
 import 'package:red_grid_link/data/models/session.dart';
 import 'package:red_grid_link/data/models/team_role.dart';
 import 'package:red_grid_link/providers/connection_quality_provider.dart';
+import 'package:red_grid_link/providers/demo_data_provider.dart';
 import 'package:red_grid_link/providers/emergency_beacon_provider.dart';
+import 'package:red_grid_link/providers/settings_provider.dart';
 import 'package:red_grid_link/services/field_link/battery/battery_manager.dart';
 import 'package:red_grid_link/services/field_link/field_link_service.dart';
 
@@ -81,7 +83,13 @@ final emergencyWiringProvider = Provider<void>((ref) {
 /// is active.
 ///
 /// Updates reactively whenever a session is created, joined, or left.
+/// When [demoModeProvider] is active, emits a fake "DEMO PATROL" session
+/// so session-gated UI renders without a real BLE session (used by
+/// fastlane screenshot generation and marketing demos).
 final activeSessionProvider = StreamProvider<Session?>((ref) {
+  if (ref.watch(demoModeProvider)) {
+    return Stream.value(ref.watch(demoSessionProvider));
+  }
   final service = ref.watch(fieldLinkServiceProvider);
   return service.sessionStream;
 });
@@ -94,7 +102,12 @@ final activeSessionProvider = StreamProvider<Session?>((ref) {
 ///
 /// Derived from the sync engine's CRDT state; emits a new list whenever
 /// any peer's position or connection status changes.
+/// In demo mode, emits three fake peers (ALPHA / BRAVO / CHARLIE) so
+/// every peer-driven UI surface renders realistically.
 final connectedPeersProvider = StreamProvider<List<Peer>>((ref) {
+  if (ref.watch(demoModeProvider)) {
+    return Stream.value(ref.watch(demoPeersProvider));
+  }
   final service = ref.watch(fieldLinkServiceProvider);
   return service.peersStream;
 });
@@ -118,7 +131,11 @@ final connectedPeerCountProvider = Provider<int>((ref) {
 ///
 /// Ghosts decay through opacity states over time and can be manually
 /// dismissed or automatically removed when the peer reconnects.
+/// In demo mode, emits one faded ghost (DELTA) to show the feature.
 final ghostsProvider = StreamProvider<List<Ghost>>((ref) {
+  if (ref.watch(demoModeProvider)) {
+    return Stream.value(ref.watch(demoGhostsProvider));
+  }
   final service = ref.watch(fieldLinkServiceProvider);
   return service.ghostsStream;
 });
@@ -130,13 +147,17 @@ final ghostsProvider = StreamProvider<List<Ghost>>((ref) {
 /// Current battery mode (expedition or active).
 ///
 /// Switching modes adjusts the sync heartbeat interval.
+/// In demo mode, returns [BatteryMode.active] without touching the service.
 final batteryModeProvider = StateProvider<BatteryMode>((ref) {
+  if (ref.watch(demoModeProvider)) return BatteryMode.active;
   final service = ref.watch(fieldLinkServiceProvider);
   return service.batteryMode;
 });
 
 /// Human-readable battery projection string (e.g., "8hr 12min remaining").
+/// In demo mode, returns a plausible placeholder.
 final batteryProjectionProvider = Provider<String>((ref) {
+  if (ref.watch(demoModeProvider)) return '8hr 12min remaining';
   final service = ref.watch(fieldLinkServiceProvider);
   return service.batteryProjection;
 });
@@ -157,7 +178,12 @@ final fieldLinkStatusProvider = Provider<FieldLinkStatus>((ref) {
 });
 
 /// Stream of Field Link status changes for reactive UI updates.
+/// In demo mode, emits [FieldLinkStatus.connected] so sync status bars
+/// render the connected state instead of an error.
 final fieldLinkStatusStreamProvider = StreamProvider<FieldLinkStatus>((ref) {
+  if (ref.watch(demoModeProvider)) {
+    return Stream.value(FieldLinkStatus.connected);
+  }
   final service = ref.watch(fieldLinkServiceProvider);
   return service.statusStream;
 });
@@ -170,7 +196,11 @@ final fieldLinkStatusStreamProvider = StreamProvider<FieldLinkStatus>((ref) {
 ///
 /// Emits the latest list of live (non-tombstoned) markers whenever
 /// the sync engine's CRDT state changes.
+/// In demo mode, emits five fake markers covering every icon type.
 final syncedMarkersProvider = StreamProvider<List<model.Marker>>((ref) {
+  if (ref.watch(demoModeProvider)) {
+    return Stream.value(ref.watch(demoMarkersProvider));
+  }
   final service = ref.watch(fieldLinkServiceProvider);
   return service.markersStream;
 });
@@ -183,7 +213,11 @@ final syncedMarkersProvider = StreamProvider<List<model.Marker>>((ref) {
 ///
 /// Emits the latest list of live (non-tombstoned) annotations whenever
 /// the sync engine's CRDT state changes.
+/// In demo mode, emits one boundary polygon around the demo AO.
 final syncedAnnotationsProvider = StreamProvider<List<Annotation>>((ref) {
+  if (ref.watch(demoModeProvider)) {
+    return Stream.value(ref.watch(demoAnnotationsProvider));
+  }
   final service = ref.watch(fieldLinkServiceProvider);
   return service.annotationsStream;
 });
@@ -195,7 +229,9 @@ final syncedAnnotationsProvider = StreamProvider<List<Annotation>>((ref) {
 /// The local device's current team role in the active session.
 ///
 /// Defaults to [TeamRole.scout] when no service is available.
+/// In demo mode, returns [TeamRole.lead] so the local device is the session lead.
 final localRoleProvider = Provider<TeamRole>((ref) {
+  if (ref.watch(demoModeProvider)) return TeamRole.lead;
   final service = ref.watch(fieldLinkServiceProvider);
   return service.roleManager.localRole;
 });
@@ -210,7 +246,10 @@ final isLeadProvider = Provider<bool>((ref) {
 // ---------------------------------------------------------------------------
 
 /// The local device ID for this Field Link instance.
+/// In demo mode, returns a placeholder ID so session-scoped operations
+/// don't depend on a real service.
 final localDeviceIdProvider = Provider<String>((ref) {
+  if (ref.watch(demoModeProvider)) return 'demo-local';
   final service = ref.watch(fieldLinkServiceProvider);
   return service.localDeviceId;
 });
@@ -234,7 +273,11 @@ final activeBoundaryProvider = Provider<Annotation?>((ref) {
 ///
 /// Emits a [BoundaryEvent] whenever the local user or a peer crosses
 /// outside the active boundary. Used by the map screen to show alerts.
+/// In demo mode, returns an empty stream to avoid spurious SnackBars.
 final boundaryEventStreamProvider = StreamProvider<BoundaryEvent>((ref) {
+  if (ref.watch(demoModeProvider)) {
+    return const Stream.empty();
+  }
   final service = ref.watch(fieldLinkServiceProvider);
   return service.boundaryEventStream;
 });
