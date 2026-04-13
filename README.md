@@ -31,7 +31,7 @@ Built on the MGRS engine from [Red Grid MGRS](https://github.com/RedGridTactical
 
 | Team Map | MGRS Grid | Field Link | Tools | Themes |
 |:---:|:---:|:---:|:---:|:---:|
-| ![Team Map](docs/images/01_map_team.png) | ![MGRS Grid](docs/images/02_grid_mgrs.png) | ![Field Link](docs/images/03_field_link.png) | ![Tools](docs/images/04_tools.png) | ![Themes](docs/images/05_themes.png) |
+| ![Team Map](screenshots/raw/01_map_team.png) | ![MGRS Grid](screenshots/raw/02_grid_mgrs.png) | ![Field Link](screenshots/raw/03_field_link.png) | ![Tools](screenshots/raw/04_tools.png) | ![Themes](screenshots/raw/05_themes.png) |
 
 ---
 
