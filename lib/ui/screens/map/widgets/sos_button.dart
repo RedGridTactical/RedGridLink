@@ -57,8 +57,8 @@ class _SosButtonState extends ConsumerState<SosButton>
     }
 
     return Positioned(
-      bottom: 100,
-      right: 16,
+      top: MediaQuery.of(context).padding.top + 8,
+      right: 12,
       child: AnimatedBuilder(
         animation: _pulseAnimation,
         builder: (context, child) {

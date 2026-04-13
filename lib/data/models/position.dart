@@ -42,6 +42,8 @@ class Position {
     accuracy: (json['acc'] as num?)?.toDouble(),
     mgrsRaw: json['mgrs'] as String? ?? '',
     mgrsFormatted: '', // Compute from mgrsRaw after construction
-    timestamp: DateTime.fromMillisecondsSinceEpoch(json['ts'] as int),
+    timestamp: json['ts'] != null
+        ? DateTime.fromMillisecondsSinceEpoch(json['ts'] as int)
+        : DateTime.now(),
   );
 }

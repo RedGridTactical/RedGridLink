@@ -192,7 +192,30 @@ class FieldLinkService {
 
     // Start sub-services.
     await _transport.initialize();
+
+    // The creator advertises the Field Link GATT service so joiners
+    // can discover and connect.
+    final transport = _transport;
+    if (transport is BleTransport) {
+      await transport.startAdvertising(sessionId);
+    }
+
+    // Subscribe to discovered devices BEFORE starting the scan so we
+    // don't miss joiners discovered instantly.
+    await _autoConnectSub?.cancel();
+    _autoConnectSub = _transport.discoveredDevices.listen((device) async {
+      if (_transport.connectedDeviceIds.contains(device.id)) return;
+      try {
+        print('[FieldLink] Creator auto-connecting to ${device.id}...');
+        await _transport.connect(device.id);
+        print('[FieldLink] Creator connected to ${device.id}!');
+      } catch (e) {
+        print('[FieldLink] Creator connect failed: $e — will retry');
+      }
+    });
+
     await _transport.startDiscovery(sessionId);
+
     await _syncEngine.start(config, sessionId: sessionId);
     await _ghostManager.start();
     _startBatteryPolling();
@@ -205,7 +228,19 @@ class FieldLinkService {
   /// Join an existing Field Link session.
   ///
   /// Returns `true` if the join was successful. For PIN-protected
-  /// sessions, the correct [pin] must be provided.
+  /// sessions, the correct [pin] must be provided — it is validated
+  /// by the session host via a BLE control message handshake, NOT by
+  /// a local database lookup (the joiner's device has never seen the
+  /// session before).
+  ///
+  /// Flow:
+  ///   1. Scan for the host's BLE advertisement.
+  ///   2. Connect as central (flutter_blue_plus).
+  ///   3. Start sync engine + send a `join_request` control message
+  ///      with the PIN (if provided).
+  ///   4. The host validates the PIN against its real session and
+  ///      responds with `join_response {accepted: true/false}`.
+  ///   5. If rejected, disconnect and return false.
   Future<bool> joinSession(
     String sessionId, {
     String? pin,
@@ -216,34 +251,29 @@ class FieldLinkService {
       await leaveSession();
     }
 
-    // For PIN mode, verify the PIN.
-    final existingSession = await _sessionRepository.getSessionById(sessionId);
-    if (existingSession != null &&
-        existingSession.securityMode == SecurityMode.pin) {
-      if (pin == null || existingSession.pin != pin) {
-        return false;
-      }
-    }
+    final session = Session(
+      id: sessionId,
+      name: 'Joined Session',
+      securityMode: pin != null ? SecurityMode.pin : SecurityMode.open,
+      pin: pin,
+      createdAt: DateTime.now(),
+      operationalMode: OperationalMode.sar,
+      peers: [_localDeviceId],
+      isActive: true,
+    );
 
-    final session = existingSession ??
-        Session(
-          id: sessionId,
-          name: 'Joined Session',
-          securityMode: pin != null ? SecurityMode.pin : SecurityMode.open,
-          pin: pin,
-          createdAt: DateTime.now(),
-          operationalMode: OperationalMode.sar,
-          peers: [_localDeviceId],
-          isActive: true,
-        );
-
-    if (existingSession == null) {
-      await _sessionRepository.createSession(session);
-    } else {
+    // Use upsert — the joiner may retry joining the same session
+    // (e.g., first open attempt fails PIN, then retry with correct PIN).
+    // A plain INSERT would throw UNIQUE constraint on the second attempt.
+    final existing = await _sessionRepository.getSessionById(sessionId);
+    if (existing != null) {
       await _sessionRepository.activateSession(sessionId);
+    } else {
+      await _sessionRepository.createSession(session);
     }
 
     _activeSession = session.copyWith(isActive: true);
+    _pendingJoinPin = pin;
     _roleManager.initializeAsJoiner();
     _keyExchangeManager.initialize();
     _emitSession();
@@ -251,22 +281,32 @@ class FieldLinkService {
     final config = _configForMode(session.operationalMode);
 
     await _transport.initialize();
-    await _transport.startDiscovery(sessionId);
 
-    // Auto-connect to the first discovered device.  The BLE scan starts
-    // immediately above; when a nearby host advertising fieldLinkServiceUuid
-    // is found, we connect without waiting for the user to tap.
+    // Subscribe to discovered devices BEFORE starting the scan so we
+    // don't miss the creator if it's discovered instantly. Broadcast
+    // streams don't buffer — any event emitted before a listener
+    // subscribes is silently lost.
     await _autoConnectSub?.cancel();
     _autoConnectSub = _transport.discoveredDevices.listen((device) async {
-      final sub = _autoConnectSub;
-      _autoConnectSub = null;
-      await sub?.cancel();
+      // Skip devices we're already connected to.
+      if (_transport.connectedDeviceIds.contains(device.id)) return;
+
       try {
+        print('[FieldLink] Auto-connecting to ${device.id}...');
         await _transport.connect(device.id);
-      } catch (_) {
-        // Connection failure is non-fatal; user can retry or use QR/manual entry.
+        print('[FieldLink] Connected to ${device.id}!');
+        // Only cancel the subscription AFTER a successful connect.
+        // If connect fails, the subscription stays active so it can
+        // retry on the next scan cycle.
+        await _autoConnectSub?.cancel();
+        _autoConnectSub = null;
+      } catch (e) {
+        // Connection failed — keep listening for retry on next scan.
+        print('[FieldLink] Connect failed: $e — will retry');
       }
     });
+
+    await _transport.startDiscovery(sessionId);
 
     await _syncEngine.start(config, sessionId: sessionId);
     await _ghostManager.start();
@@ -276,6 +316,10 @@ class FieldLinkService {
 
     return true;
   }
+
+  /// PIN sent by the joiner, held until the host responds with
+  /// `join_response`. Cleared after validation completes.
+  String? _pendingJoinPin;
 
   /// Leave the current session.
   ///
@@ -298,6 +342,10 @@ class FieldLinkService {
     await _syncEngine.stop();
     await _transport.disconnectAll();
     await _transport.stopDiscovery();
+    final stopTransport = _transport;
+    if (stopTransport is BleTransport) {
+      await stopTransport.stopAdvertising();
+    }
     _stopBatteryPolling();
 
     // Mark all peers in this session as disconnected.
@@ -497,6 +545,8 @@ class FieldLinkService {
   /// Set the local device's callsign and broadcast to peers.
   void setCallsign(String value) {
     _roleManager.setCallsign(value);
+    // Persist on the sync engine so every heartbeat includes the callsign.
+    _syncEngine.localCallsign = value;
     final payload = _roleManager.encodeCallsignUpdate();
     _syncEngine.broadcastControl(payload);
   }
@@ -570,6 +620,12 @@ class FieldLinkService {
 
   /// The active transport type.
   TransportType get activeTransport => _transport.type;
+
+  /// The sync engine (exposed for diagnostics).
+  SyncEngine get syncEngine => _syncEngine;
+
+  /// The raw transport (exposed for diagnostics).
+  TransportService get transport => _transport;
 
   // ---------------------------------------------------------------------------
   // Lifecycle
@@ -659,6 +715,16 @@ class FieldLinkService {
         _startRssiPolling();
         // Broadcast ECDH public key to newly connected peers.
         _broadcastPublicKey();
+        // If we're a joiner with a pending PIN, send a join_request
+        // so the host can validate it via the BLE control channel.
+        if (_pendingJoinPin != null) {
+          _syncEngine.broadcastControl({
+            'evt': 'join_request',
+            'pin': _pendingJoinPin,
+            'deviceId': _localDeviceId,
+          });
+          _pendingJoinPin = null;
+        }
         break;
       case TransportState.discovering:
         if (_status != FieldLinkStatus.connected) {
@@ -751,6 +817,10 @@ class FieldLinkService {
       case 'role_assign':
       case 'callsign_update':
         _roleManager.handleControlEvent(event.data, event.senderId);
+        // Rebuild the peer list so role/callsign changes are reflected
+        // in the UI immediately. The RoleManager is separate from CRDT
+        // state, so we need to manually trigger a refresh.
+        _onSyncStateChanged(_syncEngine.currentState);
         break;
       case 'emergency':
         _emergencyBeacon.handleRemoteEmergency(event.senderId, event.data);
@@ -769,10 +839,75 @@ class FieldLinkService {
         );
         _messageService.addMessage(msg);
         break;
+      case 'join_request':
+        _handleJoinRequest(event.senderId, event.data);
+        break;
+      case 'join_response':
+        _handleJoinResponse(event.data);
+        break;
       default:
         // Other control events (boundary_exit, join, leave, etc.) are
         // handled elsewhere or are informational.
         break;
+    }
+  }
+
+  /// Handle an incoming `join_request` from a joiner (host side).
+  ///
+  /// Validates the joiner's PIN against the real session PIN. If the
+  /// session is Open or the PIN matches, accepts the join. Otherwise
+  /// rejects and the joiner will disconnect.
+  void _handleJoinRequest(String senderId, Map<String, dynamic> data) {
+    if (_activeSession == null) return;
+
+    final sessionPin = _activeSession!.pin;
+    final securityMode = _activeSession!.securityMode;
+    final joinerPin = data['pin'] as String?;
+
+    bool accepted;
+    if (securityMode == SecurityMode.open) {
+      // Open session — always accept.
+      accepted = true;
+    } else if (securityMode == SecurityMode.pin) {
+      // PIN mode — validate.
+      accepted = joinerPin != null && joinerPin == sessionPin;
+    } else {
+      // QR mode — the QR payload contains the session ID which the
+      // joiner already used to find us. Accept.
+      accepted = true;
+    }
+
+    _syncEngine.broadcastControl({
+      'evt': 'join_response',
+      'accepted': accepted,
+      'targetDeviceId': senderId,
+    });
+
+    if (!accepted) {
+      // Optionally disconnect the rejected peer after a short delay
+      // so the response has time to be delivered.
+      Future.delayed(const Duration(seconds: 1), () {
+        _transport.disconnect(senderId).catchError((_) {});
+      });
+    }
+  }
+
+  /// Handle an incoming `join_response` from the host (joiner side).
+  ///
+  /// If rejected, leaves the session and emits an error status so the
+  /// UI can show "INCORRECT PIN" and revert to the join screen.
+  void _handleJoinResponse(Map<String, dynamic> data) {
+    final accepted = data['accepted'] as bool? ?? false;
+    final targetId = data['targetDeviceId'] as String?;
+
+    // Only process responses addressed to us.
+    if (targetId != null && targetId != _localDeviceId) return;
+
+    if (!accepted) {
+      // PIN was wrong — leave the session.
+      leaveSession();
+      // Notify listeners of the rejection via an error status.
+      _setStatus(FieldLinkStatus.error);
     }
   }
 
@@ -819,10 +954,17 @@ class FieldLinkService {
       final shortId = entry.key.length > 8
           ? entry.key.substring(0, 8)
           : entry.key;
+      // Use the peer's callsign from the RoleManager if available,
+      // otherwise fall back to the truncated device ID.
+      final callsign = _roleManager.callsignForPeer(entry.key);
+      final displayName = callsign.isNotEmpty ? callsign : shortId;
 
+      final peerRole = _roleManager.roleForPeer(entry.key);
       peers.add(Peer(
         id: entry.key,
-        displayName: shortId,
+        displayName: displayName,
+        callsign: callsign,
+        role: peerRole,
         position: entry.value,
         lastSeen: entry.value.timestamp,
         isConnected: isConnected,

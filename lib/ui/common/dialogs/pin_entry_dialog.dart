@@ -8,18 +8,23 @@ import '../../../core/utils/haptics.dart';
 
 /// Four-digit PIN entry dialog for Field Link sessions.
 ///
-/// Each digit is displayed in its own box. Focus auto-advances as the user
-/// types. Returns the 4-digit [String] on completion, or `null` when
-/// cancelled / dismissed.
+/// Uses a single hidden TextField to avoid keyboard flicker from multiple
+/// focus nodes. The 4 digit boxes are purely visual — all keyboard input
+/// goes to the hidden field.
 class PinEntryDialog extends StatefulWidget {
   const PinEntryDialog({
     super.key,
     this.title = 'Enter Session PIN',
     required this.colors,
+    this.allowEmpty = false,
   });
 
   final String title;
   final TacticalColorScheme colors;
+
+  /// When true, shows a "SKIP" button that returns an empty string instead
+  /// of null. Used when joining via scan where the session may be open.
+  final bool allowEmpty;
 
   @override
   State<PinEntryDialog> createState() => _PinEntryDialogState();
@@ -28,45 +33,50 @@ class PinEntryDialog extends StatefulWidget {
 class _PinEntryDialogState extends State<PinEntryDialog> {
   static const int _pinLength = 4;
 
-  late final List<TextEditingController> _controllers;
-  late final List<FocusNode> _focusNodes;
+  final _controller = TextEditingController();
+  final _focusNode = FocusNode();
+  String _currentPin = '';
 
   @override
   void initState() {
     super.initState();
-    _controllers =
-        List.generate(_pinLength, (_) => TextEditingController());
-    _focusNodes = List.generate(_pinLength, (_) => FocusNode());
+    _controller.addListener(_onTextChanged);
   }
 
   @override
   void dispose() {
-    for (final c in _controllers) {
-      c.dispose();
-    }
-    for (final f in _focusNodes) {
-      f.dispose();
-    }
+    _controller.removeListener(_onTextChanged);
+    _controller.dispose();
+    _focusNode.dispose();
     super.dispose();
   }
 
-  void _onDigitChanged(int index, String value) {
-    if (value.length == 1) {
-      selectionTick();
-      if (index < _pinLength - 1) {
-        _focusNodes[index + 1].requestFocus();
-      } else {
-        // All digits entered — submit.
-        _submit();
+  void _onTextChanged() {
+    final text = _controller.text;
+    if (text.length <= _pinLength) {
+      setState(() => _currentPin = text);
+      if (text.length > 0) selectionTick();
+      if (text.length == _pinLength) {
+        // Auto-submit after short delay so user sees the last digit fill.
+        Future.delayed(const Duration(milliseconds: 200), () {
+          if (mounted && _currentPin.length == _pinLength) {
+            _submit();
+          }
+        });
       }
+    } else {
+      // Truncate to max length
+      _controller.text = text.substring(0, _pinLength);
+      _controller.selection = TextSelection.fromPosition(
+        TextPosition(offset: _pinLength),
+      );
     }
   }
 
   void _submit() {
-    final pin = _controllers.map((c) => c.text).join();
-    if (pin.length == _pinLength) {
+    if (_currentPin.length == _pinLength) {
       tapMedium();
-      Navigator.of(context).pop(pin);
+      Navigator.of(context).pop(_currentPin);
     }
   }
 
@@ -85,40 +95,58 @@ class _PinEntryDialogState extends State<PinEntryDialog> {
         style: TacticalTextStyles.heading(colors),
         textAlign: TextAlign.center,
       ),
-      content: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: List.generate(_pinLength, (i) {
-          return Container(
-            width: 52,
-            height: 60,
-            margin: const EdgeInsets.symmetric(horizontal: 6),
-            child: TextField(
-              controller: _controllers[i],
-              focusNode: _focusNodes[i],
-              textAlign: TextAlign.center,
-              keyboardType: TextInputType.number,
-              maxLength: 1,
-              autofocus: i == 0,
-              style: TacticalTextStyles.value(colors).copyWith(fontSize: 24),
-              cursorColor: colors.accent,
-              inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-              decoration: InputDecoration(
-                counterText: '',
-                filled: true,
-                fillColor: colors.card2,
-                enabledBorder: OutlineInputBorder(
-                  borderSide: BorderSide(color: colors.border),
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                focusedBorder: OutlineInputBorder(
-                  borderSide: BorderSide(color: colors.accent, width: 2),
-                  borderRadius: BorderRadius.circular(8),
+      content: GestureDetector(
+        onTap: () => _focusNode.requestFocus(),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            // Visual digit boxes
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: List.generate(_pinLength, (i) {
+                final hasDigit = i < _currentPin.length;
+                final isActive = i == _currentPin.length;
+                return Container(
+                  width: 52,
+                  height: 60,
+                  margin: const EdgeInsets.symmetric(horizontal: 6),
+                  decoration: BoxDecoration(
+                    color: colors.card2,
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(
+                      color: isActive ? colors.accent : colors.border,
+                      width: isActive ? 2 : 1,
+                    ),
+                  ),
+                  child: Center(
+                    child: Text(
+                      hasDigit ? _currentPin[i] : '',
+                      style: TacticalTextStyles.value(colors)
+                          .copyWith(fontSize: 24),
+                    ),
+                  ),
+                );
+              }),
+            ),
+
+            // Hidden text field that captures keyboard input
+            SizedBox(
+              height: 1,
+              child: Opacity(
+                opacity: 0,
+                child: TextField(
+                  controller: _controller,
+                  focusNode: _focusNode,
+                  autofocus: true,
+                  keyboardType: TextInputType.number,
+                  maxLength: _pinLength,
+                  inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                  decoration: const InputDecoration(counterText: ''),
                 ),
               ),
-              onChanged: (v) => _onDigitChanged(i, v),
             ),
-          );
-        }),
+          ],
+        ),
       ),
       actions: [
         TextButton(
@@ -133,6 +161,22 @@ class _PinEntryDialogState extends State<PinEntryDialog> {
             ),
           ),
         ),
+        if (widget.allowEmpty)
+          TextButton(
+            style: TextButton.styleFrom(
+              minimumSize: const Size(0, AppConstants.minTouchTarget),
+            ),
+            onPressed: () {
+              tapMedium();
+              Navigator.of(context).pop('');
+            },
+            child: Text(
+              'SKIP (OPEN)',
+              style: TacticalTextStyles.buttonText(colors).copyWith(
+                color: colors.text3,
+              ),
+            ),
+          ),
         TextButton(
           style: TextButton.styleFrom(
             minimumSize: const Size(0, AppConstants.minTouchTarget),
@@ -156,12 +200,14 @@ Future<String?> showPinEntryDialog(
   BuildContext context, {
   String? title,
   required TacticalColorScheme colors,
+  bool allowEmpty = false,
 }) {
   return showDialog<String>(
     context: context,
     builder: (_) => PinEntryDialog(
       title: title ?? 'Enter Session PIN',
       colors: colors,
+      allowEmpty: allowEmpty,
     ),
   );
 }

@@ -9,6 +9,7 @@ import 'package:red_grid_link/data/models/team_role.dart';
 import 'package:red_grid_link/providers/connection_quality_provider.dart';
 import 'package:red_grid_link/providers/demo_data_provider.dart';
 import 'package:red_grid_link/providers/emergency_beacon_provider.dart';
+import 'package:red_grid_link/providers/location_provider.dart';
 import 'package:red_grid_link/providers/settings_provider.dart';
 import 'package:red_grid_link/services/field_link/battery/battery_manager.dart';
 import 'package:red_grid_link/services/field_link/field_link_service.dart';
@@ -73,6 +74,39 @@ final emergencyWiringProvider = Provider<void>((ref) {
   ref.onDispose(() {
     service.onEmergencyStateChanged = null;
   });
+});
+
+/// Pushes GPS positions to the Field Link sync engine whenever a session
+/// is active, regardless of which tab is visible. Without this, positions
+/// only update when the MAP tab's build() method runs — if the user stays
+/// on the LINK tab after joining, the sync engine has no position to
+/// broadcast and peers never see each other.
+///
+/// Watch this provider in the app shell alongside [rssiWiringProvider].
+final positionSyncProvider = Provider<void>((ref) {
+  if (ref.watch(demoModeProvider)) return;
+
+  final isActive = ref.watch(isSessionActiveProvider);
+  if (!isActive) return;
+
+  final FieldLinkService service;
+  try {
+    service = ref.watch(fieldLinkServiceProvider);
+  } on UnimplementedError {
+    return;
+  }
+
+  final position = ref.watch(currentPositionProvider);
+  if (position != null) {
+    // Schedule after the current event loop turn to avoid "Tried to
+    // modify a provider while the widget tree was building" —
+    // updatePosition triggers CRDT state + stream changes that can
+    // re-enter the provider graph. Future.microtask still runs in
+    // the same frame; Future() schedules a new event.
+    Future(() {
+      service.updatePosition(position);
+    });
+  }
 });
 
 // ---------------------------------------------------------------------------

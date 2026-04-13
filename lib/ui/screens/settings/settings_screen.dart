@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -184,47 +185,48 @@ class SettingsScreen extends ConsumerWidget {
 
                     const SizedBox(height: 20),
 
-                    // ── DEVELOPER ──────────────────────────────────
-                    SectionHeader(title: 'Developer', colors: colors),
-                    const SizedBox(height: 12),
-                    TacticalCard(
-                      colors: colors,
-                      padding: const EdgeInsets.all(12),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  'DEMO MODE',
-                                  style: TacticalTextStyles.label(colors),
-                                ),
-                                const SizedBox(height: 2),
-                                Text(
-                                  'Uses Washington DC coordinates '
-                                  'instead of live GPS',
-                                  style: TacticalTextStyles.dim(colors),
-                                ),
-                              ],
+                    // ── DEVELOPER (debug builds only) ───────────────
+                    if (kDebugMode) ...[
+                      SectionHeader(title: 'Developer', colors: colors),
+                      const SizedBox(height: 12),
+                      TacticalCard(
+                        colors: colors,
+                        padding: const EdgeInsets.all(12),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    'DEMO MODE',
+                                    style: TacticalTextStyles.label(colors),
+                                  ),
+                                  const SizedBox(height: 2),
+                                  Text(
+                                    'Uses demo coordinates '
+                                    'instead of live GPS',
+                                    style: TacticalTextStyles.dim(colors),
+                                  ),
+                                ],
+                              ),
                             ),
-                          ),
-                          SizedBox(
-                            height: AppConstants.minTouchTarget,
-                            child: Switch(
-                              value: ref.watch(demoModeProvider),
-                              activeTrackColor: colors.accent,
-                              onChanged: (v) => ref
-                                  .read(demoModeProvider.notifier)
-                                  .set(v),
+                            SizedBox(
+                              height: AppConstants.minTouchTarget,
+                              child: Switch(
+                                value: ref.watch(demoModeProvider),
+                                activeTrackColor: colors.accent,
+                                onChanged: (v) => ref
+                                    .read(demoModeProvider.notifier)
+                                    .set(v),
+                              ),
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
-                    ),
-
-                    const SizedBox(height: 20),
+                      const SizedBox(height: 20),
+                    ],
 
                     // ── SUBSCRIPTION ───────────────────────────────────
                     const SubscriptionSection(),

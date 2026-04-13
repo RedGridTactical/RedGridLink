@@ -26,6 +26,10 @@ class RedGridLinkApp extends ConsumerWidget {
     ref.watch(rssiWiringProvider);
     // Wire remote emergency state so alert overlay shows for remote SOS.
     ref.watch(emergencyWiringProvider);
+    // Push GPS positions to the sync engine when a session is active.
+    // This runs regardless of which tab is visible — critical for peer
+    // visibility. Without it, positions only update on the MAP tab.
+    ref.watch(positionSyncProvider);
 
     return MaterialApp(
       title: 'Red Grid Link',

@@ -74,6 +74,39 @@ class SyncEngine {
   /// The local device identifier used as the CRDT node ID.
   String get localDeviceId => _localDeviceId;
 
+  /// Local callsign to include in every position broadcast.
+  /// Set by [FieldLinkService] when the user sets their display name.
+  String localCallsign = '';
+
+  // ---------------------------------------------------------------------------
+  // Diagnostics
+  // ---------------------------------------------------------------------------
+
+  /// Total messages received by the sync engine.
+  int _diagMessagesReceived = 0;
+  int get diagMessagesReceived => _diagMessagesReceived;
+
+  /// Messages successfully decoded and applied.
+  int _diagMessagesApplied = 0;
+  int get diagMessagesApplied => _diagMessagesApplied;
+
+  /// Messages that failed to decode.
+  int _diagMessagesFailed = 0;
+  int get diagMessagesFailed => _diagMessagesFailed;
+
+  /// Last decoding error message.
+  String? _diagLastError;
+  String? get diagLastError => _diagLastError;
+
+  /// Number of positions in the CRDT state (excluding local).
+  int get diagRemotePositionCount {
+    int count = 0;
+    for (final key in _state.positions.keys) {
+      if (key != _localDeviceId) count++;
+    }
+    return count;
+  }
+
   SyncEngine({
     required TransportService transport,
     required PeerRepository peerRepository,
@@ -180,11 +213,13 @@ class SyncEngine {
     // Update CRDT state.
     _state = _state.updatePosition(_localDeviceId, position);
 
-    // Encode and broadcast.
+    // Encode and broadcast — include callsign so peers learn our name
+    // from every heartbeat, not just a one-shot control message.
     final payload = _encoder.encodePosition(
       _localDeviceId,
       position,
       _state.sequenceCounter.countFor(_localDeviceId),
+      callsign: localCallsign.isNotEmpty ? localCallsign : null,
     );
     await _transport.broadcast(payload.toBytes());
 
@@ -296,11 +331,25 @@ class SyncEngine {
 
   /// Handle a raw incoming message from the transport layer.
   Future<void> _handleIncomingMessage(TransportMessage message) async {
+    _diagMessagesReceived++;
     try {
       final payload = SyncPayload.fromBytes(message.data);
 
       // Ignore messages from ourselves.
       if (payload.senderId == _localDeviceId) return;
+
+      // Extract callsign from position payloads and emit as a control
+      // event so FieldLinkService can update the RoleManager. This ensures
+      // peer names appear even if the one-shot callsign_update was missed.
+      if (payload.type == SyncPayloadType.position) {
+        final cs = payload.data['cs'] as String?;
+        if (cs != null && cs.isNotEmpty && !_controlController.isClosed) {
+          _controlController.add(ControlMessage(
+            senderId: payload.senderId,
+            data: {'evt': 'callsign_update', 'cs': cs},
+          ));
+        }
+      }
 
       // Apply to CRDT state (merge handles conflict resolution).
       _state = _state.applyDelta(payload);
@@ -316,9 +365,13 @@ class SyncEngine {
             .add(ControlMessage(senderId: payload.senderId, data: payload.data));
       }
 
+      _diagMessagesApplied++;
       _emitState();
     } catch (e) {
-      // Malformed payload — skip silently. In production, log the error.
+      _diagMessagesFailed++;
+      _diagLastError = e.toString();
+      print('[SyncEngine] DECODE FAILED: $e (data: ${message.data.length} bytes, '
+          'first 50: ${String.fromCharCodes(message.data.take(50))})');
     }
   }
 
@@ -399,6 +452,7 @@ class SyncEngine {
       _localDeviceId,
       localPos,
       _state.sequenceCounter.countFor(_localDeviceId),
+      callsign: localCallsign.isNotEmpty ? localCallsign : null,
     );
     try {
       await _transport.broadcast(payload.toBytes());

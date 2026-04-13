@@ -1,8 +1,8 @@
 import 'dart:async';
 import 'dart:math';
-import 'dart:typed_data';
 
 import 'package:flutter/foundation.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_blue_plus/flutter_blue_plus.dart';
 import 'package:red_grid_link/core/constants/ble_constants.dart';
 import 'package:red_grid_link/core/constants/sync_constants.dart';
@@ -82,8 +82,22 @@ class BleTransport implements TransportService {
   // Connections
   // ---------------------------------------------------------------------------
 
-  /// Connected peripherals keyed by remote ID string.
+  /// Connected peripherals keyed by remote ID string (central-mode connections
+  /// established via flutter_blue_plus when WE are the central).
   final Map<String, BluetoothDevice> _connectedDevices = {};
+
+  /// Centrals that connected to us while we were advertising in peripheral
+  /// mode (via CBPeripheralManager). Keyed by the central's CoreBluetooth UUID.
+  /// These are NOT in [_connectedDevices] because they connected to our
+  /// GATT server, not the other way around.
+  final Set<String> _peripheralCentrals = {};
+
+  /// Maps CoreBluetooth central UUIDs (from peripheral mode) to the peer's
+  /// logical device ID (from their first SyncPayload.senderId). CoreBluetooth
+  /// identifies centrals by their system UUID which is different from the
+  /// app-level _localDeviceId. Without this mapping, _onSyncStateChanged
+  /// can't match CRDT position keys to connected device IDs.
+  final Map<String, String> _centralIdToDeviceId = {};
 
   /// Characteristic subscriptions per device.
   final Map<String, List<StreamSubscription<List<int>>>> _charSubscriptions =
@@ -120,7 +134,29 @@ class BleTransport implements TransportService {
   static const int _reconnectBaseDelayMs = 1000;
 
   @override
-  List<String> get connectedDeviceIds => _connectedDevices.keys.toList();
+  List<String> get connectedDeviceIds {
+    // Union of central-mode connections (flutter_blue_plus) and
+    // peripheral-mode connections (centrals that connected to our GATT server).
+    // Use the mapped logical device ID (from the peer's first sync payload)
+    // instead of the BLE remote ID / CB central UUID — the CRDT state keys
+    // positions by _localDeviceId, not by BLE hardware ID.
+    final ids = <String>{};
+    for (final bleId in _connectedDevices.keys) {
+      final deviceId = _centralIdToDeviceId[bleId];
+      ids.add(deviceId ?? bleId);
+    }
+    for (final centralUuid in _peripheralCentrals) {
+      final deviceId = _centralIdToDeviceId[centralUuid];
+      if (deviceId != null) {
+        ids.add(deviceId);
+      } else {
+        // Haven't received a sync payload from this central yet —
+        // include the CB UUID as a placeholder so the set isn't empty.
+        ids.add(centralUuid);
+      }
+    }
+    return ids.toList();
+  }
 
   // ---------------------------------------------------------------------------
   // Incoming messages
@@ -131,6 +167,28 @@ class BleTransport implements TransportService {
 
   @override
   Stream<TransportMessage> get incomingMessages => _messageController.stream;
+
+  // ---------------------------------------------------------------------------
+  // Diagnostics
+  // ---------------------------------------------------------------------------
+
+  /// Total messages received by the transport (before sync engine).
+  int _diagMessagesReceived = 0;
+  int get diagMessagesReceived => _diagMessagesReceived;
+
+  /// Total messages emitted to the sync engine.
+  int _diagMessagesEmitted = 0;
+  int get diagMessagesEmitted => _diagMessagesEmitted;
+
+  /// Number of connected centrals in peripheral mode.
+  int get diagPeripheralCentralCount => _peripheralCentrals.length;
+
+  /// Number of central-mode connections (flutter_blue_plus).
+  int get diagCentralConnectionCount => _connectedDevices.length;
+
+  /// Last transport-layer error.
+  String? _diagLastError;
+  String? get diagLastError => _diagLastError;
 
   // ---------------------------------------------------------------------------
   // MTU
@@ -167,7 +225,7 @@ class BleTransport implements TransportService {
     // while CBCentralManager initializes (~100-500ms). Using `.first` would
     // capture that initial `unknown` and incorrectly treat BT as unavailable.
     // We filter out `unknown` and wait for a definitive state (on/off/etc).
-    debugPrint('[BleTransport] initialize: checking adapter state...');
+    print('[BleTransport] initialize: checking adapter state...');
     BluetoothAdapterState adapterState;
     try {
       adapterState = await FlutterBluePlus.adapterState
@@ -175,7 +233,7 @@ class BleTransport implements TransportService {
           .first
           .timeout(const Duration(seconds: 5));
     } on TimeoutException {
-      debugPrint('[BleTransport] adapter state check timed out after 5s');
+      print('[BleTransport] adapter state check timed out after 5s');
       _setState(TransportState.error);
       throw const TransportException(
         'Bluetooth adapter state could not be determined. '
@@ -183,7 +241,7 @@ class BleTransport implements TransportService {
       );
     }
 
-    debugPrint('[BleTransport] adapter state: $adapterState');
+    print('[BleTransport] adapter state: $adapterState');
     if (adapterState != BluetoothAdapterState.on) {
       _setState(TransportState.error);
       throw const TransportException(
@@ -192,7 +250,7 @@ class BleTransport implements TransportService {
     }
 
     _setState(TransportState.idle);
-    debugPrint('[BleTransport] initialized successfully');
+    print('[BleTransport] initialized successfully');
   }
 
   @override
@@ -220,7 +278,7 @@ class BleTransport implements TransportService {
     await stopDiscovery();
 
     _setState(TransportState.discovering);
-    debugPrint('[BleTransport] startDiscovery: session=$sessionId');
+    print('[BleTransport] startDiscovery: session=$sessionId');
 
     // Start a continuous scan filtered to our service UUID.
     // flutter_blue_plus emits results via scanResults stream.
@@ -481,14 +539,27 @@ class BleTransport implements TransportService {
 
     final subscriptions = <StreamSubscription<List<int>>>[];
 
+    print('[BleTransport] _subscribeToCharacteristics: '
+        'device=$deviceId, services=${services.length}');
+
     for (final service in services) {
+      print('[BleTransport]   service: ${service.uuid.str}');
       if (service.uuid.str.toLowerCase() !=
           BleConstants.fieldLinkServiceUuid.toLowerCase()) {
         continue;
       }
 
+      print('[BleTransport]   MATCHED Field Link service!');
+
       for (final char in service.characteristics) {
+        print('[BleTransport]     char: ${char.uuid.str} '
+            'notify=${char.properties.notify} '
+            'indicate=${char.properties.indicate} '
+            'write=${char.properties.write} '
+            'writeNoResp=${char.properties.writeWithoutResponse}');
+
         if (!targetCharUuids.contains(char.uuid.str.toLowerCase())) {
+          print('[BleTransport]     SKIP (not a target char)');
           continue;
         }
 
@@ -496,8 +567,11 @@ class BleTransport implements TransportService {
         if (char.properties.notify || char.properties.indicate) {
           try {
             await char.setNotifyValue(true);
+            print('[BleTransport]     SUBSCRIBED to ${char.uuid.str}');
 
             final sub = char.onValueReceived.listen((value) {
+              print('[BleTransport]     DATA received on ${char.uuid.str}: '
+                  '${value.length} bytes');
               _onCharacteristicValueReceived(
                 deviceId,
                 Uint8List.fromList(value),
@@ -505,13 +579,16 @@ class BleTransport implements TransportService {
             });
 
             subscriptions.add(sub);
-          } catch (_) {
-            // Characteristic subscription failure is non-fatal.
+          } catch (e) {
+            print('[BleTransport]     SUBSCRIBE FAILED: $e');
           }
+        } else {
+          print('[BleTransport]     SKIP subscribe (no notify/indicate)');
         }
       }
     }
 
+    print('[BleTransport] subscribed to ${subscriptions.length} characteristics');
     _charSubscriptions[deviceId] = subscriptions;
   }
 
@@ -521,6 +598,7 @@ class BleTransport implements TransportService {
   /// before emitting. Otherwise emit the complete message immediately.
   void _onCharacteristicValueReceived(String deviceId, Uint8List value) {
     if (value.isEmpty) return;
+    _diagMessagesReceived++;
 
     // Chunking protocol:
     //   byte 0: flags  (0x00 = complete, 0x01 = first chunk, 0x02 = mid,
@@ -561,8 +639,18 @@ class BleTransport implements TransportService {
   }
 
   void _emitMessage(String deviceId, Uint8List data) {
+    _diagMessagesEmitted++;
+    print('[BleTransport] INCOMING message from $deviceId: ${data.length} bytes');
+
+    // Learn the peer's logical device ID from the payload so we can map
+    // BLE remote IDs to _localDeviceIds. Without this mapping,
+    // connectedDeviceIds returns BLE remote IDs but CRDT state positions
+    // are keyed by _localDeviceId — they never match, and peers show
+    // as disconnected with 0/8 connected.
+    _learnDeviceIdFromPayload(deviceId, data);
+
     _messageController.add(TransportMessage(
-      senderId: deviceId,
+      senderId: _centralIdToDeviceId[deviceId] ?? deviceId,
       data: data,
       receivedAt: DateTime.now(),
     ));
@@ -605,7 +693,7 @@ class BleTransport implements TransportService {
       final packet = Uint8List(1 + data.length);
       packet[0] = 0x00; // complete
       packet.setRange(1, packet.length, data);
-      await characteristic.write(packet, withoutResponse: true);
+      await characteristic.write(packet, withoutResponse: false);
     } else {
       // Chunk the payload.
       await _sendChunked(characteristic, data, maxChunkPayload);
@@ -616,11 +704,38 @@ class BleTransport implements TransportService {
   Future<void> broadcast(Uint8List data) async {
     final errors = <String>[];
 
+    // Send to central-mode connections (flutter_blue_plus — we connected to them).
     for (final deviceId in _connectedDevices.keys.toList()) {
       try {
         await send(deviceId, data);
       } on Exception catch (e) {
         errors.add('$deviceId: $e');
+      }
+    }
+
+    // Send to peripheral-mode connections (centrals that connected to our
+    // GATT server). Push data via ble_peripheral's updateCharacteristic which
+    // triggers a characteristic notification on the central side.
+    if (_peripheralCentrals.isNotEmpty) {
+      try {
+        // Prepend the "complete" chunk flag (0x00) so the receiver's
+        // _onCharacteristicValueReceived correctly identifies this as a
+        // non-chunked message.
+        final packet = Uint8List(1 + data.length);
+        packet[0] = 0x00; // complete (non-chunked)
+        packet.setRange(1, packet.length, data);
+
+        // Send notification to all subscribed centrals via platform channel.
+        try {
+          await _advertiserChannel.invokeMethod<void>('updateValue', {
+            'characteristicUuid': BleConstants.positionCharUuid,
+            'data': packet,
+          });
+        } catch (e) {
+          print('[BleTransport] peripheral updateValue failed: $e');
+        }
+      } catch (e) {
+        errors.add('peripheral-broadcast: $e');
       }
     }
 
@@ -665,7 +780,7 @@ class BleTransport implements TransportService {
       packet[1] = seq & 0xFF;
       packet.setRange(2, 2 + chunkSize, data, offset);
 
-      await characteristic.write(packet, withoutResponse: true);
+      await characteristic.write(packet, withoutResponse: false);
 
       offset += chunkSize;
       seq++;
@@ -741,6 +856,29 @@ class BleTransport implements TransportService {
     }
   }
 
+  /// Try to extract the senderId from a raw SyncPayload so we can map
+  /// the CoreBluetooth central UUID to the peer's logical device ID.
+  void _learnDeviceIdFromPayload(String centralUuid, Uint8List rawData) {
+    if (_centralIdToDeviceId.containsKey(centralUuid)) return;
+
+    try {
+      // The raw data from peripheral writes doesn't have the chunk header —
+      // it's the raw JSON bytes of the SyncPayload.
+      final jsonStr = String.fromCharCodes(rawData);
+      if (!jsonStr.startsWith('{')) return;
+      // SyncPayload uses 's' (compact) or 'senderId' (verbose) for the sender
+      final sidMatch = RegExp(r'"(?:s|senderId)"\s*:\s*"([^"]+)"').firstMatch(jsonStr);
+      if (sidMatch != null) {
+        final deviceId = sidMatch.group(1)!;
+        _centralIdToDeviceId[centralUuid] = deviceId;
+        print('[BleTransport] Learned device ID mapping: '
+            '$centralUuid → $deviceId');
+      }
+    } catch (_) {
+      // Best-effort — if we can't parse, the CB UUID is used as fallback.
+    }
+  }
+
   /// Start periodic RSSI polling for all connected devices.
   ///
   /// Calls [onRssi] with (deviceId, rssi) every [interval] for each
@@ -777,18 +915,92 @@ class BleTransport implements TransportService {
   // (e.g., via a companion native module).
 
   /// Start advertising the Field Link service.
+  /// Start advertising the Field Link GATT service via the custom
+  /// BleAdvertiserChannel (CBPeripheralManager on iOS).
   ///
-  /// This is a no-op stub. Native advertising requires platform channels
-  /// on Android (BLE Advertiser API) and iOS (CBPeripheralManager).
+  /// The GATT service UUID matches [BleConstants.fieldLinkServiceUuid],
+  /// the same UUID that central-mode scanners filter on in [startDiscovery].
+  /// Platform channel for BLE peripheral-mode advertising (GATT server).
+  static const MethodChannel _advertiserChannel =
+      MethodChannel('com.redgrid.link/ble_advertiser');
+
+  /// Event channel for incoming writes from centrals when in peripheral mode.
+  static const EventChannel _advertiserEventChannel =
+      EventChannel('com.redgrid.link/ble_advertiser/events');
+
+  /// Subscription for the advertiser event stream (peripheral mode).
+  StreamSubscription<dynamic>? _advertiserEventSub;
+
   Future<void> startAdvertising(String sessionId) async {
     _activeSessionId = sessionId;
-    // Native GATT server advertising — future enhancement
+
+    try {
+      await _advertiserChannel.invokeMethod<void>('startAdvertising', {
+        'sessionId': sessionId,
+      });
+      print('[BleTransport] startAdvertising: session=$sessionId');
+    } on PlatformException catch (e) {
+      print('[BleTransport] startAdvertising failed: ${e.message}');
+    }
+
+    // Listen for incoming data from centrals that write to our GATT chars,
+    // and track central connection/disconnection for peripheral mode.
+    await _advertiserEventSub?.cancel();
+    _advertiserEventSub = _advertiserEventChannel
+        .receiveBroadcastStream()
+        .listen((dynamic event) {
+      if (event is! Map) return;
+      final eventName = event['event'] as String?;
+      final data = event['data'] as Map?;
+      if (eventName == null || data == null) return;
+
+      switch (eventName) {
+        case 'onDataReceived':
+          final centralId = data['centralId'] as String? ?? '';
+          final rawData = data['data'];
+          if (rawData is Uint8List && rawData.isNotEmpty) {
+            // The joiner's send() prepends a chunk header (byte 0 = 0x00
+            // for complete, or 0x01/0x02/0x03 for chunked). We need to
+            // process it through _onCharacteristicValueReceived just like
+            // central-mode data, NOT pass raw bytes directly — raw bytes
+            // include the header which makes JSON parsing fail silently.
+            _onCharacteristicValueReceived(centralId, rawData);
+          }
+          break;
+
+        case 'onCentralSubscribed':
+          final centralId = data['centralId'] as String? ?? '';
+          print('[BleTransport] Central connected (peripheral): $centralId');
+          _peripheralCentrals.add(centralId);
+          _setState(TransportState.connected);
+          break;
+
+        case 'onCentralUnsubscribed':
+          final centralId = data['centralId'] as String? ?? '';
+          print('[BleTransport] Central disconnected (peripheral): $centralId');
+          _peripheralCentrals.remove(centralId);
+          if (_connectedDevices.isEmpty && _peripheralCentrals.isEmpty) {
+            _setState(TransportState.disconnected);
+          }
+          break;
+      }
+    });
   }
 
-  /// Stop advertising.
+  /// Stop advertising and tear down the GATT server.
   Future<void> stopAdvertising() async {
     _activeSessionId = null;
-    // Native GATT server advertising — future enhancement
+    _peripheralCentrals.clear();
+    _centralIdToDeviceId.clear();
+    await _advertiserEventSub?.cancel();
+    _advertiserEventSub = null;
+
+    try {
+      await _advertiserChannel.invokeMethod<void>('stopAdvertising');
+      print('[BleTransport] stopAdvertising');
+    } catch (e) {
+      print('[BleTransport] stopAdvertising failed: $e');
+    }
   }
 
   // ---------------------------------------------------------------------------
@@ -797,7 +1009,7 @@ class BleTransport implements TransportService {
 
   void _setState(TransportState newState) {
     if (_state == newState) return;
-    debugPrint('[BleTransport] state: $_state → $newState');
+    print('[BleTransport] state: $_state → $newState');
     _state = newState;
     if (!_stateController.isClosed) {
       _stateController.add(newState);

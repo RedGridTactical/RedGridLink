@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 import 'dart:io' show Platform;
 
 import 'package:flutter/material.dart';
@@ -11,6 +12,7 @@ import '../../../../core/theme/tactical_text_styles.dart';
 import '../../../../core/utils/haptics.dart';
 import '../../../../data/models/peer.dart';
 import '../../../../providers/field_link_provider.dart';
+import '../../../../providers/settings_provider.dart';
 import '../../../../providers/theme_provider.dart';
 import '../../../../services/field_link/transport/transport_service.dart';
 import '../../../common/dialogs/pin_entry_dialog.dart';
@@ -159,46 +161,32 @@ class _SessionJoinCardState extends ConsumerState<SessionJoinCard> {
   Future<void> _joinSession(DiscoveredDevice device) async {
     final colors = ref.read(currentThemeProvider);
 
-    // If session requires PIN, prompt for it.
-    String? pin;
-    // We cannot know security mode from discovery alone; try open first,
-    // and if it fails, prompt for PIN.
+    // We cannot know the security mode from BLE advertisement data alone.
+    // Always prompt for PIN — the user can leave it empty for open sessions.
+    // The host validates via BLE control message (join_request/join_response).
+    final pin = await showPinEntryDialog(
+      context,
+      colors: colors,
+      allowEmpty: true,
+    );
+
+    // User cancelled the dialog entirely.
+    if (pin == null) return;
 
     setState(() => _isJoining = true);
     tapHeavy();
 
     try {
       final service = ref.read(fieldLinkServiceProvider);
-      final success = await service.joinSession(device.id, pin: pin);
+      await service.joinSession(
+        device.id,
+        pin: pin.isNotEmpty ? pin : null,
+      );
 
-      if (!success && mounted) {
-        // Likely PIN-protected -- prompt for PIN.
-        pin = await showPinEntryDialog(
-          context,
-          colors: colors,
-        );
-
-        if (pin != null) {
-          final retrySuccess = await service.joinSession(
-            device.id,
-            pin: pin,
-          );
-
-          if (!retrySuccess && mounted) {
-            notifyWarning();
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text(
-                  'INCORRECT PIN',
-                  style: TacticalTextStyles.caption(colors).copyWith(
-                    color: Colors.white,
-                  ),
-                ),
-                backgroundColor: const Color(0xFFCC0000),
-              ),
-            );
-          }
-        }
+      // Set callsign from display name so peers see a human-readable label.
+      final displayName = ref.read(displayNameProvider);
+      if (displayName.isNotEmpty) {
+        service.setCallsign(displayName);
       }
     } catch (e) {
       notifyError();
@@ -238,6 +226,9 @@ class _SessionJoinCardState extends ConsumerState<SessionJoinCard> {
     try {
       final service = ref.read(fieldLinkServiceProvider);
       final success = await service.joinSession(sessionId);
+
+      final dn = ref.read(displayNameProvider);
+      if (dn.isNotEmpty) service.setCallsign(dn);
 
       if (!success && mounted) {
         // Prompt for PIN.
@@ -280,8 +271,42 @@ class _SessionJoinCardState extends ConsumerState<SessionJoinCard> {
     tapHeavy();
 
     try {
+      // Parse the QR payload JSON to extract session ID, PIN, and mode.
+      // The QR contains: {id, name, sec, pin, mode}
+      final Map<String, dynamic> payload;
+      try {
+        payload = jsonDecode(qrData) as Map<String, dynamic>;
+      } catch (_) {
+        // Not valid JSON — treat the raw string as a session ID (fallback).
+        final service = ref.read(fieldLinkServiceProvider);
+        await service.joinSession(qrData);
+        return;
+      }
+
+      final sessionId = payload['id'] as String? ?? qrData;
+      final pin = payload['pin'] as String?;
+
       final service = ref.read(fieldLinkServiceProvider);
-      await service.joinSession(qrData, qrData: qrData);
+      final success = await service.joinSession(sessionId, pin: pin);
+
+      final dn = ref.read(displayNameProvider);
+      if (dn.isNotEmpty) service.setCallsign(dn);
+
+      if (!success && mounted) {
+        notifyWarning();
+        final colors = ref.read(currentThemeProvider);
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              'INCORRECT PIN',
+              style: TacticalTextStyles.caption(colors).copyWith(
+                color: Colors.white,
+              ),
+            ),
+            backgroundColor: const Color(0xFFCC0000),
+          ),
+        );
+      }
     } catch (e) {
       notifyError();
     } finally {

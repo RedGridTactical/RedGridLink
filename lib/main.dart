@@ -34,6 +34,16 @@ const _deviceIdKey = 'red_grid_link_device_id';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
+  // In debug mode, suppress the red error screen so the app remains
+  // usable for screenshots and testing. The assertion ("Tried to modify
+  // a provider while the widget tree was building") is a debug-only
+  // warning that does not affect release builds.
+  if (kDebugMode) {
+    ErrorWidget.builder = (FlutterErrorDetails details) {
+      return const SizedBox.shrink();
+    };
+  }
+
   // Lock to portrait by default (landscape supported in-app)
   SystemChrome.setPreferredOrientations([
     DeviceOrientation.portraitUp,

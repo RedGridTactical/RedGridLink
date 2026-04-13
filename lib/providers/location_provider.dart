@@ -74,18 +74,20 @@ final positionStreamProvider = StreamProvider<Position>((ref) {
 /// Used when demo mode is active to avoid displaying real GPS data
 /// (e.g., for screenshots).
 Position _buildDemoPosition() {
-  const lat = 38.8895;
-  const lon = -77.0353;
+  // Shenandoah National Park, VA — remote wilderness trail junction.
+  // Must match the reference point in demo_data_provider.dart.
+  const lat = 38.5225;
+  const lon = -78.4352;
   final mgrsRaw = toMGRS(lat, lon);
   final mgrsFormatted = formatMGRS(mgrsRaw);
 
   return Position(
     lat: lat,
     lon: lon,
-    altitude: 15.0,
-    speed: 0.0,
-    heading: 45.0,
-    accuracy: 3.0,
+    altitude: 945.0,
+    speed: 1.2,
+    heading: 42.0,
+    accuracy: 3.5,
     mgrsRaw: mgrsRaw,
     mgrsFormatted: mgrsFormatted,
     timestamp: DateTime.now(),

@@ -249,8 +249,17 @@ class EntitlementNotifier extends StateNotifier<String> {
 }
 
 /// User entitlement tier: free, pro, proLink, or team.
+///
+/// When demo mode is active, forces `proLink` so all features (themes,
+/// maps, AAR, Field Link) are unlocked for screenshots and demos.
 final entitlementProvider =
     StateNotifierProvider<EntitlementNotifier, String>((ref) {
   final repo = ref.watch(settingsRepositoryProvider);
-  return EntitlementNotifier(repo);
+  final notifier = EntitlementNotifier(repo);
+  final isDemo = ref.watch(demoModeProvider);
+  if (isDemo && notifier.state == 'free') {
+    // Don't persist — just override in memory for the session.
+    notifier.state = 'proLink';
+  }
+  return notifier;
 });

@@ -2,8 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:red_grid_link/core/theme/tactical_colors.dart';
+import 'package:red_grid_link/data/models/operational_mode.dart';
 import 'package:red_grid_link/data/models/tactical_message.dart';
 import 'package:red_grid_link/providers/field_link_provider.dart';
+import 'package:red_grid_link/providers/mode_provider.dart';
 
 /// Compact message input bar for sending tactical messages during a session.
 ///
@@ -49,6 +51,47 @@ class _MessageBarState extends ConsumerState<MessageBar> {
 
   TacticalColorScheme get colors => widget.colors;
 
+  /// Mode-specific label overrides for tactical messages.
+  static String _labelForMode(TacticalMessageType type, OperationalMode mode) {
+    switch (mode) {
+      case OperationalMode.sar:
+        switch (type) {
+          case TacticalMessageType.rallyOnMe: return 'RALLY ON ME';
+          case TacticalMessageType.foundSomething: return 'SUBJECT FOUND';
+          case TacticalMessageType.headingBack: return 'RTB';
+          case TacticalMessageType.needSupplies: return 'NEED SUPPLIES';
+          default: return type.label;
+        }
+      case OperationalMode.backcountry:
+        switch (type) {
+          case TacticalMessageType.stop: return 'WAIT UP';
+          case TacticalMessageType.rallyOnMe: return 'MEET HERE';
+          case TacticalMessageType.foundSomething: return 'CHECK THIS OUT';
+          case TacticalMessageType.headingBack: return 'HEADING BACK';
+          case TacticalMessageType.needSupplies: return 'NEED GEAR';
+          default: return type.label;
+        }
+      case OperationalMode.hunting:
+        switch (type) {
+          case TacticalMessageType.stop: return 'HOLD POSITION';
+          case TacticalMessageType.rallyOnMe: return 'RALLY UP';
+          case TacticalMessageType.foundSomething: return 'GAME SPOTTED';
+          case TacticalMessageType.headingBack: return 'HEADING TO TRUCK';
+          case TacticalMessageType.needSupplies: return 'NEED AMMO / GEAR';
+          default: return type.label;
+        }
+      case OperationalMode.training:
+        switch (type) {
+          case TacticalMessageType.stop: return 'ENDEX / FREEZE';
+          case TacticalMessageType.rallyOnMe: return 'RALLY POINT';
+          case TacticalMessageType.foundSomething: return 'CONTACT';
+          case TacticalMessageType.headingBack: return 'RTB';
+          case TacticalMessageType.needSupplies: return 'NEED RESUPPLY';
+          default: return type.label;
+        }
+    }
+  }
+
   void _send(TacticalMessageType type, {String? customText}) {
     final service = ref.read(fieldLinkServiceProvider);
     service.sendTacticalMessage(type, customText: customText);
@@ -78,6 +121,7 @@ class _MessageBarState extends ConsumerState<MessageBar> {
   }
 
   Widget _buildButtonRow() {
+    final mode = ref.watch(currentModeProvider);
     return Container(
       height: 48,
       color: colors.card.withValues(alpha: 0.9),
@@ -86,7 +130,7 @@ class _MessageBarState extends ConsumerState<MessageBar> {
         padding: const EdgeInsets.symmetric(horizontal: 8),
         child: Row(
           children: [
-            ..._preCanned.map(_buildButton),
+            ..._preCanned.map((t) => _buildButton(t, mode)),
             const SizedBox(width: 4),
             _buildCustomButton(),
           ],
@@ -95,8 +139,9 @@ class _MessageBarState extends ConsumerState<MessageBar> {
     );
   }
 
-  Widget _buildButton(TacticalMessageType type) {
+  Widget _buildButton(TacticalMessageType type, OperationalMode mode) {
     final isHelp = type == TacticalMessageType.help;
+    final label = _labelForMode(type, mode);
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 3, vertical: 6),
       child: Material(
@@ -117,7 +162,7 @@ class _MessageBarState extends ConsumerState<MessageBar> {
                 ),
                 const SizedBox(width: 6),
                 Text(
-                  type.label,
+                  label,
                   style: TextStyle(
                     fontSize: 11,
                     fontWeight: FontWeight.w600,

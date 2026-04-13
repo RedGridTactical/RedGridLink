@@ -125,7 +125,9 @@ class _MapScreenState extends ConsumerState<MapScreen> {
       final latLng = LatLng(gpsPosition.lat, gpsPosition.lon);
       controllerService.followPosition(latLng);
 
-      // Check local position against the active boundary.
+      // Position syncing to Field Link is handled by positionSyncProvider
+      // in app.dart — runs on every tab, not just MAP. Boundary checks
+      // still need to happen here for SnackBar alerts.
       if (isSessionActive) {
         ref.read(fieldLinkServiceProvider).checkLocalBoundary(
               gpsPosition.lat,
@@ -228,7 +230,7 @@ class _MapScreenState extends ConsumerState<MapScreen> {
           if (isSessionActive && !showToolbar)
             Positioned(
               right: 12,
-              bottom: 60,
+              bottom: 100,
               child: _AnnotationToggleButton(
                 colors: colors,
                 onTap: () {

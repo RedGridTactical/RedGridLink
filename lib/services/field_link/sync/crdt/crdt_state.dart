@@ -58,7 +58,11 @@ class CrdtState {
 
     switch (delta.type) {
       case SyncPayloadType.position:
-        final pos = Position.fromJson(delta.data);
+        // The DeltaEncoder puts the timestamp on the outer SyncPayload,
+        // not in the data map. Inject it so Position.fromJson can find it.
+        final posData = Map<String, dynamic>.from(delta.data);
+        posData['ts'] ??= delta.timestamp.millisecondsSinceEpoch;
+        final pos = Position.fromJson(posData);
         final register = LwwRegister<Position>(
           nodeId: senderId,
           timestamp: ts,

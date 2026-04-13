@@ -24,67 +24,28 @@
 	<string>????</string>
 	<key>CFBundleVersion</key>
 	<string>$(FLUTTER_BUILD_NUMBER)</string>
+	<key>ITSAppUsesNonExemptEncryption</key>
+	<false/>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
-
-	<!-- ================================================================== -->
-	<!-- Bluetooth usage descriptions (required for BLE Field Link)         -->
-	<!-- ================================================================== -->
 	<key>NSBluetoothAlwaysUsageDescription</key>
 	<string>Red Grid Link uses Bluetooth to discover and communicate with nearby team members via Field Link, even when the app is in the background.</string>
 	<key>NSBluetoothPeripheralUsageDescription</key>
 	<string>Red Grid Link uses Bluetooth to share your position with nearby team members via Field Link.</string>
-
-	<!-- ================================================================== -->
-	<!-- Location usage descriptions (required for MGRS + Field Link)       -->
-	<!-- ================================================================== -->
-	<key>NSLocationWhenInUseUsageDescription</key>
-	<string>Red Grid Link uses your location to display your MGRS grid position on the map and share it with your team via Field Link.</string>
-	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
-	<string>Red Grid Link uses your location in the background to keep your MGRS position updated and share it with your team via Field Link during active sessions.</string>
-
-	<!-- ================================================================== -->
-	<!-- Camera usage description (QR code scanning for session join)       -->
-	<!-- ================================================================== -->
-	<key>NSCameraUsageDescription</key>
-	<string>Red Grid Link uses the camera to scan QR codes for quick Field Link session joining.</string>
-
-	<!-- ================================================================== -->
-	<!-- Photo library usage (share_plus / file_picker may access photos)   -->
-	<!-- ================================================================== -->
-	<key>NSPhotoLibraryUsageDescription</key>
-	<string>Red Grid Link may access photos when sharing session exports or importing files.</string>
-
-	<!-- ================================================================== -->
-	<!-- Local network usage (Multipeer Connectivity)                       -->
-	<!-- ================================================================== -->
-	<key>NSLocalNetworkUsageDescription</key>
-	<string>Red Grid Link uses the local network to discover and connect with nearby team members via Field Link.</string>
-
-	<!-- ================================================================== -->
-	<!-- Bonjour services (required for Multipeer Connectivity browsing)    -->
-	<!-- ================================================================== -->
 	<key>NSBonjourServices</key>
 	<array>
 		<string>_red-grid-link._tcp</string>
 	</array>
-
-	<!-- ================================================================== -->
-	<!-- Background modes                                                   -->
-	<!-- bluetooth-central:     BLE scanning for Field Link discovery        -->
-	<!-- bluetooth-peripheral:  BLE advertising as Field Link peer           -->
-	<!-- location:              Background GPS for position sharing          -->
-	<!-- ================================================================== -->
-	<key>UIBackgroundModes</key>
-	<array>
-		<string>bluetooth-central</string>
-		<string>bluetooth-peripheral</string>
-		<string>location</string>
-	</array>
-
-	<!-- ================================================================== -->
-	<!-- Scene configuration (Flutter default)                              -->
-	<!-- ================================================================== -->
+	<key>NSCameraUsageDescription</key>
+	<string>Red Grid Link uses the camera to scan QR codes for quick Field Link session joining.</string>
+	<key>NSLocalNetworkUsageDescription</key>
+	<string>Red Grid Link uses the local network to discover and connect with nearby team members via Field Link.</string>
+	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+	<string>Red Grid Link uses your location in the background to keep your MGRS position updated and share it with your team via Field Link during active sessions.</string>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>Red Grid Link uses your location to display your MGRS grid position on the map and share it with your team via Field Link.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Red Grid Link may access photos when sharing session exports or importing files.</string>
 	<key>UIApplicationSceneManifest</key>
 	<dict>
 		<key>UIApplicationSupportsMultipleScenes</key>
@@ -106,15 +67,14 @@
 			</array>
 		</dict>
 	</dict>
-	<!-- ================================================================== -->
-	<!-- Encryption declaration (AES-256-GCM used for Field Link sync)     -->
-	<!-- Qualifies for mass market exemption under EAR 740.17              -->
-	<!-- (peer-to-peer auth/communication, not content protection/DRM)     -->
-	<!-- ================================================================== -->
-	<key>ITSAppUsesNonExemptEncryption</key>
-	<false/>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
+	<key>UIBackgroundModes</key>
+	<array>
+		<string>bluetooth-central</string>
+		<string>bluetooth-peripheral</string>
+		<string>location</string>
+	</array>
 	<key>UILaunchStoryboardName</key>
 	<string>LaunchScreen</string>
 	<key>UIMainStoryboardFile</key>

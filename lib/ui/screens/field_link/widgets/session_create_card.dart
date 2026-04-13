@@ -13,6 +13,7 @@ import '../../../../core/utils/haptics.dart';
 import '../../../../data/models/operational_mode.dart';
 import '../../../../data/models/session.dart';
 import '../../../../providers/field_link_provider.dart';
+import '../../../../providers/settings_provider.dart';
 import '../../../../providers/theme_provider.dart';
 import '../../../../services/field_link/battery/battery_manager.dart';
 import '../../../common/widgets/tactical_button.dart';
@@ -103,6 +104,18 @@ class _SessionCreateCardState extends ConsumerState<SessionCreateCard> {
         pin: _securityMode == SecurityMode.pin ? _generatedPin : null,
         mode: _operationalMode,
       );
+
+      // Set callsign from display name so peers see a human-readable
+      // label instead of a truncated UUID.
+      final displayName = ref.read(displayNameProvider);
+      if (displayName.isNotEmpty) {
+        service.setCallsign(displayName);
+      }
+
+      // Sync the global operational mode to match the session so the
+      // bottom nav mode indicator and all mode-aware UI reflects the
+      // mode the user selected for this session.
+      ref.read(operationalModeProvider.notifier).set(_operationalMode.id);
     } catch (e) {
       notifyError();
       if (mounted) {

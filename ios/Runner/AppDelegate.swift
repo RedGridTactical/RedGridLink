@@ -6,6 +6,7 @@ import UIKit
 
     private var multipeerChannel: MultipeerChannel?
     private var batteryChannel: BatteryChannel?
+    private var bleAdvertiserChannel: BleAdvertiserChannel?
 
     override func application(
         _ application: UIApplication,
@@ -30,5 +31,9 @@ import UIKit
 
         // Register BLE PHY platform channel (Coded PHY / Long Range)
         BlePhyChannel.register(with: messenger)
+
+        // Register BLE Advertiser platform channel (GATT server / peripheral mode)
+        bleAdvertiserChannel = BleAdvertiserChannel()
+        bleAdvertiserChannel?.register(with: messenger)
     }
 }
