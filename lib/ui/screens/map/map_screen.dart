@@ -121,9 +121,13 @@ class _MapScreenState extends ConsumerState<MapScreen> {
 
     // Feed GPS position to the map controller for auto-follow and recenter.
     // This bridges LocationService → MapControllerService reactively.
+    // Deferred to post-frame to avoid "FlutterMap not rendered yet" error
+    // on the very first build when the controller isn't initialized.
     if (gpsPosition != null) {
       final latLng = LatLng(gpsPosition.lat, gpsPosition.lon);
-      controllerService.followPosition(latLng);
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) controllerService.followPosition(latLng);
+      });
 
       // Position syncing to Field Link is handled by positionSyncProvider
       // in app.dart — runs on every tab, not just MAP. Boundary checks

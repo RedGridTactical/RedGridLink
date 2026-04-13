@@ -34,13 +34,20 @@ const _deviceIdKey = 'red_grid_link_device_id';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  // In debug mode, suppress the red error screen so the app remains
-  // usable for screenshots and testing. The assertion ("Tried to modify
-  // a provider while the widget tree was building") is a debug-only
-  // warning that does not affect release builds.
+  // In debug mode, log errors but keep the widget tree functional.
+  // The default red error screen replaces the ENTIRE widget, making
+  // the app unusable. This logs the error and shows a minimal indicator.
   if (kDebugMode) {
     ErrorWidget.builder = (FlutterErrorDetails details) {
-      return const SizedBox.shrink();
+      FlutterError.dumpErrorToConsole(details);
+      return Container(
+        color: const Color(0x88FF0000),
+        padding: const EdgeInsets.all(8),
+        child: Text(
+          details.exceptionAsString().split('\n').first,
+          style: const TextStyle(color: Color(0xFFFFFFFF), fontSize: 10),
+        ),
+      );
     };
   }
 
