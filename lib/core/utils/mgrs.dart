@@ -109,7 +109,7 @@ String _utmToMGRS(
   ];
 
   final int setNum = ((zoneNum - 1) % colSets) + 1;
-  final String colSet = colOrigins[((setNum - 1) / 2).floor()];
+  final String colSet = colOrigins[(setNum - 1) % 3];
   final String rowSet = rowOrigins[(setNum - 1) % 2];
 
   final int colIdx = (easting / 100000).floor() - 1;
@@ -246,7 +246,7 @@ String formatUTM(double lat, double lon) {
     final northing = int.parse(nums.substring(half)) * scale;
 
     final setNum = ((zone - 1) % 6) + 1;
-    final colSet = ['ABCDEFGH', 'JKLMNPQR', 'STUVWXYZ'][((setNum - 1) / 2).floor()];
+    final colSet = ['ABCDEFGH', 'JKLMNPQR', 'STUVWXYZ'][(setNum - 1) % 3];
     final rowSet = [
       'ABCDEFGHJKLMNPQRSTUV',
       'FGHJKLMNPQRSTUVABCDE'
