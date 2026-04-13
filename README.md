@@ -29,13 +29,9 @@ Built on the MGRS engine from [Red Grid MGRS](https://github.com/RedGridTactical
 
 ## Screenshots
 
-| Map & Team | Grid View | Field Link | Ghost Markers |
-|:---:|:---:|:---:|:---:|
-| ![Map & Team](docs/images/screenshot_1_map_team.png) | ![Grid View](docs/images/screenshot_2_grid_view.png) | ![Field Link](docs/images/screenshot_3_field_link.png) | ![Ghost Markers](docs/images/screenshot_4_ghost_markers.png) |
-
-| AAR Export | Tactical Themes | Tools | Onboarding |
-|:---:|:---:|:---:|:---:|
-| ![AAR Export](docs/images/screenshot_5_aar_export.png) | ![Tactical Themes](docs/images/screenshot_6_themes.png) | ![Tools](docs/images/screenshot_7_tools.png) | ![Onboarding](docs/images/screenshot_8_onboarding.png) |
+| Team Map | MGRS Grid | Field Link | Tools | Themes |
+|:---:|:---:|:---:|:---:|:---:|
+| ![Team Map](docs/images/01_map_team.png) | ![MGRS Grid](docs/images/02_grid_mgrs.png) | ![Field Link](docs/images/03_field_link.png) | ![Tools](docs/images/04_tools.png) | ![Themes](docs/images/05_themes.png) |
 
 ---
 
