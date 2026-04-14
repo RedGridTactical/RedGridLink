@@ -28,17 +28,14 @@
     align-items: center;
   }
 
-  /* Red Grid tactical gradients — dark-to-red theme */
+  /* Each frame gets a unique gradient matching its theme */
   .frame-1 { background: linear-gradient(170deg, #0A0000 0%, #0A0000 20%, #8B0000 75%, #CC3333 100%); }
-  .frame-2 { background: linear-gradient(170deg, #0A0000 0%, #110000 25%, #660000 70%, #CC3333 100%); }
-  .frame-3 { background: linear-gradient(170deg, #0A0000 0%, #0A0000 20%, #991111 75%, #CC3333 100%); }
-  .frame-4 { background: linear-gradient(170deg, #0A0000 0%, #0A0000 30%, #772222 75%, #CC3333 100%); }
-  .frame-5 { background: linear-gradient(170deg, #0A0000 0%, #0A0000 20%, #8B0000 80%, #EE4444 100%); }
-  .frame-6 { background: linear-gradient(170deg, #001400 0%, #001400 25%, #006600 70%, #00BB00 100%); }
-  .frame-7 { background: linear-gradient(170deg, #000A14 0%, #000A14 25%, #005588 70%, #0099DD 100%); }
-  .frame-8 { background: linear-gradient(170deg, #F0F0F0 0%, #E0E0E0 25%, #990000 75%, #CC3333 100%); }
+  .frame-2 { background: linear-gradient(170deg, #001400 0%, #001400 25%, #006600 70%, #00BB00 100%); }
+  .frame-3 { background: linear-gradient(170deg, #000A14 0%, #000A14 25%, #005588 70%, #0099DD 100%); }
+  .frame-4 { background: linear-gradient(170deg, #F0F0F0 0%, #E0E0E0 25%, #990000 75%, #CC3333 100%); }
+  .frame-5 { background: linear-gradient(170deg, #0A0000 0%, #0A0000 20%, #991111 75%, #CC3333 100%); }
 
-  /* Decorative blur shapes */
+  /* Decorative blur */
   .frame::before {
     content: '';
     position: absolute;
@@ -48,25 +45,15 @@
     opacity: 0.07;
     top: 300px;
     left: -200px;
-    background: #CC3333;
     filter: blur(160px);
     pointer-events: none;
   }
-  .frame::after {
-    content: '';
-    position: absolute;
-    width: 700px;
-    height: 700px;
-    border-radius: 50%;
-    opacity: 0.04;
-    bottom: 800px;
-    right: -100px;
-    background: #FF6666;
-    filter: blur(120px);
-    pointer-events: none;
-  }
+  .frame-1::before { background: #CC3333; }
+  .frame-2::before { background: #00CC00; }
+  .frame-3::before { background: #0099DD; }
+  .frame-4::before { background: #CC0000; }
+  .frame-5::before { background: #CC3333; }
 
-  /* Headline text */
   .headline {
     position: relative;
     z-index: 2;
@@ -97,11 +84,9 @@
     letter-spacing: 0.5px;
   }
 
-  /* Day White frame overrides */
-  .frame-8 .headline { color: #111111; text-shadow: none; }
-  .frame-8 .subtitle { color: rgba(0,0,0,0.5); }
+  .frame-4 .headline { color: #111111; text-shadow: none; }
+  .frame-4 .subtitle { color: rgba(0,0,0,0.5); }
 
-  /* Phone mockup — larger for impact */
   .phone {
     position: relative;
     z-index: 2;
@@ -128,60 +113,39 @@
 </head>
 <body>
 
-<!-- 1: Team Map — hero shot -->
+<!-- 1: Red Light MAP -->
 <div class="frame frame-1">
   <div class="headline">Your Team. One Map. No Signal Required.</div>
   <div class="subtitle">Encrypted Bluetooth sync — zero infrastructure</div>
   <div class="phone"><img src="../../screenshots/raw/01_map_team.png" alt="Map with team positions"></div>
 </div>
 
-<!-- 2: MGRS Grid -->
+<!-- 2: NVG Green GRID -->
 <div class="frame frame-2">
   <div class="headline">MGRS Precision Navigation</div>
   <div class="subtitle">Live 10-digit military grid, 1-meter accuracy</div>
   <div class="phone"><img src="../../screenshots/raw/02_grid_mgrs.png" alt="MGRS grid display"></div>
 </div>
 
-<!-- 3: Field Link Session -->
+<!-- 3: Blue Force LINK -->
 <div class="frame frame-3">
   <div class="headline">Field Link — Zero Infrastructure</div>
   <div class="subtitle">AES-256 encrypted peer-to-peer coordination</div>
   <div class="phone"><img src="../../screenshots/raw/03_field_link.png" alt="Field Link session"></div>
 </div>
 
-<!-- 4: 11 Tools -->
+<!-- 4: Day White TOOLS -->
 <div class="frame frame-4">
   <div class="headline">11 Tactical Field Tools</div>
   <div class="subtitle">Dead reckoning, resection, coord converter + 8 more</div>
   <div class="phone"><img src="../../screenshots/raw/04_tools.png" alt="11 tactical tools"></div>
 </div>
 
-<!-- 5: Themes selector -->
+<!-- 5: Red Light SETTINGS -->
 <div class="frame frame-5">
   <div class="headline">4 Tactical Display Themes</div>
   <div class="subtitle">Red Light · NVG Green · Day White · Blue Force</div>
   <div class="phone"><img src="../../screenshots/raw/05_themes.png" alt="Theme selector"></div>
-</div>
-
-<!-- 6: NVG Green map -->
-<div class="frame frame-6">
-  <div class="headline">Night Vision Ready</div>
-  <div class="subtitle">NOD-compatible green phosphor display</div>
-  <div class="phone"><img src="../../screenshots/raw/06_nvg_green.png" alt="NVG Green map"></div>
-</div>
-
-<!-- 7: Blue Force tools -->
-<div class="frame frame-7">
-  <div class="headline">11 Tools In Blue Force</div>
-  <div class="subtitle">Dead reckoning to slope calc — any theme</div>
-  <div class="phone"><img src="../../screenshots/raw/07_blue_force.png" alt="Blue Force tools"></div>
-</div>
-
-<!-- 8: Day White link -->
-<div class="frame frame-8">
-  <div class="headline">High-Visibility Day Mode</div>
-  <div class="subtitle">Full contrast team coordination</div>
-  <div class="phone"><img src="../../screenshots/raw/08_day_white.png" alt="Day White peers"></div>
 </div>
 
 </body>

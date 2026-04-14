@@ -29,9 +29,6 @@ const CAPTIONS = [
   '03_field_link',
   '04_tools',
   '05_themes',
-  '06_nvg_green',
-  '07_blue_force',
-  '08_day_white',
 ];
 
 (async () => {
