@@ -227,10 +227,14 @@ class SyncEngine {
   }
 
   /// Add or update a marker and broadcast the delta.
+  /// Saves locally regardless of session state — broadcast is best-effort.
   Future<void> addMarker(Marker marker) async {
-    if (!_isRunning) return;
-
     _state = _state.upsertMarker(_localDeviceId, marker);
+
+    if (!_isRunning) {
+      _emitState();
+      return;
+    }
 
     final payload = _encoder.encodeMarker(
       _localDeviceId,
@@ -248,10 +252,14 @@ class SyncEngine {
   }
 
   /// Add or update an annotation and broadcast the delta.
+  /// Saves locally regardless of session state — broadcast is best-effort.
   Future<void> addAnnotation(Annotation annotation) async {
-    if (!_isRunning) return;
-
     _state = _state.upsertAnnotation(_localDeviceId, annotation);
+
+    if (!_isRunning) {
+      _emitState();
+      return;
+    }
 
     final payload = _encoder.encodeAnnotation(
       _localDeviceId,
@@ -265,9 +273,12 @@ class SyncEngine {
 
   /// Remove a marker by ID and broadcast a tombstone.
   Future<void> removeMarker(String markerId) async {
-    if (!_isRunning) return;
-
     _state = _state.deleteMarker(_localDeviceId, markerId);
+
+    if (!_isRunning) {
+      _emitState();
+      return;
+    }
 
     final payload = _encoder.encodeMarkerDelete(
       _localDeviceId,
@@ -284,9 +295,12 @@ class SyncEngine {
 
   /// Remove an annotation by ID and broadcast a tombstone.
   Future<void> removeAnnotation(String annotationId) async {
-    if (!_isRunning) return;
-
     _state = _state.deleteAnnotation(_localDeviceId, annotationId);
+
+    if (!_isRunning) {
+      _emitState();
+      return;
+    }
 
     final payload = _encoder.encodeAnnotationDelete(
       _localDeviceId,

@@ -28,14 +28,17 @@
     align-items: center;
   }
 
-  /* Each frame gets a unique gradient matching its theme */
   .frame-1 { background: linear-gradient(170deg, #0A0000 0%, #0A0000 20%, #8B0000 75%, #CC3333 100%); }
   .frame-2 { background: linear-gradient(170deg, #001400 0%, #001400 25%, #006600 70%, #00BB00 100%); }
   .frame-3 { background: linear-gradient(170deg, #000A14 0%, #000A14 25%, #005588 70%, #0099DD 100%); }
   .frame-4 { background: linear-gradient(170deg, #F0F0F0 0%, #E0E0E0 25%, #990000 75%, #CC3333 100%); }
   .frame-5 { background: linear-gradient(170deg, #0A0000 0%, #0A0000 20%, #991111 75%, #CC3333 100%); }
+  .frame-6 { background: linear-gradient(170deg, #0A0000 0%, #0A0000 20%, #8B0000 75%, #EE4444 100%); }
+  .frame-7 { background: linear-gradient(170deg, #001400 0%, #001400 25%, #007700 70%, #00DD00 100%); }
+  .frame-8 { background: linear-gradient(170deg, #000A14 0%, #000A14 25%, #006699 70%, #00BBEE 100%); }
+  .frame-9 { background: linear-gradient(170deg, #F0F0F0 0%, #E0E0E0 25%, #BB2222 75%, #EE4444 100%); }
+  .frame-10 { background: linear-gradient(170deg, #F0F0F0 0%, #E0E0E0 25%, #990000 75%, #CC3333 100%); }
 
-  /* Decorative blur */
   .frame::before {
     content: '';
     position: absolute;
@@ -48,11 +51,10 @@
     filter: blur(160px);
     pointer-events: none;
   }
-  .frame-1::before { background: #CC3333; }
-  .frame-2::before { background: #00CC00; }
-  .frame-3::before { background: #0099DD; }
+  .frame-1::before, .frame-5::before, .frame-6::before, .frame-9::before, .frame-10::before { background: #CC3333; }
+  .frame-2::before, .frame-7::before { background: #00CC00; }
+  .frame-3::before, .frame-8::before { background: #0099DD; }
   .frame-4::before { background: #CC0000; }
-  .frame-5::before { background: #CC3333; }
 
   .headline {
     position: relative;
@@ -61,7 +63,7 @@
     font-weight: 800;
     color: #ffffff;
     text-align: center;
-    line-height: 1.08;
+    line-height: 1.12;
     letter-spacing: -2px;
     max-width: 1100px;
     padding: 140px 80px 0;
@@ -72,20 +74,20 @@
   .subtitle {
     position: relative;
     z-index: 2;
-    font-size: 40px;
+    font-size: 42px;
     font-weight: 400;
-    color: rgba(255,255,255,0.65);
+    color: rgba(255,255,255,0.72);
     text-align: center;
-    margin-top: 22px;
+    margin-top: 24px;
     max-width: 1000px;
-    line-height: 1.35;
+    line-height: 1.4;
     padding: 0 80px;
     font-family: 'SF Mono', 'Menlo', monospace;
     letter-spacing: 0.5px;
   }
 
-  .frame-4 .headline { color: #111111; text-shadow: none; }
-  .frame-4 .subtitle { color: rgba(0,0,0,0.5); }
+  .frame-4 .headline, .frame-9 .headline, .frame-10 .headline { color: #111111; text-shadow: none; }
+  .frame-4 .subtitle, .frame-9 .subtitle, .frame-10 .subtitle { color: rgba(0,0,0,0.55); }
 
   .phone {
     position: relative;
@@ -113,39 +115,64 @@
 </head>
 <body>
 
-<!-- 1: Red Light MAP -->
 <div class="frame frame-1">
   <div class="headline">Your Team. One Map. No Signal Required.</div>
   <div class="subtitle">Encrypted Bluetooth sync — zero infrastructure</div>
-  <div class="phone"><img src="../../screenshots/raw/01_map_team.png" alt="Map with team positions"></div>
+  <div class="phone"><img src="../../screenshots/raw/01_map_team.png" alt="Team map"></div>
 </div>
 
-<!-- 2: NVG Green GRID -->
 <div class="frame frame-2">
   <div class="headline">MGRS Precision Navigation</div>
   <div class="subtitle">Live 10-digit military grid, 1-meter accuracy</div>
-  <div class="phone"><img src="../../screenshots/raw/02_grid_mgrs.png" alt="MGRS grid display"></div>
+  <div class="phone"><img src="../../screenshots/raw/02_grid_mgrs.png" alt="MGRS grid"></div>
 </div>
 
-<!-- 3: Blue Force LINK -->
 <div class="frame frame-3">
   <div class="headline">Field Link — Zero Infrastructure</div>
   <div class="subtitle">AES-256 encrypted peer-to-peer coordination</div>
-  <div class="phone"><img src="../../screenshots/raw/03_field_link.png" alt="Field Link session"></div>
+  <div class="phone"><img src="../../screenshots/raw/03_field_link.png" alt="Field Link"></div>
 </div>
 
-<!-- 4: Day White TOOLS -->
 <div class="frame frame-4">
   <div class="headline">11 Tactical Field Tools</div>
-  <div class="subtitle">Dead reckoning, resection, coord converter + 8 more</div>
-  <div class="phone"><img src="../../screenshots/raw/04_tools.png" alt="11 tactical tools"></div>
+  <div class="subtitle">Dead reckoning, resection, coord converter + more</div>
+  <div class="phone"><img src="../../screenshots/raw/04_tools.png" alt="Tools"></div>
 </div>
 
-<!-- 5: Red Light SETTINGS -->
 <div class="frame frame-5">
   <div class="headline">4 Tactical Display Themes</div>
   <div class="subtitle">Red Light · NVG Green · Day White · Blue Force</div>
-  <div class="phone"><img src="../../screenshots/raw/05_themes.png" alt="Theme selector"></div>
+  <div class="phone"><img src="../../screenshots/raw/05_themes.png" alt="Themes"></div>
+</div>
+
+<div class="frame frame-6">
+  <div class="headline">Distance & Bearing at a Tap</div>
+  <div class="subtitle">Tactical info on every teammate</div>
+  <div class="phone"><img src="../../screenshots/raw/06_peer_popup.png" alt="Peer popup"></div>
+</div>
+
+<div class="frame frame-7">
+  <div class="headline">Dead Reckoning Plotter</div>
+  <div class="subtitle">Heading + distance to MGRS destination</div>
+  <div class="phone"><img src="../../screenshots/raw/07_dead_reckoning.png" alt="Dead reckoning"></div>
+</div>
+
+<div class="frame frame-8">
+  <div class="headline">Celestial Navigation</div>
+  <div class="subtitle">Sun and moon bearing — calibrate any compass</div>
+  <div class="phone"><img src="../../screenshots/raw/08_celestial.png" alt="Celestial"></div>
+</div>
+
+<div class="frame frame-9">
+  <div class="headline">Mark Boundaries & Search Sectors</div>
+  <div class="subtitle">Draw polygons and share with your team</div>
+  <div class="phone"><img src="../../screenshots/raw/09_search_area.png" alt="Search area"></div>
+</div>
+
+<div class="frame frame-10">
+  <div class="headline">Team Roster with Roles</div>
+  <div class="subtitle">Lead · Scout · Medic · Comms — assign on the fly</div>
+  <div class="phone"><img src="../../screenshots/raw/10_roster.png" alt="Team roster"></div>
 </div>
 
 </body>

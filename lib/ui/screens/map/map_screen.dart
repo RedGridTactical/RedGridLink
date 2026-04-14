@@ -289,7 +289,9 @@ class _MapScreenState extends ConsumerState<MapScreen> {
             ),
 
           // ── Message bar (above coordinate bar, session-gated) ────────────
-          if (isSessionActive)
+          // Hidden when the annotation toolbar is open (same position) OR
+          // when actively drawing — both would block the map.
+          if (isSessionActive && !showToolbar && !isDrawing)
             Positioned(
               left: 0,
               right: 0,

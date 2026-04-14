@@ -232,10 +232,17 @@ final fieldLinkStatusStreamProvider = StreamProvider<FieldLinkStatus>((ref) {
 /// the sync engine's CRDT state changes.
 /// In demo mode, emits five fake markers covering every icon type.
 final syncedMarkersProvider = StreamProvider<List<model.Marker>>((ref) {
-  if (ref.watch(demoModeProvider)) {
-    return Stream.value(ref.watch(demoMarkersProvider));
-  }
   final service = ref.watch(fieldLinkServiceProvider);
+  if (ref.watch(demoModeProvider)) {
+    final demo = ref.watch(demoMarkersProvider);
+    Stream<List<model.Marker>> mergedStream() async* {
+      yield [...demo, ...service.currentMarkers];
+      await for (final user in service.markersStream) {
+        yield [...demo, ...user];
+      }
+    }
+    return mergedStream();
+  }
   return service.markersStream;
 });
 
@@ -247,12 +254,22 @@ final syncedMarkersProvider = StreamProvider<List<model.Marker>>((ref) {
 ///
 /// Emits the latest list of live (non-tombstoned) annotations whenever
 /// the sync engine's CRDT state changes.
-/// In demo mode, emits one boundary polygon around the demo AO.
+/// In demo mode, merges the demo AO boundary with any user-drawn
+/// annotations so drawings persist on the map.
 final syncedAnnotationsProvider = StreamProvider<List<Annotation>>((ref) {
-  if (ref.watch(demoModeProvider)) {
-    return Stream.value(ref.watch(demoAnnotationsProvider));
-  }
   final service = ref.watch(fieldLinkServiceProvider);
+  if (ref.watch(demoModeProvider)) {
+    final demo = ref.watch(demoAnnotationsProvider);
+    // Emit an initial snapshot (demo + any already-saved user annotations)
+    // then merge demo with every subsequent user-draw event.
+    Stream<List<Annotation>> mergedStream() async* {
+      yield [...demo, ...service.currentAnnotations];
+      await for (final user in service.annotationsStream) {
+        yield [...demo, ...user];
+      }
+    }
+    return mergedStream();
+  }
   return service.annotationsStream;
 });
 

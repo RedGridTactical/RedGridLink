@@ -33,6 +33,10 @@ Built on the MGRS engine from [Red Grid MGRS](https://github.com/RedGridTactical
 |:---:|:---:|:---:|:---:|:---:|
 | ![Team Map](screenshots/raw/01_map_team.png) | ![MGRS Grid](screenshots/raw/02_grid_mgrs.png) | ![Field Link](screenshots/raw/03_field_link.png) | ![Tools](screenshots/raw/04_tools.png) | ![Themes](screenshots/raw/05_themes.png) |
 
+| Peer Detail | Dead Reckoning | Celestial Nav | Search Area | Team Roster |
+|:---:|:---:|:---:|:---:|:---:|
+| ![Peer Popup](screenshots/raw/06_peer_popup.png) | ![Dead Reckoning](screenshots/raw/07_dead_reckoning.png) | ![Celestial](screenshots/raw/08_celestial.png) | ![Search Area](screenshots/raw/09_search_area.png) | ![Team Roster](screenshots/raw/10_roster.png) |
+
 ---
 
 ## Features

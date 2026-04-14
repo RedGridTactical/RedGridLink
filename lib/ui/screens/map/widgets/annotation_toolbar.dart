@@ -111,8 +111,10 @@ class AnnotationToolbar extends ConsumerWidget {
                       tooltip: 'Undo point',
                     ),
                     const SizedBox(width: 4),
-                    // Done
-                    if (drawingPoints.length >= 2)
+                    // Done — marker mode needs 1+ point, others need 2+
+                    if ((drawingMode == DrawingMode.marker &&
+                            drawingPoints.isNotEmpty) ||
+                        drawingPoints.length >= 2)
                       _SmallButton(
                         icon: Icons.check,
                         colors: colors,

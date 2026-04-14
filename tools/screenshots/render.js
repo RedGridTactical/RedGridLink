@@ -29,6 +29,11 @@ const CAPTIONS = [
   '03_field_link',
   '04_tools',
   '05_themes',
+  '06_peer_popup',
+  '07_dead_reckoning',
+  '08_celestial',
+  '09_search_area',
+  '10_roster',
 ];
 
 (async () => {
