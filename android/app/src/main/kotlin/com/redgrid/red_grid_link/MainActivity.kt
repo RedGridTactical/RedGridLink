@@ -15,6 +15,7 @@ class MainActivity : FlutterActivity() {
 
     private var nearbyConnectionsChannel: NearbyConnectionsChannel? = null
     private var batteryChannel: BatteryChannel? = null
+    private var bleAdvertiserChannel: BleAdvertiserChannel? = null
     private var mainMethodChannel: MethodChannel? = null
     private var blePhyChannel: MethodChannel? = null
 
@@ -28,6 +29,11 @@ class MainActivity : FlutterActivity() {
 
         // Register Battery platform channel
         batteryChannel = BatteryChannel(this).also {
+            it.register(flutterEngine)
+        }
+
+        // Register BLE Advertiser platform channel (GATT server + advertising)
+        bleAdvertiserChannel = BleAdvertiserChannel(this).also {
             it.register(flutterEngine)
         }
 
@@ -56,6 +62,9 @@ class MainActivity : FlutterActivity() {
 
         batteryChannel?.unregister()
         batteryChannel = null
+
+        bleAdvertiserChannel?.unregister()
+        bleAdvertiserChannel = null
 
         mainMethodChannel?.setMethodCallHandler(null)
         mainMethodChannel = null
