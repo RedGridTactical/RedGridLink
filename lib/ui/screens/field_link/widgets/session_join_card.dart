@@ -53,15 +53,29 @@ class _SessionJoinCardState extends ConsumerState<SessionJoinCard> {
           return false;
         }
       } else {
+        // Android: SCAN + CONNECT + ADVERTISE. The joiner also advertises
+        // now (v1.5.4) so a third teammate can find them mid-session, and
+        // so the creator's slot isn't the single point of failure if its
+        // BLE advertising is rate-limited. Without ADVERTISE granted,
+        // BleAdvertiserChannel.kt silently fails when we try to start
+        // the GATT server from joinSession.
         final scanStatus = await Permission.bluetoothScan.status;
         final connectStatus = await Permission.bluetoothConnect.status;
-        if (!scanStatus.isGranted || !connectStatus.isGranted) {
+        final advertiseStatus = await Permission.bluetoothAdvertise.status;
+        if (!scanStatus.isGranted ||
+            !connectStatus.isGranted ||
+            !advertiseStatus.isGranted) {
           final results = await [
             Permission.bluetoothScan,
             Permission.bluetoothConnect,
+            Permission.bluetoothAdvertise,
           ].request();
-          final allGranted = results.values.every((s) => s.isGranted);
-          if (!allGranted && mounted) {
+          // SCAN and CONNECT are hard requirements. ADVERTISE is soft —
+          // without it the joiner can still operate as a central-only
+          // client, just won't be discoverable to a third teammate.
+          final hardGranted = (results[Permission.bluetoothScan]?.isGranted ?? false) &&
+              (results[Permission.bluetoothConnect]?.isGranted ?? false);
+          if (!hardGranted && mounted) {
             _showScanError('Bluetooth permission required. Enable in Settings.');
             return false;
           }
@@ -112,8 +126,29 @@ class _SessionJoinCardState extends ConsumerState<SessionJoinCard> {
       deviceSub = service.discoveredSessionsStream.listen((device) {
         if (!mounted) return;
         setState(() {
-          if (!_discoveredDevices.any((d) => d.id == device.id)) {
+          // Some BLE stacks deliver the service UUID in the first scan
+          // callback and the service data (which carries our sessionId)
+          // in a later one. If we already have this device WITHOUT a
+          // sessionId and the new result DOES carry one, replace the
+          // entry in place so a user-tap joins the correct session
+          // instead of erroring out with "this host did not broadcast
+          // its session id".
+          final existingIndex =
+              _discoveredDevices.indexWhere((d) => d.id == device.id);
+          if (existingIndex == -1) {
             _discoveredDevices.add(device);
+          } else {
+            final existing = _discoveredDevices[existingIndex];
+            final needsUpgrade = (existing.sessionId == null ||
+                    existing.sessionId!.isEmpty) &&
+                device.sessionId != null &&
+                device.sessionId!.isNotEmpty;
+            // Also upgrade if the RSSI changed meaningfully so the list
+            // reflects current signal strength.
+            final rssiChanged = (existing.rssi ?? 0) != (device.rssi ?? 0);
+            if (needsUpgrade || rssiChanged) {
+              _discoveredDevices[existingIndex] = device;
+            }
           }
         });
       });
