@@ -1,3 +1,5 @@
+import 'dart:io' show Platform;
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -26,6 +28,9 @@ import 'package:red_grid_link/services/field_link/field_link_service.dart';
 import 'package:red_grid_link/services/field_link/ghost/ghost_manager.dart';
 import 'package:red_grid_link/services/field_link/sync/sync_engine.dart';
 import 'package:red_grid_link/services/field_link/transport/ble_transport.dart';
+import 'package:red_grid_link/services/field_link/transport/ios_p2p_transport.dart';
+import 'package:red_grid_link/services/field_link/transport/multi_transport.dart';
+import 'package:red_grid_link/services/field_link/transport/transport_service.dart';
 import 'package:red_grid_link/services/map/tile_manager.dart';
 
 /// Key used to persist the local device ID across launches.
@@ -94,7 +99,26 @@ void main() async {
   // ---------------------------------------------------------------------------
   // Field Link sub-services
   // ---------------------------------------------------------------------------
-  final transport = BleTransport();
+
+  // The transport stack runs BLE everywhere. On iOS, Multipeer Connectivity
+  // is added as a parallel transport so the two phones have two independent
+  // ways to find each other in proximity. iOS suppresses BLE service-UUID
+  // emission while the app is backgrounded; MPC keeps working in that
+  // state and so prevents the "we paired but now nobody can see anyone"
+  // failure mode that motivated the v1.5.4 reviewer reports.
+  final BleTransport bleTransport = BleTransport();
+  final TransportService transport;
+  if (Platform.isIOS) {
+    transport = MultiTransport(
+      primary: bleTransport,
+      secondaries: [IosP2pTransport()],
+    );
+  } else {
+    // Android: BLE only for now. Nearby Connections (AndroidP2pTransport)
+    // is a planned addition; no native plugin is wired yet.
+    transport = bleTransport;
+  }
+
   final ghostManager = GhostManager();
   final batteryManager = BatteryManager();
   final syncEngine = SyncEngine(

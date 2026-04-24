@@ -311,13 +311,47 @@ class BleAdvertiserChannel(
             .addServiceUuid(ParcelUuid(SERVICE_UUID))
             .build()
 
+        // Encode the session UUID v4 as 16 raw bytes and put it in the
+        // scan-response service-data payload. Joiners parse this from
+        // `ScanResult.advertisementData.serviceData` and use it as the
+        // canonical CRDT session id. Without this, the join button would
+        // call FieldLinkService.joinSession(device.id) where device.id is
+        // the BLE peripheral MAC address, which mismatches the host's
+        // UUID v4 sessionId and silently breaks sync. (Was the cause of
+        // multiple post-v1.5.2 reviewer reports of "phones can't find
+        // each other in active sessions".)
+        //
+        // Falls back to the legacy "RGL" tag if the sessionId is unparseable
+        // so we do not hard-fail advertising on a corrupt session id.
+        val sessionBytes = pendingSessionId?.let { sessionIdToBytes(it) }
+            ?: "RGL".toByteArray()
         val scanResponse = AdvertiseData.Builder()
             .setIncludeDeviceName(false)
-            .addServiceData(ParcelUuid(SERVICE_UUID), "RGL".toByteArray())
+            .addServiceData(ParcelUuid(SERVICE_UUID), sessionBytes)
             .build()
 
         adv.startAdvertising(settings, data, scanResponse, advertiseCallback)
         Log.i(TAG, "Advertising started (session=$pendingSessionId)")
+    }
+
+    /**
+     * Convert a UUID v4 string ("550e8400-e29b-41d4-a716-446655440000")
+     * into the 16 raw bytes that go into the BLE service data field.
+     * Mirrors `BleConstants.encodeSessionIdToBytes` on the Dart side and
+     * `BleAdvertiserChannel.sessionIdToBytes` on iOS.
+     *
+     * Returns null if the input is not a parseable hex UUID.
+     */
+    private fun sessionIdToBytes(sessionId: String): ByteArray? {
+        val hex = sessionId.replace("-", "")
+        if (hex.length != 32) return null
+        return try {
+            ByteArray(16) { i ->
+                hex.substring(i * 2, i * 2 + 2).toInt(16).toByte()
+            }
+        } catch (e: NumberFormatException) {
+            null
+        }
     }
 
     @Suppress("MissingPermission")

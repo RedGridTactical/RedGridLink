@@ -24,6 +24,7 @@ import 'package:red_grid_link/services/field_link/security/key_exchange_manager.
 import 'package:red_grid_link/services/field_link/sync/crdt/crdt_state.dart';
 import 'package:red_grid_link/services/field_link/sync/sync_engine.dart';
 import 'package:red_grid_link/services/field_link/transport/ble_transport.dart';
+import 'package:red_grid_link/services/field_link/transport/multi_transport.dart';
 import 'package:red_grid_link/services/field_link/transport/transport_service.dart';
 
 /// Connection status for the Field Link service.
@@ -163,7 +164,12 @@ class FieldLinkService {
       await leaveSession();
     }
 
-    final sessionId = generateDeviceId(); // UUID v4
+    // Short 16-hex tag so it fits in the BLE advertisement LocalName
+    // field (iOS CoreBluetooth only permits ServiceUUID + LocalName
+    // for 3rd-party ads). The same tag is reused by joiners as their
+    // session ID so CRDT, marker persistence, and session records all
+    // align across peers.
+    final sessionId = generateSessionTag();
     final sessionKey = generateSessionKey();
     final sessionPin = securityMode == SecurityMode.pin
         ? (pin ?? generatePin())
@@ -194,10 +200,12 @@ class FieldLinkService {
     await _transport.initialize();
 
     // The creator advertises the Field Link GATT service so joiners
-    // can discover and connect.
-    final transport = _transport;
-    if (transport is BleTransport) {
-      await transport.startAdvertising(sessionId);
+    // can discover and connect. Resolve the underlying BleTransport
+    // even when it is wrapped in a MultiTransport (the iOS dual-stack
+    // wrapper that runs BLE alongside Multipeer Connectivity).
+    final ble = _resolveBleTransport();
+    if (ble != null) {
+      await ble.startAdvertising(sessionId);
     }
 
     // Subscribe to discovered devices BEFORE starting the scan so we
@@ -205,6 +213,16 @@ class FieldLinkService {
     await _autoConnectSub?.cancel();
     _autoConnectSub = _transport.discoveredDevices.listen((device) async {
       if (_transport.connectedDeviceIds.contains(device.id)) return;
+
+      // With v1.5.4 the joiner also advertises the same sessionId once
+      // it commits to joining. Filter discoveries so the creator only
+      // auto-connects to peers in its own session — without this, two
+      // overlapping sessions in proximity would have hosts grabbing each
+      // other's joiners.
+      if (device.sessionId != null && device.sessionId != sessionId) {
+        return;
+      }
+
       try {
         print('[FieldLink] Creator auto-connecting to ${device.id}...');
         await _transport.connect(device.id);
@@ -282,6 +300,33 @@ class FieldLinkService {
 
     await _transport.initialize();
 
+    // The joiner ALSO advertises the same session id once it has
+    // committed to joining. This makes the link symmetric:
+    //
+    // - If the host is backgrounded (iOS suppresses central-mode service
+    //   UUID emission while backgrounded), the joiner's advertisement
+    //   keeps the host discoverable to OS-level scan callbacks.
+    // - If a third teammate joins later, they can find this joiner just
+    //   as easily as they found the host.
+    // - If the host's BLE advertising slot is contested (some Android
+    //   chipsets rate-limit advertisers), the joiner's slot picks up the
+    //   slack.
+    //
+    // Two phones advertising the same session id is fine — BLE central
+    // scan results de-duplicate by remoteId, and the CRDT layer is
+    // idempotent.
+    final joinerBle = _resolveBleTransport();
+    if (joinerBle != null) {
+      try {
+        await joinerBle.startAdvertising(sessionId);
+      } catch (e) {
+        // Best-effort: BLE peripheral advertising may not be available on
+        // every device (some Android chipsets, older iOS hardware). The
+        // joiner can still operate as a central-only client.
+        print('[FieldLink] Joiner startAdvertising failed: $e');
+      }
+    }
+
     // Subscribe to discovered devices BEFORE starting the scan so we
     // don't miss the creator if it's discovered instantly. Broadcast
     // streams don't buffer — any event emitted before a listener
@@ -290,6 +335,16 @@ class FieldLinkService {
     _autoConnectSub = _transport.discoveredDevices.listen((device) async {
       // Skip devices we're already connected to.
       if (_transport.connectedDeviceIds.contains(device.id)) return;
+
+      // Only auto-connect to devices in our session. Without this guard,
+      // the joiner would race against any nearby Field Link host —
+      // including ones from other sessions — and try to handshake with
+      // the wrong peer. `device.sessionId == null` means the peer is on
+      // an old build that didn't include sessionId in its advertisement;
+      // skip those rather than risk a cross-session collision.
+      if (device.sessionId != null && device.sessionId != sessionId) {
+        return;
+      }
 
       try {
         print('[FieldLink] Auto-connecting to ${device.id}...');
@@ -342,9 +397,9 @@ class FieldLinkService {
     await _syncEngine.stop();
     await _transport.disconnectAll();
     await _transport.stopDiscovery();
-    final stopTransport = _transport;
-    if (stopTransport is BleTransport) {
-      await stopTransport.stopAdvertising();
+    final stopBle = _resolveBleTransport();
+    if (stopBle != null) {
+      await stopBle.stopAdvertising();
     }
     _stopBatteryPolling();
 
@@ -1093,19 +1148,34 @@ class FieldLinkService {
 
   /// Start RSSI polling if transport is BLE and a callback is registered.
   void _startRssiPolling() {
-    final transport = _transport;
+    final ble = _resolveBleTransport();
     final callback = onRssiReading;
-    if (transport is BleTransport && callback != null) {
-      transport.startRssiPolling(onRssi: callback);
+    if (ble != null && callback != null) {
+      ble.startRssiPolling(onRssi: callback);
     }
   }
 
   /// Stop RSSI polling and clear quality data.
   void _stopRssiPolling() {
-    final transport = _transport;
-    if (transport is BleTransport) {
-      transport.stopRssiPolling();
+    final ble = _resolveBleTransport();
+    if (ble != null) {
+      ble.stopRssiPolling();
     }
     onRssiClear?.call();
+  }
+
+  /// Find the underlying [BleTransport] instance regardless of whether
+  /// `_transport` is a bare BLE transport or a [MultiTransport] wrapper.
+  ///
+  /// Returns null if no BLE transport is in the stack — e.g. a future
+  /// configuration where MPC or Nearby Connections is used standalone.
+  /// All BLE-only operations (peripheral mode advertising, RSSI polling)
+  /// route through this helper instead of an `is BleTransport` check
+  /// that would fail when the transport is wrapped.
+  BleTransport? _resolveBleTransport() {
+    final transport = _transport;
+    if (transport is BleTransport) return transport;
+    if (transport is MultiTransport) return transport.bleTransport;
+    return null;
   }
 }

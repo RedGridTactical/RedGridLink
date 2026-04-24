@@ -38,10 +38,27 @@ enum TransportState {
 /// A device discovered during scanning / browsing.
 class DiscoveredDevice {
   /// Platform-specific identifier (BLE address, endpoint ID, peer ID).
+  ///
+  /// Used by [TransportService.connect] to actually open a link to the
+  /// peer. This is NOT the Field Link session UUID — see [sessionId].
   final String id;
 
   /// Human-readable name advertised by the peer.
   final String name;
+
+  /// Field Link session UUID parsed from the peer's advertising payload
+  /// (BLE service data on Android/iOS, MPC discoveryInfo on iOS).
+  ///
+  /// This is the UUID v4 the host generated in
+  /// [FieldLinkService.createSession]. Joiners MUST pass this value to
+  /// [FieldLinkService.joinSession] so both ends use the same CRDT
+  /// session id. Falling back to [id] would create a sessionId mismatch
+  /// (CoreBluetooth UUID vs. UUID v4) and silently drop all sync data.
+  ///
+  /// May be `null` if the peer is on an old build that did not include
+  /// the session id in its advertisement, or if the scan callback fired
+  /// before the service-data field was populated.
+  final String? sessionId;
 
   /// Device platform inferred from advertising data.
   final DeviceType deviceType;
@@ -55,6 +72,7 @@ class DiscoveredDevice {
   const DiscoveredDevice({
     required this.id,
     required this.name,
+    this.sessionId,
     this.deviceType = DeviceType.unknown,
     this.rssi,
     required this.discoveredAt,
@@ -62,7 +80,7 @@ class DiscoveredDevice {
 
   @override
   String toString() =>
-      'DiscoveredDevice(id: $id, name: $name, rssi: $rssi)';
+      'DiscoveredDevice(id: $id, name: $name, sessionId: $sessionId, rssi: $rssi)';
 }
 
 /// An incoming data message from a connected peer.

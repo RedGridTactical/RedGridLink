@@ -225,7 +225,7 @@ class BleTransport implements TransportService {
     // while CBCentralManager initializes (~100-500ms). Using `.first` would
     // capture that initial `unknown` and incorrectly treat BT as unavailable.
     // We filter out `unknown` and wait for a definitive state (on/off/etc).
-    print('[BleTransport] initialize: checking adapter state...');
+    if (kDebugMode) print('[BleTransport] initialize: checking adapter state...');
     BluetoothAdapterState adapterState;
     try {
       adapterState = await FlutterBluePlus.adapterState
@@ -233,7 +233,7 @@ class BleTransport implements TransportService {
           .first
           .timeout(const Duration(seconds: 5));
     } on TimeoutException {
-      print('[BleTransport] adapter state check timed out after 5s');
+      if (kDebugMode) print('[BleTransport] adapter state check timed out after 5s');
       _setState(TransportState.error);
       throw const TransportException(
         'Bluetooth adapter state could not be determined. '
@@ -241,7 +241,7 @@ class BleTransport implements TransportService {
       );
     }
 
-    print('[BleTransport] adapter state: $adapterState');
+    if (kDebugMode) print('[BleTransport] adapter state: $adapterState');
     if (adapterState != BluetoothAdapterState.on) {
       _setState(TransportState.error);
       throw const TransportException(
@@ -250,7 +250,7 @@ class BleTransport implements TransportService {
     }
 
     _setState(TransportState.idle);
-    print('[BleTransport] initialized successfully');
+    if (kDebugMode) print('[BleTransport] initialized successfully');
   }
 
   @override
@@ -278,7 +278,7 @@ class BleTransport implements TransportService {
     await stopDiscovery();
 
     _setState(TransportState.discovering);
-    print('[BleTransport] startDiscovery: session=$sessionId');
+    if (kDebugMode) print('[BleTransport] startDiscovery: session=$sessionId');
 
     // Start a continuous scan filtered to our service UUID.
     // flutter_blue_plus emits results via scanResults stream.
@@ -346,11 +346,44 @@ class BleTransport implements TransportService {
               ? device.platformName
               : 'Unknown';
 
+      // Parse the host's Field Link session UUID out of the advertisement
+      // payload. The host (createSession side) writes the session id as
+      // 16 raw bytes into CBAdvertisementDataServiceDataKey on iOS or
+      // AdvertiseData.addServiceData(...) on Android, both keyed by
+      // BleConstants.fieldLinkServiceUuid.
+      //
+      // Without this, the join button on the scan list would call
+      // FieldLinkService.joinSession(device.id) — but device.id is the
+      // BLE peripheral's CoreBluetooth UUID, NOT the host's UUID v4
+      // sessionId, so the joiner ends up running CRDT under a different
+      // sessionId than the host. The host then silently ignores all
+      // sync messages and the two phones "can't find each other"
+      // even though BLE is connected. This was the root cause of the
+      // post-v1.5.2 reviewer reports.
+      String? sessionId;
+      try {
+        final serviceData = result.advertisementData.serviceData;
+        final guid = Guid(BleConstants.fieldLinkServiceUuid);
+        // ScanResult.serviceData is keyed by Guid; some platforms strip
+        // the dashes when normalising. Try both forms.
+        final raw = serviceData[guid] ??
+            serviceData[Guid(
+                BleConstants.fieldLinkServiceUuid.replaceAll('-', ''))];
+        if (raw != null && raw.isNotEmpty) {
+          sessionId = BleConstants.decodeSessionIdFromBytes(raw);
+        }
+      } catch (_) {
+        // Malformed service data — leave sessionId null. The user can
+        // still manually paste the session id via the QR / Manual flow.
+        sessionId = null;
+      }
+
       // Infer device type from advertising data if possible.
       // For now, mark all as unknown; higher layers resolve via handshake.
       final discovered = DiscoveredDevice(
         id: device.remoteId.str,
         name: name,
+        sessionId: sessionId,
         deviceType: DeviceType.unknown,
         rssi: result.rssi,
         discoveredAt: DateTime.now(),
@@ -539,27 +572,27 @@ class BleTransport implements TransportService {
 
     final subscriptions = <StreamSubscription<List<int>>>[];
 
-    print('[BleTransport] _subscribeToCharacteristics: '
+    if (kDebugMode) print('[BleTransport] _subscribeToCharacteristics: '
         'device=$deviceId, services=${services.length}');
 
     for (final service in services) {
-      print('[BleTransport]   service: ${service.uuid.str}');
+      if (kDebugMode) print('[BleTransport]   service: ${service.uuid.str}');
       if (service.uuid.str.toLowerCase() !=
           BleConstants.fieldLinkServiceUuid.toLowerCase()) {
         continue;
       }
 
-      print('[BleTransport]   MATCHED Field Link service!');
+      if (kDebugMode) print('[BleTransport]   MATCHED Field Link service!');
 
       for (final char in service.characteristics) {
-        print('[BleTransport]     char: ${char.uuid.str} '
+        if (kDebugMode) print('[BleTransport]     char: ${char.uuid.str} '
             'notify=${char.properties.notify} '
             'indicate=${char.properties.indicate} '
             'write=${char.properties.write} '
             'writeNoResp=${char.properties.writeWithoutResponse}');
 
         if (!targetCharUuids.contains(char.uuid.str.toLowerCase())) {
-          print('[BleTransport]     SKIP (not a target char)');
+          if (kDebugMode) print('[BleTransport]     SKIP (not a target char)');
           continue;
         }
 
@@ -567,10 +600,10 @@ class BleTransport implements TransportService {
         if (char.properties.notify || char.properties.indicate) {
           try {
             await char.setNotifyValue(true);
-            print('[BleTransport]     SUBSCRIBED to ${char.uuid.str}');
+            if (kDebugMode) print('[BleTransport]     SUBSCRIBED to ${char.uuid.str}');
 
             final sub = char.onValueReceived.listen((value) {
-              print('[BleTransport]     DATA received on ${char.uuid.str}: '
+              if (kDebugMode) print('[BleTransport]     DATA received on ${char.uuid.str}: '
                   '${value.length} bytes');
               _onCharacteristicValueReceived(
                 deviceId,
@@ -580,15 +613,15 @@ class BleTransport implements TransportService {
 
             subscriptions.add(sub);
           } catch (e) {
-            print('[BleTransport]     SUBSCRIBE FAILED: $e');
+            if (kDebugMode) print('[BleTransport]     SUBSCRIBE FAILED: $e');
           }
         } else {
-          print('[BleTransport]     SKIP subscribe (no notify/indicate)');
+          if (kDebugMode) print('[BleTransport]     SKIP subscribe (no notify/indicate)');
         }
       }
     }
 
-    print('[BleTransport] subscribed to ${subscriptions.length} characteristics');
+    if (kDebugMode) print('[BleTransport] subscribed to ${subscriptions.length} characteristics');
     _charSubscriptions[deviceId] = subscriptions;
   }
 
@@ -640,7 +673,7 @@ class BleTransport implements TransportService {
 
   void _emitMessage(String deviceId, Uint8List data) {
     _diagMessagesEmitted++;
-    print('[BleTransport] INCOMING message from $deviceId: ${data.length} bytes');
+    if (kDebugMode) print('[BleTransport] INCOMING message from $deviceId: ${data.length} bytes');
 
     // Learn the peer's logical device ID from the payload so we can map
     // BLE remote IDs to _localDeviceIds. Without this mapping,
@@ -732,7 +765,7 @@ class BleTransport implements TransportService {
             'data': packet,
           });
         } catch (e) {
-          print('[BleTransport] peripheral updateValue failed: $e');
+          if (kDebugMode) print('[BleTransport] peripheral updateValue failed: $e');
         }
       } catch (e) {
         errors.add('peripheral-broadcast: $e');
@@ -871,7 +904,7 @@ class BleTransport implements TransportService {
       if (sidMatch != null) {
         final deviceId = sidMatch.group(1)!;
         _centralIdToDeviceId[centralUuid] = deviceId;
-        print('[BleTransport] Learned device ID mapping: '
+        if (kDebugMode) print('[BleTransport] Learned device ID mapping: '
             '$centralUuid → $deviceId');
       }
     } catch (_) {
@@ -938,9 +971,9 @@ class BleTransport implements TransportService {
       await _advertiserChannel.invokeMethod<void>('startAdvertising', {
         'sessionId': sessionId,
       });
-      print('[BleTransport] startAdvertising: session=$sessionId');
+      if (kDebugMode) print('[BleTransport] startAdvertising: session=$sessionId');
     } on PlatformException catch (e) {
-      print('[BleTransport] startAdvertising failed: ${e.message}');
+      if (kDebugMode) print('[BleTransport] startAdvertising failed: ${e.message}');
     }
 
     // Listen for incoming data from centrals that write to our GATT chars,
@@ -970,14 +1003,14 @@ class BleTransport implements TransportService {
 
         case 'onCentralSubscribed':
           final centralId = data['centralId'] as String? ?? '';
-          print('[BleTransport] Central connected (peripheral): $centralId');
+          if (kDebugMode) print('[BleTransport] Central connected (peripheral): $centralId');
           _peripheralCentrals.add(centralId);
           _setState(TransportState.connected);
           break;
 
         case 'onCentralUnsubscribed':
           final centralId = data['centralId'] as String? ?? '';
-          print('[BleTransport] Central disconnected (peripheral): $centralId');
+          if (kDebugMode) print('[BleTransport] Central disconnected (peripheral): $centralId');
           _peripheralCentrals.remove(centralId);
           if (_connectedDevices.isEmpty && _peripheralCentrals.isEmpty) {
             _setState(TransportState.disconnected);
@@ -997,9 +1030,9 @@ class BleTransport implements TransportService {
 
     try {
       await _advertiserChannel.invokeMethod<void>('stopAdvertising');
-      print('[BleTransport] stopAdvertising');
+      if (kDebugMode) print('[BleTransport] stopAdvertising');
     } catch (e) {
-      print('[BleTransport] stopAdvertising failed: $e');
+      if (kDebugMode) print('[BleTransport] stopAdvertising failed: $e');
     }
   }
 
@@ -1009,7 +1042,7 @@ class BleTransport implements TransportService {
 
   void _setState(TransportState newState) {
     if (_state == newState) return;
-    print('[BleTransport] state: $_state → $newState');
+    if (kDebugMode) print('[BleTransport] state: $_state → $newState');
     _state = newState;
     if (!_stateController.isClosed) {
       _stateController.add(newState);

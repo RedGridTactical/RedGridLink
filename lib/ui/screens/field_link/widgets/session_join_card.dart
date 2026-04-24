@@ -161,6 +161,33 @@ class _SessionJoinCardState extends ConsumerState<SessionJoinCard> {
   Future<void> _joinSession(DiscoveredDevice device) async {
     final colors = ref.read(currentThemeProvider);
 
+    // The host's session UUID v4 is broadcast in the BLE service-data
+    // advertising field and parsed into [DiscoveredDevice.sessionId] by
+    // [BleTransport]. If it's missing, the host is on an old build that
+    // didn't include sessionId in its advertisement — the user must use
+    // the QR or Manual entry path to enter the full session id.
+    //
+    // Calling joinSession(device.id) instead would pass the BLE peripheral
+    // CoreBluetooth UUID as the sessionId, which mismatches the host's
+    // UUID v4 and silently breaks all CRDT sync (the cause of multiple
+    // post-v1.5.2 reviewer reports).
+    final sessionId = device.sessionId;
+    if (sessionId == null || sessionId.isEmpty) {
+      notifyError();
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text(
+              'This host did not broadcast its session id. Update both devices, or use Scan QR / Enter Manually.',
+              style: TextStyle(color: Colors.white),
+            ),
+            backgroundColor: Color(0xFFCC0000),
+          ),
+        );
+      }
+      return;
+    }
+
     // We cannot know the security mode from BLE advertisement data alone.
     // Always prompt for PIN — the user can leave it empty for open sessions.
     // The host validates via BLE control message (join_request/join_response).
@@ -179,7 +206,7 @@ class _SessionJoinCardState extends ConsumerState<SessionJoinCard> {
     try {
       final service = ref.read(fieldLinkServiceProvider);
       await service.joinSession(
-        device.id,
+        sessionId,
         pin: pin.isNotEmpty ? pin : null,
       );
 

@@ -188,16 +188,59 @@ class BleAdvertiserChannel: NSObject {
 
     /// Actually start the BLE advertisement. Called only after the GATT
     /// service has been confirmed registered via `didAdd`.
+    ///
+    /// Includes the Field Link sessionId as 16 raw bytes of service data
+    /// keyed by the service UUID. Joiners parse this payload from
+    /// `result.advertisementData.serviceData` (flutter_blue_plus) and use
+    /// it as the canonical CRDT session id. Without this, joiners would
+    /// fall back to the BLE peripheral's CoreBluetooth UUID, mismatch the
+    /// host's UUID v4 sessionId, and silently lose all sync data.
+    ///
+    /// NOTE: CoreBluetooth's foreground advertisement payload is limited
+    /// to 31 bytes. Service-UUID-128 takes 18 bytes; 16 bytes of service
+    /// data plus the 2-byte service-UUID prefix and 1-byte AD-type header
+    /// = 19 bytes, totalling 37. iOS handles the overflow by spilling the
+    /// service data into the scan-response packet, which flutter_blue_plus
+    /// merges back into `result.advertisementData.serviceData` on the
+    /// scanning side. The local name "RGL" was dropped to keep the primary
+    /// advertisement compact and to avoid further overflow.
     private func beginAdvertising() {
         guard let pm = peripheralManager else { return }
 
-        pm.startAdvertising([
+        var advertData: [String: Any] = [
             CBAdvertisementDataServiceUUIDsKey: [BleAdvertiserChannel.serviceUUID],
-            CBAdvertisementDataLocalNameKey: "RGL",
-        ])
+        ]
+
+        if let sessionId = pendingSessionId,
+           let sessionBytes = BleAdvertiserChannel.sessionIdToBytes(sessionId) {
+            // CBAdvertisementDataServiceDataKey is a [CBUUID: Data] dict.
+            advertData[CBAdvertisementDataServiceDataKey] = [
+                BleAdvertiserChannel.serviceUUID: Data(sessionBytes),
+            ]
+        }
+
+        pm.startAdvertising(advertData)
 
         os_log("Advertising started (session=%{public}@)", log: log, type: .info,
                pendingSessionId ?? "nil")
+    }
+
+    /// Convert a UUID v4 string ("550e8400-e29b-41d4-a716-446655440000")
+    /// into the 16 raw bytes that go into the BLE service data field.
+    /// Mirrors `BleConstants.encodeSessionIdToBytes` on the Dart side.
+    private static func sessionIdToBytes(_ sessionId: String) -> [UInt8]? {
+        let hex = sessionId.replacingOccurrences(of: "-", with: "")
+        guard hex.count == 32 else { return nil }
+        var bytes = [UInt8]()
+        bytes.reserveCapacity(16)
+        var index = hex.startIndex
+        for _ in 0..<16 {
+            let next = hex.index(index, offsetBy: 2)
+            guard let byte = UInt8(hex[index..<next], radix: 16) else { return nil }
+            bytes.append(byte)
+            index = next
+        }
+        return bytes
     }
 
     private func stopAdvertising() {
