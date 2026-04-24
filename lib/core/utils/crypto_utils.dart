@@ -49,6 +49,14 @@ String generateDeviceId() {
   return _uuid.v4();
 }
 
+/// Generate a Field Link session ID (UUID v4).
+///
+/// Alias of [generateDeviceId] exposed for intent — callers that want a
+/// session identifier should call this one. The 16-byte UUID is advertised
+/// raw in BLE service data so that joiners can parse it out of
+/// advertising payloads (see [BleConstants.encodeSessionIdToBytes]).
+String generateSessionTag() => generateDeviceId();
+
 // ---------------------------------------------------------------------------
 // Internal SHA-256 implementation
 // ---------------------------------------------------------------------------
