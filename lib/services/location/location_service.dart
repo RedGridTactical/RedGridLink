@@ -207,13 +207,24 @@ class LocationService {
 
   /// Initialize the location service.
   ///
-  /// Checks permissions and starts the GPS position stream if
-  /// permission is granted. If permission is denied, the stream
-  /// will remain empty until [requestPermission] is called and
-  /// [initialize] is re-invoked.
+  /// Checks current permission status and starts the GPS position
+  /// stream only if permission is already granted.
+  ///
+  /// IMPORTANT: This method deliberately does NOT request permission.
+  /// Permission may only be requested from UI surfaces that first
+  /// display an in-app Prominent Disclosure explaining what location
+  /// data is accessed, how it is used, and how it is handled (e.g.
+  /// the onboarding PermissionsPage). Requesting permission silently
+  /// on app launch — without a prior disclosure — violates the Google
+  /// Play "Prominent Disclosure and Consent" policy and has been the
+  /// cause of prior review rejections.
+  ///
+  /// If permission is not yet granted, the stream stays empty. The
+  /// user can grant it explicitly from onboarding or device Settings,
+  /// and [initialize] will start the stream on next invocation.
   Future<void> initialize() async {
-    final hasPermission = await requestPermission();
-    if (!hasPermission) return;
+    final status = await _permissionHandler.checkStatus();
+    if (status != LocationPermissionStatus.granted) return;
 
     _startStream();
   }

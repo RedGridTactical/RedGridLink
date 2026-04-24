@@ -258,13 +258,9 @@ class _PermissionsPageState extends State<PermissionsPage>
           ),
           const SizedBox(height: 24),
 
-          // Location permission
-          _PermissionCard(
-            icon: Icons.my_location,
-            title: 'LOCATION ACCESS',
-            description:
-                'Required for MGRS grid display, map positioning, '
-                'and sharing your location with nearby team members.',
+          // Location permission — Prominent Disclosure
+          // (Google Play User Data policy: Prominent Disclosure and Consent)
+          _LocationDisclosureCard(
             isGranted: _locationGranted,
             isChecked: _locationChecked,
             isRequesting: _locationRequesting,
@@ -312,6 +308,161 @@ class _PermissionsPageState extends State<PermissionsPage>
           ),
 
           const SizedBox(height: 32),
+        ],
+      ),
+    );
+  }
+}
+
+/// Prominent Disclosure card for location access.
+///
+/// This card satisfies Google Play's User Data policy "Prominent
+/// Disclosure and Consent Requirement" for apps that access location
+/// (including background location). It spells out, before the OS
+/// runtime permission prompt fires, exactly what data the app
+/// accesses, how it is used, what happens in the background, and
+/// where the data goes (or does not go).
+///
+/// Do NOT request location permission without showing this card first.
+class _LocationDisclosureCard extends StatelessWidget {
+  const _LocationDisclosureCard({
+    required this.isGranted,
+    required this.isChecked,
+    required this.isRequesting,
+    required this.colors,
+    required this.onRequest,
+  });
+
+  final bool isGranted;
+  final bool isChecked;
+  final bool isRequesting;
+  final TacticalColorScheme colors;
+  final VoidCallback onRequest;
+
+  @override
+  Widget build(BuildContext context) {
+    return TacticalCard(
+      colors: colors,
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Header row
+          Row(
+            children: [
+              Icon(Icons.my_location, size: 24, color: colors.accent),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Text(
+                  'LOCATION ACCESS',
+                  style: TacticalTextStyles.subheading(colors),
+                ),
+              ),
+              if (isChecked && isGranted)
+                Icon(Icons.check_circle, size: 24, color: colors.accent),
+            ],
+          ),
+          const SizedBox(height: 12),
+
+          // Prominent disclosure — four labelled sections.
+          _DisclosureSection(
+            label: 'DATA ACCESSED',
+            body:
+                'Your precise location from the device\u2019s GPS — '
+                'latitude, longitude, altitude, speed, and heading.',
+            colors: colors,
+          ),
+          _DisclosureSection(
+            label: 'HOW RED GRID LINK USES IT',
+            body:
+                'Displays your position on the map, computes your MGRS '
+                'grid, records GPS tracks during sessions, shares your '
+                'position with connected teammates over a direct '
+                'Bluetooth peer-to-peer mesh, and powers the emergency '
+                'beacon and boundary alerts.',
+            colors: colors,
+          ),
+          _DisclosureSection(
+            label: 'BACKGROUND ACCESS',
+            body:
+                'If you separately allow "Allow all the time" in your '
+                'device Settings, the app continues to read and share '
+                'your position with connected teammates while the '
+                'screen is off or another app is in the foreground. '
+                'This is what lets the team keep seeing you during an '
+                'active search-and-rescue mission. You can revoke this '
+                'at any time in Settings.',
+            colors: colors,
+          ),
+          _DisclosureSection(
+            label: 'WHERE YOUR DATA GOES',
+            body:
+                'Your location data stays on your device and is shared '
+                'only with teammates you are directly connected to over '
+                'encrypted Bluetooth Low Energy. Red Grid Link has no '
+                'user accounts, no cloud sync, and no analytics. Your '
+                'location is never uploaded to our servers, any third '
+                'party, or any advertising network.',
+            colors: colors,
+          ),
+          const SizedBox(height: 4),
+          Text(
+            'See Settings \u2192 Privacy Policy for full details.',
+            style: TacticalTextStyles.dim(colors),
+          ),
+          if (isChecked && !isGranted) ...[
+            const SizedBox(height: 12),
+            if (isRequesting)
+              SizedBox(
+                height: 44,
+                child: Center(
+                  child: SizedBox(
+                    width: 24,
+                    height: 24,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2,
+                      color: colors.accent,
+                    ),
+                  ),
+                ),
+              )
+            else
+              TacticalButton(
+                label: 'Grant Location Access',
+                icon: Icons.shield,
+                colors: colors,
+                isCompact: true,
+                onPressed: onRequest,
+              ),
+          ],
+        ],
+      ),
+    );
+  }
+}
+
+/// A single labelled paragraph inside the location Prominent Disclosure.
+class _DisclosureSection extends StatelessWidget {
+  const _DisclosureSection({
+    required this.label,
+    required this.body,
+    required this.colors,
+  });
+
+  final String label;
+  final String body;
+  final TacticalColorScheme colors;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 10),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(label, style: TacticalTextStyles.label(colors)),
+          const SizedBox(height: 2),
+          Text(body, style: TacticalTextStyles.caption(colors)),
         ],
       ),
     );
