@@ -1,5 +1,7 @@
 import 'dart:async';
+import 'dart:io' show Platform;
 
+import 'package:flutter/foundation.dart';
 import 'package:geolocator/geolocator.dart' as geo;
 import 'package:red_grid_link/core/utils/mgrs.dart';
 import 'package:red_grid_link/data/models/position.dart';
@@ -224,31 +226,78 @@ class LocationService {
   /// and [initialize] will start the stream on next invocation.
   Future<void> initialize() async {
     final status = await _permissionHandler.checkStatus();
-    if (status != LocationPermissionStatus.granted) return;
+    if (kDebugMode) {
+      print('[LocationService] initialize: permission status = $status');
+    }
+    if (status != LocationPermissionStatus.granted) {
+      if (kDebugMode) {
+        print('[LocationService] initialize: NOT starting stream — '
+            'permission $status (waiting for user grant via PermissionsPage)');
+      }
+      return;
+    }
 
     _startStream();
   }
+
+  /// Whether the GPS position stream is currently subscribed.
+  ///
+  /// Used by callers (notably HomeScreen on app resume) to detect a
+  /// stalled stream and call [initialize] again.
+  bool get isStreamRunning => _geoSubscription != null;
 
   /// Start the underlying geolocator position stream.
   void _startStream() {
     _geoSubscription?.cancel();
 
-    // Use AndroidSettings for richer configuration on Android.
-    // On iOS, geolocator falls back gracefully when AndroidSettings
-    // is provided — it uses the accuracy and distanceFilter fields
-    // from the base LocationSettings.
-    // Background location is structured here but not enabled yet;
-    // Phase 7 polish will add foreground service configuration.
-    final locationSettings = geo.AndroidSettings(
-      accuracy: _accuracy,
-      distanceFilter: _distanceFilter,
-      intervalDuration: _updateInterval,
-      foregroundNotificationConfig: const geo.ForegroundNotificationConfig(
-        notificationTitle: 'Red Grid Link',
-        notificationText: 'Tracking your position',
-        enableWakeLock: true,
-      ),
-    );
+    // CRITICAL: use platform-specific settings. The previous code passed
+    // `AndroidSettings` on iOS too, on the (incorrect) assumption that
+    // iOS would fall back to the base `LocationSettings` fields and
+    // ignore the rest. In practice this leaves CLLocationManager at its
+    // default `pausesLocationUpdatesAutomatically = YES`, which means a
+    // stationary iPad on a desk DURING TESTING sees iOS auto-pause the
+    // location stream after a few seconds and the app NEVER receives a
+    // position fix. Setting `pauseLocationUpdatesAutomatically: false`
+    // via `AppleSettings` is the only way to override this — bug
+    // discovered in v1.5.4 TestFlight, fixed in v1.5.4+310.
+    //
+    // Also explicitly set `activityType` so iOS chooses correct power
+    // management (otherwise it assumes "automotive" which uses different
+    // accuracy/cadence rules).
+    final geo.LocationSettings locationSettings;
+    if (Platform.isIOS) {
+      locationSettings = geo.AppleSettings(
+        accuracy: _accuracy,
+        distanceFilter: _distanceFilter,
+        activityType: geo.ActivityType.fitness,
+        pauseLocationUpdatesAutomatically: false,
+        showBackgroundLocationIndicator: false,
+        // We do NOT set allowBackgroundLocationUpdates: only the
+        // "WhileInUse" entitlement is in our Info.plist; setting this
+        // to true would crash on apps without "Always" auth.
+      );
+    } else if (Platform.isAndroid) {
+      locationSettings = geo.AndroidSettings(
+        accuracy: _accuracy,
+        distanceFilter: _distanceFilter,
+        intervalDuration: _updateInterval,
+        foregroundNotificationConfig: const geo.ForegroundNotificationConfig(
+          notificationTitle: 'Red Grid Link',
+          notificationText: 'Tracking your position',
+          enableWakeLock: true,
+        ),
+      );
+    } else {
+      locationSettings = geo.LocationSettings(
+        accuracy: _accuracy,
+        distanceFilter: _distanceFilter,
+      );
+    }
+
+    if (kDebugMode) {
+      print('[LocationService] _startStream: platform=${Platform.operatingSystem} '
+          'accuracy=$_accuracy distanceFilter=$_distanceFilter');
+    }
 
     final stream = geo.GeolocatorPlatform.instance.getPositionStream(
       locationSettings: locationSettings,
@@ -258,6 +307,10 @@ class LocationService {
       _onPositionUpdate,
       onError: _onPositionError,
     );
+
+    if (kDebugMode) {
+      print('[LocationService] _startStream: subscription created');
+    }
   }
 
   /// Restart the GPS stream (e.g., after configuration changes).
@@ -269,6 +322,11 @@ class LocationService {
 
   /// Handle an incoming geolocator position update.
   void _onPositionUpdate(geo.Position geoPos) {
+    if (kDebugMode && _lastPosition == null) {
+      // Log only the FIRST fix — subsequent updates would spam.
+      print('[LocationService] FIRST FIX: lat=${geoPos.latitude} '
+          'lon=${geoPos.longitude} acc=${geoPos.accuracy}m');
+    }
     final position = _convertPosition(geoPos);
     _lastPosition = position;
     _positionController.add(position);

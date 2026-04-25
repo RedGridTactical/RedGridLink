@@ -26,11 +26,47 @@ final activeTabProvider = StateProvider<int>((ref) => 0);
 /// A thin mode indicator bar sits above the bottom navigation,
 /// showing the current operational mode (SAR, Backcountry, Hunting,
 /// or Training) so the user always knows which context is active.
-class HomeScreen extends ConsumerWidget {
+class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends ConsumerState<HomeScreen>
+    with WidgetsBindingObserver {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    // On app resume, force a re-check of location permission and
+    // restart the GPS stream if it stalled. Three scenarios this
+    // catches:
+    //   1. User granted location in iOS Settings while the app was
+    //      backgrounded — invalidate makes the next watch re-run
+    //      LocationService.initialize().
+    //   2. Stream stalled (iOS sometimes tears down location after
+    //      long backgrounding) — re-running initialize() restarts it.
+    //   3. Fresh-install upgrade where prior version had different
+    //      permission state — covers any state mismatch on first run.
+    // This is a no-op when the stream is already running and emitting.
+    if (state == AppLifecycleState.resumed) {
+      ref.invalidate(locationInitProvider);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final colors = ref.watch(currentThemeProvider);
     final activeTab = ref.watch(activeTabProvider);
     final mode = ref.watch(currentModeProvider);
