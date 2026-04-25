@@ -189,34 +189,53 @@ class BleAdvertiserChannel: NSObject {
     /// Actually start the BLE advertisement. Called only after the GATT
     /// service has been confirmed registered via `didAdd`.
     ///
-    /// Includes the Field Link sessionId as 16 raw bytes of service data
-    /// keyed by the service UUID. Joiners parse this payload from
-    /// `result.advertisementData.serviceData` (flutter_blue_plus) and use
-    /// it as the canonical CRDT session id. Without this, joiners would
-    /// fall back to the BLE peripheral's CoreBluetooth UUID, mismatch the
-    /// host's UUID v4 sessionId, and silently lose all sync data.
+    /// CRITICAL: Apple does NOT support `CBAdvertisementDataServiceDataKey`
+    /// in `CBPeripheralManager.startAdvertising` for third-party apps —
+    /// the documentation is misleading. Passing it causes a SIGABRT in
+    /// Apple's XPC serialization with `-[CBUUID UTF8String]: unrecognized
+    /// selector` (the inner `[CBUUID: Data]` dict is rejected because
+    /// CoreBluetooth's XPC layer only accepts string keys for that
+    /// payload). v1.5.4+307 had this and TestFlight crash logs caught it
+    /// on iPad / iOS 26.3. Fixed in v1.5.4+308 by reverting to the
+    /// Apple-blessed 2-key dict (ServiceUUIDs + optional LocalName).
     ///
-    /// NOTE: CoreBluetooth's foreground advertisement payload is limited
-    /// to 31 bytes. Service-UUID-128 takes 18 bytes; 16 bytes of service
-    /// data plus the 2-byte service-UUID prefix and 1-byte AD-type header
-    /// = 19 bytes, totalling 37. iOS handles the overflow by spilling the
-    /// service data into the scan-response packet, which flutter_blue_plus
-    /// merges back into `result.advertisementData.serviceData` on the
-    /// scanning side. The local name "RGL" was dropped to keep the primary
-    /// advertisement compact and to avoid further overflow.
+    /// The session id is therefore NOT carried in the BLE advertisement
+    /// from iOS hosts. iOS-to-iOS discovery falls back to Multipeer
+    /// Connectivity (wired in main.dart via MultiTransport), which uses
+    /// Bonjour's discoveryInfo to carry the session id. iOS hosts seen
+    /// by Android scanners still appear, but `device.sessionId` is null,
+    /// so the joiner UI prompts for QR / Manual entry.
     private func beginAdvertising() {
         guard let pm = peripheralManager else { return }
 
-        var advertData: [String: Any] = [
+        // Apple's whitelist for `startAdvertising:` is:
+        //   - CBAdvertisementDataServiceUUIDsKey  (array of CBUUID)
+        //   - CBAdvertisementDataLocalNameKey     (String)
+        // Anything else either silently strips OR crashes the XPC layer.
+        let advertData: [String: Any] = [
             CBAdvertisementDataServiceUUIDsKey: [BleAdvertiserChannel.serviceUUID],
         ]
 
-        if let sessionId = pendingSessionId,
-           let sessionBytes = BleAdvertiserChannel.sessionIdToBytes(sessionId) {
-            // CBAdvertisementDataServiceDataKey is a [CBUUID: Data] dict.
-            advertData[CBAdvertisementDataServiceDataKey] = [
-                BleAdvertiserChannel.serviceUUID: Data(sessionBytes),
-            ]
+        // Belt-and-braces guard: if a future change re-introduces a key
+        // outside the whitelist (and especially one whose VALUE contains
+        // a non-NSString-keyed dict, like CBAdvertisementDataServiceDataKey
+        // = [CBUUID: Data]), the XPC serialization in CoreBluetooth will
+        // SIGABRT inside `pm.startAdvertising`. Fail loudly during dev/
+        // beta builds so the regression is caught before another TestFlight
+        // crash report.
+        let allowedKeys: Set<String> = [
+            CBAdvertisementDataServiceUUIDsKey,
+            CBAdvertisementDataLocalNameKey,
+        ]
+        for k in advertData.keys {
+            assert(
+                allowedKeys.contains(k),
+                """
+                BleAdvertiserChannel: advertData contains key '\(k)' which
+                is NOT in Apple's documented whitelist for startAdvertising:.
+                See v1.5.4+307 TestFlight crash (CBUUID UTF8String).
+                """
+            )
         }
 
         pm.startAdvertising(advertData)
