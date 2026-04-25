@@ -1,11 +1,13 @@
 import 'dart:io' show Platform;
 
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:permission_handler/permission_handler.dart';
 
 import '../../../../core/theme/tactical_colors.dart';
 import '../../../../core/theme/tactical_text_styles.dart';
 import '../../../../core/utils/haptics.dart';
+import '../../../../providers/location_provider.dart';
 import '../../../common/widgets/tactical_button.dart';
 import '../../../common/widgets/tactical_card.dart';
 
@@ -13,7 +15,7 @@ import '../../../common/widgets/tactical_card.dart';
 ///
 /// Requests location and Bluetooth permissions with explanations.
 /// Users can proceed even if permissions are denied (with a warning).
-class PermissionsPage extends StatefulWidget {
+class PermissionsPage extends ConsumerStatefulWidget {
   const PermissionsPage({
     super.key,
     required this.colors,
@@ -22,10 +24,10 @@ class PermissionsPage extends StatefulWidget {
   final TacticalColorScheme colors;
 
   @override
-  State<PermissionsPage> createState() => _PermissionsPageState();
+  ConsumerState<PermissionsPage> createState() => _PermissionsPageState();
 }
 
-class _PermissionsPageState extends State<PermissionsPage>
+class _PermissionsPageState extends ConsumerState<PermissionsPage>
     with WidgetsBindingObserver {
   bool _locationGranted = false;
   bool _bluetoothGranted = false;
@@ -65,6 +67,20 @@ class _PermissionsPageState extends State<PermissionsPage>
         btStatus = await Permission.bluetooth.status;
       } else {
         btStatus = await Permission.bluetoothScan.status;
+      }
+
+      // Detect a permission grant that happened OUTSIDE this widget — e.g.
+      // user backgrounded the app, granted location in iOS Settings, came
+      // back to onboarding. The status flipped from non-granted to granted
+      // without _requestLocation() ever firing, so the location service
+      // never had a chance to start its GPS stream. Invalidate the init
+      // provider so the next watch re-runs LocationService.initialize().
+      // Without this, the iPad-no-GPS-fix bug from v1.5.4+307/+308 lives on
+      // in the post-Settings-grant path.
+      final wasNotGranted = !_locationGranted;
+      final nowGranted = locationStatus.isGranted;
+      if (wasNotGranted && nowGranted) {
+        ref.invalidate(locationInitProvider);
       }
 
       if (mounted) {
@@ -117,6 +133,16 @@ class _PermissionsPageState extends State<PermissionsPage>
       }
 
       if (status.isGranted) {
+        // CRITICAL: kick the LocationService init provider so the GPS
+        // stream actually starts. The provider is a FutureProvider read
+        // by HomeScreen at app startup; on a fresh install that read
+        // fires BEFORE the user reaches this onboarding page and resolves
+        // with `permission != granted` → the stream never starts. Without
+        // this invalidate(), the iPad/iPhone the user just granted on
+        // would sit at "no GPS fix" forever after onboarding completes,
+        // which in turn breaks Field Link sync (heartbeat broadcasts
+        // nothing if the local position is null). Bug fixed in v1.5.4+309.
+        ref.invalidate(locationInitProvider);
         notifySuccess();
       } else if (status.isPermanentlyDenied) {
         if (mounted) _showSettingsSnackbar('Location');
