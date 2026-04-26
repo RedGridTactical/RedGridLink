@@ -415,8 +415,19 @@ extension BleAdvertiserChannel: CBPeripheralManagerDelegate {
     func peripheralManager(_ peripheral: CBPeripheralManager,
                            central: CBCentral,
                            didSubscribeTo characteristic: CBCharacteristic) {
-        os_log("CENTRAL SUBSCRIBED: %{public}@ to %{public}@", log: log, type: .error,
-               central.identifier.uuidString, characteristic.uuid.uuidString)
+        // CRITICAL (v1.5.4+311): include `central.maximumUpdateValueLength`
+        // in the event so the Dart side can chunk notify payloads that
+        // exceed the negotiated ATT MTU. Default ATT MTU is 23 (20 byte
+        // payload). A typical Field Link position payload is 150–250
+        // bytes; without chunking, iOS silently truncates the rest and
+        // the central receives garbled JSON that fails to decode (the
+        // root cause of the iPad-as-host → iPhone-as-joiner regression
+        // surfaced in v1.5.4+307…+310 TestFlight reports).
+        let maxUpdateLen = central.maximumUpdateValueLength
+        os_log("CENTRAL SUBSCRIBED: %{public}@ to %{public}@ maxUpdateLen=%d",
+               log: log, type: .error,
+               central.identifier.uuidString, characteristic.uuid.uuidString,
+               maxUpdateLen)
 
         if !subscribedCentrals.contains(where: { $0.identifier == central.identifier }) {
             subscribedCentrals.append(central)
@@ -425,6 +436,7 @@ extension BleAdvertiserChannel: CBPeripheralManagerDelegate {
         sendEvent("onCentralSubscribed", data: [
             "centralId": central.identifier.uuidString,
             "characteristicUuid": characteristic.uuid.uuidString,
+            "maxUpdateLength": maxUpdateLen,
         ])
     }
 

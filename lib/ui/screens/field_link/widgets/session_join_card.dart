@@ -196,32 +196,23 @@ class _SessionJoinCardState extends ConsumerState<SessionJoinCard> {
   Future<void> _joinSession(DiscoveredDevice device) async {
     final colors = ref.read(currentThemeProvider);
 
-    // The host's session UUID v4 is broadcast in the BLE service-data
-    // advertising field and parsed into [DiscoveredDevice.sessionId] by
-    // [BleTransport]. If it's missing, the host is on an old build that
-    // didn't include sessionId in its advertisement — the user must use
-    // the QR or Manual entry path to enter the full session id.
-    //
-    // Calling joinSession(device.id) instead would pass the BLE peripheral
-    // CoreBluetooth UUID as the sessionId, which mismatches the host's
-    // UUID v4 and silently breaks all CRDT sync (the cause of multiple
-    // post-v1.5.2 reviewer reports).
-    final sessionId = device.sessionId;
-    if (sessionId == null || sessionId.isEmpty) {
-      notifyError();
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text(
-              'This host did not broadcast its session id. Update both devices, or use Scan QR / Enter Manually.',
-              style: TextStyle(color: Colors.white),
-            ),
-            backgroundColor: Color(0xFFCC0000),
-          ),
-        );
-      }
-      return;
-    }
+    // Use the host's broadcasted sessionId if available, otherwise fall
+    // back to the BLE remote id. iOS hosts cannot include serviceData in
+    // CBPeripheralManager advertisements (Apple silently strips the key;
+    // an earlier attempt to set CBAdvertisementDataServiceDataKey caused
+    // a SIGABRT — see v1.5.4+307 → +308 hotfix). So when the host is
+    // iOS, the joiner sees `device.sessionId == null`. The v1.5.4+306
+    // audit added a hard null-guard here that blocked the join entirely
+    // with a "host did not broadcast its session id" snackbar — that's
+    // what produced the iPhone-cannot-join-iPad regression TestFlight
+    // testers hit. Falling back to `device.id` matches v1.5.2 behaviour:
+    // SyncEngine does not gate incoming payloads by sessionId, so a
+    // sessionId mismatch is at most a cosmetic mislabel on the joiner's
+    // local Drift session row, not a sync break. Fixed in v1.5.4+311.
+    final sessionId =
+        (device.sessionId == null || device.sessionId!.isEmpty)
+            ? device.id
+            : device.sessionId!;
 
     // We cannot know the security mode from BLE advertisement data alone.
     // Always prompt for PIN — the user can leave it empty for open sessions.

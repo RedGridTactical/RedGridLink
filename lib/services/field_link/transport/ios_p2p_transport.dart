@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:red_grid_link/core/errors/app_exceptions.dart';
 import 'package:red_grid_link/data/models/peer.dart';
@@ -327,6 +328,22 @@ class IosP2pTransport implements TransportService {
         _handleSessionStateChanged(data);
       case 'onDataReceived':
         _handleDataReceived(data);
+      case 'onError':
+        // v1.5.4+311: surface MPC failures (advertiser/browser couldn't
+        // start, invitation timed out, etc.) to the transport state
+        // stream instead of silently swallowing them. Without this, a
+        // broken Bonjour registration (e.g. user denied iOS Local
+        // Network permission, or the NSBonjourServices Info.plist entry
+        // is incomplete) would cause MPC to silently never deliver
+        // anything — masking the BLE notify bug it was supposed to
+        // compensate for. Per the v1.5.4 audit, this was a contributing
+        // factor to the iPad↔iPhone Field Link regression.
+        if (kDebugMode) {
+          final msg = data['message'] as String? ?? '<no message>';
+          // ignore: avoid_print
+          print('[IosP2pTransport] native error: $msg');
+        }
+        _setState(TransportState.error);
     }
   }
 
@@ -335,9 +352,26 @@ class IosP2pTransport implements TransportService {
     final peerName = data['peerName'] as String? ?? 'Unknown';
     if (peerId == null) return;
 
+    // v1.5.4+311: extract the host's session id from the MPC
+    // discoveryInfo dict. The native side (`MultipeerChannel.swift`
+    // line ~131) packs `sessionId` into discoveryInfo when the host
+    // calls `startDiscovery`. Without parsing it here, every
+    // MPC-discovered peer surfaced with `sessionId: null`, the
+    // session_join_card's null-guard blocked the join, and the bug
+    // user repeatedly hit could not be worked around even by MPC.
+    String? sessionId;
+    final info = data['discoveryInfo'];
+    if (info is Map) {
+      final raw = info['sessionId'];
+      if (raw is String && raw.isNotEmpty) {
+        sessionId = raw;
+      }
+    }
+
     _discoveryController.add(DiscoveredDevice(
       id: peerId,
       name: peerName,
+      sessionId: sessionId,
       deviceType: DeviceType.ios,
       discoveredAt: DateTime.now(),
     ));

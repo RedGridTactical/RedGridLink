@@ -92,6 +92,14 @@ class BleTransport implements TransportService {
   /// GATT server, not the other way around.
   final Set<String> _peripheralCentrals = {};
 
+  /// Per-central `maximumUpdateValueLength` — the max bytes we can
+  /// notify in one `pm.updateValue:forCharacteristic:onSubscribedCentrals:`
+  /// call before iOS silently truncates. Surfaced from the native side via
+  /// the `onCentralSubscribed` event. When broadcasting, we use the MIN of
+  /// these so a single chunked stream is compatible with every subscriber.
+  /// (v1.5.4+311 fix for the iPad-as-host → iPhone-as-joiner regression.)
+  final Map<String, int> _peripheralCentralMaxUpdateLength = {};
+
   /// Maps CoreBluetooth central UUIDs (from peripheral mode) to the peer's
   /// logical device ID (from their first SyncPayload.senderId). CoreBluetooth
   /// identifies centrals by their system UUID which is different from the
@@ -749,25 +757,61 @@ class BleTransport implements TransportService {
     // Send to peripheral-mode connections (centrals that connected to our
     // GATT server). Push data via ble_peripheral's updateCharacteristic which
     // triggers a characteristic notification on the central side.
+    //
+    // CRITICAL (v1.5.4+311): chunk the payload to fit each subscribed
+    // central's `maximumUpdateValueLength`. Prior to this fix the entire
+    // payload was shipped in one `pm.updateValue` call. iOS silently
+    // truncates anything past the central's MTU - 3, and the iPhone
+    // receive side (`_onCharacteristicValueReceived`) saw garbled bytes
+    // that failed JSON parse and dropped silently. Symptom: iPhone
+    // joiner showed 0/8 connected because the iPad host's heartbeat
+    // never decoded successfully on the iPhone — even though the
+    // notification was delivered.
+    //
+    // Default ATT MTU is 23 (20-byte payload). A position SyncPayload
+    // is 150-250 bytes, so under default MTU the receiver got 19 of
+    // those bytes — never a complete JSON object. Chunking with the
+    // existing 0x01/0x02/0x03 protocol fixes this end-to-end.
     if (_peripheralCentrals.isNotEmpty) {
       try {
-        // Prepend the "complete" chunk flag (0x00) so the receiver's
-        // _onCharacteristicValueReceived correctly identifies this as a
-        // non-chunked message.
-        final packet = Uint8List(1 + data.length);
-        packet[0] = 0x00; // complete (non-chunked)
-        packet.setRange(1, packet.length, data);
+        // Use the smallest known per-central max-update-length so a
+        // single chunked stream is compatible with every subscriber.
+        // Default to BleConstants.minMtu - ATT_HEADER (20) when we
+        // haven't received maxUpdateLength yet (e.g. on Android side
+        // where we don't surface it). 20 - 2 (chunk header) = 18 bytes
+        // payload per chunk in the worst case — slow but correct.
+        final maxUpdateLen = _peripheralCentralMaxUpdateLength.values.isEmpty
+            ? (BleConstants.minMtu - _attOverhead)
+            : _peripheralCentralMaxUpdateLength.values
+                .reduce((a, b) => a < b ? a : b);
+        final maxChunkPayload = maxUpdateLen - 2; // 2 = chunk header bytes
 
-        // Send notification to all subscribed centrals via platform channel.
-        try {
-          await _advertiserChannel.invokeMethod<void>('updateValue', {
-            'characteristicUuid': BleConstants.positionCharUuid,
-            'data': packet,
-          });
-        } catch (e) {
-          if (kDebugMode) print('[BleTransport] peripheral updateValue failed: $e');
+        if (data.length <= maxChunkPayload) {
+          // Fits in a single notification — emit with the "complete"
+          // flag (0x00) so the receiver short-circuits the chunk
+          // reassembly path.
+          final packet = Uint8List(1 + data.length);
+          packet[0] = 0x00; // complete (non-chunked)
+          packet.setRange(1, packet.length, data);
+          await _peripheralUpdateValue(
+            BleConstants.positionCharUuid,
+            packet,
+          );
+        } else {
+          // Send the payload in chunks via the same protocol the
+          // central-mode `_sendChunked` uses (flag bytes 0x01/0x02/0x03
+          // + sequence number) so the receiver's reassembly logic
+          // works without modification.
+          await _sendChunkedViaPeripheral(
+            BleConstants.positionCharUuid,
+            data,
+            maxChunkPayload,
+          );
         }
       } catch (e) {
+        if (kDebugMode) {
+          print('[BleTransport] peripheral broadcast failed: $e');
+        }
         errors.add('peripheral-broadcast: $e');
       }
     }
@@ -819,6 +863,96 @@ class BleTransport implements TransportService {
       seq++;
 
       // Small delay between chunks to avoid overwhelming the BLE stack.
+      if (!isLast) {
+        await Future<void>.delayed(const Duration(milliseconds: 5));
+      }
+    }
+  }
+
+  /// Push one notification to subscribed centrals via the peripheral
+  /// platform channel. Wraps the `updateValue` invocation with retry on
+  /// transmit-queue-full (iOS returns false when the queue is full and
+  /// expects the app to wait for `peripheralManagerIsReady` before
+  /// retrying).
+  Future<void> _peripheralUpdateValue(String charUuid, Uint8List packet) async {
+    // Best-effort retry loop. On iOS `pm.updateValue` returns false when
+    // the transmit queue is full; we block briefly and retry up to 3
+    // times before giving up. The native side surfaces the boolean
+    // result via the platform-channel return value. (v1.5.4+311 fix —
+    // before this loop, a single congested notification was silently
+    // lost.)
+    const maxRetries = 3;
+    for (var attempt = 0; attempt < maxRetries; attempt++) {
+      try {
+        final result = await _advertiserChannel.invokeMethod<bool>(
+          'updateValue',
+          {
+            'characteristicUuid': charUuid,
+            'data': packet,
+          },
+        );
+        if (result == true || result == null) {
+          return;
+        }
+      } on PlatformException catch (e) {
+        if (kDebugMode) {
+          print('[BleTransport] _peripheralUpdateValue platform error '
+              'attempt=$attempt: ${e.message}');
+        }
+      }
+      await Future<void>.delayed(const Duration(milliseconds: 25));
+    }
+    if (kDebugMode) {
+      print('[BleTransport] _peripheralUpdateValue: dropped after $maxRetries '
+          'retries (transmit queue stayed full)');
+    }
+  }
+
+  /// Send [data] to all subscribed centrals using the chunking protocol
+  /// (mirror of [_sendChunked] for the peripheral path). Uses
+  /// [maxChunkPayload] derived from the SMALLEST subscribed central's
+  /// `maximumUpdateValueLength` so a single notification stream is
+  /// compatible with every subscriber.
+  Future<void> _sendChunkedViaPeripheral(
+    String charUuid,
+    Uint8List data,
+    int maxChunkPayload,
+  ) async {
+    int offset = 0;
+    int seq = 0;
+
+    while (offset < data.length) {
+      final remaining = data.length - offset;
+      final chunkSize = remaining > maxChunkPayload
+          ? maxChunkPayload
+          : remaining;
+
+      final isFirst = offset == 0;
+      final isLast = offset + chunkSize >= data.length;
+
+      int flag;
+      if (isFirst && isLast) {
+        flag = 0x00; // complete
+      } else if (isFirst) {
+        flag = 0x01; // first
+      } else if (isLast) {
+        flag = 0x03; // last
+      } else {
+        flag = 0x02; // middle
+      }
+
+      final packet = Uint8List(2 + chunkSize);
+      packet[0] = flag;
+      packet[1] = seq & 0xFF;
+      packet.setRange(2, 2 + chunkSize, data, offset);
+
+      await _peripheralUpdateValue(charUuid, packet);
+
+      offset += chunkSize;
+      seq++;
+
+      // Same inter-chunk pacing as central-mode `_sendChunked` to keep
+      // the transmit queue from saturating.
       if (!isLast) {
         await Future<void>.delayed(const Duration(milliseconds: 5));
       }
@@ -1003,8 +1137,19 @@ class BleTransport implements TransportService {
 
         case 'onCentralSubscribed':
           final centralId = data['centralId'] as String? ?? '';
-          if (kDebugMode) print('[BleTransport] Central connected (peripheral): $centralId');
+          // CBCentral.maximumUpdateValueLength surfaced from native.
+          // Defaults to BleConstants.minMtu - 3 (= 20) when the platform
+          // didn't include it in the event (older builds, or Android
+          // where the API is different). We use this to chunk our
+          // notify payloads so iOS doesn't silently truncate.
+          final maxUpdateLen = (data['maxUpdateLength'] as num?)?.toInt() ??
+              (BleConstants.minMtu - _attOverhead);
+          if (kDebugMode) {
+            print('[BleTransport] Central connected (peripheral): '
+                '$centralId maxUpdateLen=$maxUpdateLen');
+          }
           _peripheralCentrals.add(centralId);
+          _peripheralCentralMaxUpdateLength[centralId] = maxUpdateLen;
           _setState(TransportState.connected);
           break;
 
@@ -1012,6 +1157,7 @@ class BleTransport implements TransportService {
           final centralId = data['centralId'] as String? ?? '';
           if (kDebugMode) print('[BleTransport] Central disconnected (peripheral): $centralId');
           _peripheralCentrals.remove(centralId);
+          _peripheralCentralMaxUpdateLength.remove(centralId);
           if (_connectedDevices.isEmpty && _peripheralCentrals.isEmpty) {
             _setState(TransportState.disconnected);
           }

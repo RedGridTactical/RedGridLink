@@ -35,6 +35,7 @@
 	<key>NSBonjourServices</key>
 	<array>
 		<string>_red-grid-link._tcp</string>
+		<string>_red-grid-link._udp</string>
 	</array>
 	<key>NSCameraUsageDescription</key>
 	<string>Red Grid Link uses the camera to scan QR codes for quick Field Link session joining.</string>
