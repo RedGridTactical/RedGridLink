@@ -125,6 +125,7 @@ void main() async {
     transport: transport,
     peerRepository: peerRepo,
     markerRepository: markerRepo,
+    annotationRepository: annotationRepo,
     localDeviceId: deviceId,
   );
 

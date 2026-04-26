@@ -171,11 +171,25 @@ class _MapScreenState extends ConsumerState<MapScreen> {
           FlutterMap(
             mapController: controllerService.mapController,
             options: MapOptions(
-              initialCenter: const LatLng(
-                MapConstants.defaultLat,
-                MapConstants.defaultLon,
-              ),
-              initialZoom: MapConstants.defaultZoom,
+              // In demo mode the GPS provider immediately returns the demo
+              // reference point; use it as initialCenter so markers are
+              // visible from the very first frame.  In production mode
+              // gpsPosition is null until the GPS service warms up, so the
+              // map falls back to the continent-level default and then
+              // followPosition() moves it once a fix arrives.
+              initialCenter: gpsPosition != null
+                  ? LatLng(gpsPosition.lat, gpsPosition.lon)
+                  : const LatLng(
+                      MapConstants.defaultLat,
+                      MapConstants.defaultLon,
+                    ),
+              // When a GPS/demo position is available use street-level zoom so
+              // peer markers are spread across the viewport rather than all
+              // clustering at one pixel (as they would at the continent-level
+              // default zoom of 4).  Falls back to the country-overview zoom
+              // only when no position is known (first cold-start, no GPS fix).
+              initialZoom:
+                  gpsPosition != null ? 15.0 : MapConstants.defaultZoom,
               minZoom: MapConstants.minZoom,
               maxZoom: MapConstants.maxZoom,
               interactionOptions: const InteractionOptions(

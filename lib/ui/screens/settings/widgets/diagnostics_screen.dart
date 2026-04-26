@@ -10,15 +10,13 @@ import '../../../../providers/field_link_provider.dart';
 import '../../../../providers/location_provider.dart';
 import '../../../../providers/theme_provider.dart';
 
-/// In-app diagnostics screen used to debug Field Link / GPS issues on
-/// release builds (TestFlight). On a release build `kDebugMode` is
-/// `false` so all the `if (kDebugMode) print(...)` instrumentation in
-/// the BLE / MPC / Location services is silent. This screen surfaces
-/// the same internal state via a UI the tester can screenshot and
-/// send back.
+/// In-app diagnostics screen for support requests.
 ///
-/// Added in v1.5.4+312 to debug the iPad-as-host → iPhone-as-joiner
-/// regression that survived through builds 307–311.
+/// Surfaces the live internal state of GPS, the active session, and the
+/// BLE transport so a user reporting a Field Link issue can copy the
+/// snapshot and email it to support. The "Copy to clipboard" action in
+/// the app bar dumps every line in plain text suitable for pasting into
+/// an email body.
 class DiagnosticsScreen extends ConsumerStatefulWidget {
   const DiagnosticsScreen({super.key});
 
@@ -57,6 +55,74 @@ class _DiagnosticsScreenState extends ConsumerState<DiagnosticsScreen> {
     }
   }
 
+  /// One-tap path to fire the iOS / Android location permission prompt
+  /// from inside the running app. Without this, a tester whose
+  /// `hasCompletedOnboarding` flag is `true` (TestFlight upgrade) has
+  /// no in-app way to trigger `Permission.request()` — the app stays
+  /// invisible to iOS Settings → Privacy → Location Services until
+  /// `request()` is called once. Added in v1.5.4+313.
+  Future<void> _grantLocation() async {
+    try {
+      final current = await Permission.locationWhenInUse.status;
+
+      // If iOS has marked this app as permanently denied (the user has
+      // tapped "Don't Allow" then we tried again, or they revoked it
+      // post-grant), the OS won't show the prompt again — only the
+      // Settings app can flip the toggle. Send them there.
+      if (current.isPermanentlyDenied) {
+        await openAppSettings();
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Open Red Grid Link → Location → While Using App'),
+              duration: Duration(seconds: 4),
+            ),
+          );
+        }
+        return;
+      }
+
+      final result = await Permission.locationWhenInUse.request();
+
+      if (mounted) {
+        setState(() => _systemLocationStatus = result.toString());
+      }
+
+      if (result.isGranted || result.isLimited) {
+        // Kick the LocationService init provider so the GPS stream
+        // actually starts now that we have permission. Same path the
+        // onboarding PermissionsPage uses (added in v1.5.4+309).
+        ref.invalidate(locationInitProvider);
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Location permission granted — GPS starting'),
+              duration: Duration(seconds: 2),
+            ),
+          );
+        }
+      } else if (result.isPermanentlyDenied) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: const Text('Permission denied. Enable in iOS Settings.'),
+              action: SnackBarAction(
+                label: 'SETTINGS',
+                onPressed: openAppSettings,
+              ),
+            ),
+          );
+        }
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Permission request failed: $e')),
+        );
+      }
+    }
+  }
+
   String _ago(DateTime? t) {
     if (t == null) return 'never';
     final secs = DateTime.now().difference(t).inSeconds;
@@ -80,6 +146,23 @@ class _DiagnosticsScreenState extends ConsumerState<DiagnosticsScreen> {
     final fieldLink = ref.watch(fieldLinkServiceProvider);
     final session = fieldLink.activeSession;
     final ble = fieldLink.bleTransportOrNull;
+
+    // ── ACTION BUTTONS (v1.5.4+313) ─────────────────────────────
+    // If a permission is denied at the system level, give the tester a
+    // one-tap path to fire `Permission.X.request()` from inside this
+    // screen. Without this, an upgrade install where
+    // `hasCompletedOnboarding == true` skips the onboarding
+    // PermissionsPage and the user has NO in-app way to grant. iOS
+    // also doesn't list the app in Settings → Privacy → Location
+    // Services until the app has called `request()` at least once,
+    // which creates a permanent dead-end. This single button breaks
+    // that loop.
+    final showGrantLocationButton =
+        _systemLocationStatus == 'PermissionStatus.denied' ||
+            _systemLocationStatus == 'PermissionStatus.permanentlyDenied' ||
+            _systemLocationStatus == 'PermissionStatus.restricted' ||
+            (locationService.lastPosition == null &&
+                _systemLocationStatus == null);
 
     final lines = <_DiagLine>[
       // ── GPS ──────────────────────────────────────────────────
@@ -126,24 +209,6 @@ class _DiagnosticsScreenState extends ConsumerState<DiagnosticsScreen> {
       _DiagLine.kv('Messages emitted',
           '${ble?.diagMessagesEmitted ?? 0}'),
       _DiagLine.kv('Last error', ble?.diagLastError ?? '—'),
-
-      // ── How to read this ─────────────────────────────────────
-      _DiagLine.section('How to read this (v1.5.4+312)'),
-      _DiagLine.note(
-          'The two key signals when iPhone shows 0 connected even '
-          'though it joined an iPad host:\n\n'
-          '1. iPad — "Last broadcast" should tick under 5s. If it stays '
-          '"never", the iPad is not running heartbeats — usually because '
-          '"Last fix at" is "never" (no GPS fix → SyncEngine '
-          'returns early without broadcasting).\n\n'
-          '2. iPad — "Peripheral subs" should be ≥1 if iPhone is '
-          'connected. "Per-central maxUpdateLen" should report iOS '
-          's negotiated MTU (typically 182). If it says "empty" while '
-          'iPhone shows connected, the CCCD subscribe never reached '
-          'the iPad.\n\n'
-          '3. iPhone — "Last receive" should tick under 5s while iPad '
-          'is broadcasting. If it stays "never", iPad → iPhone notify '
-          'isn t reaching the central listener.'),
     ];
 
     return Scaffold(
@@ -174,9 +239,55 @@ class _DiagnosticsScreenState extends ConsumerState<DiagnosticsScreen> {
       ),
       body: ListView.builder(
         padding: const EdgeInsets.all(12),
-        itemCount: lines.length,
+        // +1 for the GRANT button row when shown.
+        itemCount: lines.length + (showGrantLocationButton ? 1 : 0),
         itemBuilder: (_, i) {
-          final l = lines[i];
+          // Top-of-list grant action.
+          if (showGrantLocationButton && i == 0) {
+            return Container(
+              margin: const EdgeInsets.only(bottom: 8),
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: colors.card,
+                border: Border.all(color: colors.accent, width: 1),
+                borderRadius: BorderRadius.circular(4),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Text(
+                    'LOCATION PERMISSION REQUIRED',
+                    style: TacticalTextStyles.label(colors).copyWith(
+                      color: colors.accent,
+                      letterSpacing: 1.5,
+                    ),
+                  ),
+                  const SizedBox(height: 6),
+                  Text(
+                    'Without it, the app cannot acquire a GPS fix; '
+                    'with no fix, Field Link heartbeats are not broadcast '
+                    'and peers will never appear on the map.',
+                    style: TacticalTextStyles.body(colors).copyWith(
+                      fontSize: 11,
+                      color: colors.text.withValues(alpha: 0.7),
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+                  ElevatedButton(
+                    onPressed: () => _grantLocation(),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: colors.accent,
+                      foregroundColor: colors.bg,
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                    ),
+                    child: const Text('GRANT LOCATION PERMISSION'),
+                  ),
+                ],
+              ),
+            );
+          }
+          // Adjust index for the action row offset.
+          final l = lines[showGrantLocationButton ? i - 1 : i];
           if (l.section != null) {
             return Padding(
               padding: const EdgeInsets.only(top: 16, bottom: 4),
@@ -185,18 +296,6 @@ class _DiagnosticsScreenState extends ConsumerState<DiagnosticsScreen> {
                 style: TacticalTextStyles.label(colors).copyWith(
                   color: colors.accent,
                   letterSpacing: 1.5,
-                ),
-              ),
-            );
-          }
-          if (l.note != null) {
-            return Padding(
-              padding: const EdgeInsets.symmetric(vertical: 8),
-              child: Text(
-                l.note!,
-                style: TacticalTextStyles.body(colors).copyWith(
-                  fontSize: 11,
-                  color: colors.text.withValues(alpha: 0.65),
                 ),
               ),
             );
@@ -238,16 +337,13 @@ class _DiagLine {
   final String? section;
   final String? key;
   final String? value;
-  final String? note;
-  _DiagLine._({this.section, this.key, this.value, this.note});
+  _DiagLine._({this.section, this.key, this.value});
 
   factory _DiagLine.section(String s) => _DiagLine._(section: s);
   factory _DiagLine.kv(String k, String v) => _DiagLine._(key: k, value: v);
-  factory _DiagLine.note(String n) => _DiagLine._(note: n);
 
   String toLine() {
     if (section != null) return '\n## ${section!.toUpperCase()}';
-    if (note != null) return note!;
     return '$key: $value';
   }
 }

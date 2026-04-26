@@ -5,6 +5,7 @@ import 'package:red_grid_link/data/models/marker.dart';
 import 'package:red_grid_link/data/models/position.dart';
 import 'package:red_grid_link/data/models/session_config.dart';
 import 'package:red_grid_link/data/models/sync_payload.dart';
+import 'package:red_grid_link/data/repositories/annotation_repository.dart';
 import 'package:red_grid_link/data/repositories/marker_repository.dart';
 import 'package:red_grid_link/data/repositories/peer_repository.dart';
 import 'package:red_grid_link/services/field_link/sync/crdt/crdt_state.dart';
@@ -40,6 +41,7 @@ class SyncEngine {
   final DeltaEncoder _encoder;
   final PeerRepository _peerRepository;
   final MarkerRepository _markerRepository;
+  final AnnotationRepository? _annotationRepository;
   final String _localDeviceId;
 
   CrdtState _state;
@@ -112,10 +114,12 @@ class SyncEngine {
     required PeerRepository peerRepository,
     required MarkerRepository markerRepository,
     required String localDeviceId,
+    AnnotationRepository? annotationRepository,
     DeltaEncoder encoder = const DeltaEncoder(),
   })  : _transport = transport,
         _peerRepository = peerRepository,
         _markerRepository = markerRepository,
+        _annotationRepository = annotationRepository,
         _localDeviceId = localDeviceId,
         _encoder = encoder,
         _state = const CrdtState();
@@ -134,6 +138,14 @@ class SyncEngine {
     _sessionId = sessionId;
     _isRunning = true;
     _state = const CrdtState();
+
+    // Re-hydrate the CRDT state from any markers / annotations already
+    // persisted for this session so a user who leaves and rejoins the
+    // same session sees their previous waypoints, search areas, and
+    // boundaries instead of an empty map. Without this, every join
+    // wipes the in-memory state and the UI shows nothing until peers
+    // re-broadcast — which never happens for solo session reuse.
+    await _hydrateFromDb(sessionId);
 
     // Listen for incoming messages from transport.
     _incomingSub = _transport.incomingMessages.listen(
@@ -162,6 +174,34 @@ class SyncEngine {
     }
 
     _emitState();
+  }
+
+  /// Seed the CRDT state with markers + annotations already persisted
+  /// for [sessionId] so a rejoiner sees their previous map content.
+  ///
+  /// Each entity is upserted using its `createdBy` device id as the CRDT
+  /// node id so subsequent merges from the original creator (if they
+  /// rejoin too) line up correctly with the sequence counter.
+  Future<void> _hydrateFromDb(String sessionId) async {
+    try {
+      final markers = await _markerRepository.getMarkersBySession(sessionId);
+      for (final marker in markers) {
+        _state = _state.upsertMarker(marker.createdBy, marker);
+      }
+    } catch (_) {
+      // Hydration failures are non-fatal — UI just shows fewer items.
+    }
+    final annoRepo = _annotationRepository;
+    if (annoRepo != null) {
+      try {
+        final annotations = await annoRepo.getAnnotationsBySession(sessionId);
+        for (final annotation in annotations) {
+          _state = _state.upsertAnnotation(annotation.createdBy, annotation);
+        }
+      } catch (_) {
+        // Same — failures are non-fatal.
+      }
+    }
   }
 
   /// Stop the sync engine and release resources.

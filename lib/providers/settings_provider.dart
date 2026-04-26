@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:red_grid_link/data/repositories/settings_repository.dart';
 
@@ -212,19 +213,33 @@ final hasCompletedOnboardingProvider =
 // ---------------------------------------------------------------------------
 
 /// Notifier for the demo mode toggle.
+///
+/// Demo mode is a developer-only feature that swaps real GPS + live peers
+/// for a hard-coded fake session (Shenandoah NP reference point, 4 fake
+/// peers, a boundary polygon).  It is used for App Store / Play Store
+/// screenshot capture and reviewer walkthroughs.
+///
+/// Release-build safety: in [kReleaseMode] this notifier ignores any
+/// persisted value and forces state to `false` permanently.  The Settings
+/// UI toggle is also gated behind [kDebugMode], so there is no code path
+/// that can enable demo mode in a production build.  This double-gate
+/// guarantees end users see their real GPS position, not demo coordinates.
 class DemoModeNotifier extends StateNotifier<bool> {
   final SettingsRepository _repo;
 
-  DemoModeNotifier(this._repo) : super(_repo.isDemoMode);
+  DemoModeNotifier(this._repo)
+      : super(kReleaseMode ? false : _repo.isDemoMode);
 
-  /// Toggle demo mode and persist to storage.
+  /// Toggle demo mode and persist to storage.  No-op in release builds.
   Future<void> set(bool value) async {
+    if (kReleaseMode) return;
     state = value;
     await _repo.setDemoMode(value);
   }
 }
 
-/// Whether demo mode is active (fake DC coordinates for screenshots).
+/// Whether demo mode is active (hard-coded fake data for screenshots).
+/// Always `false` in release builds.
 final demoModeProvider =
     StateNotifierProvider<DemoModeNotifier, bool>((ref) {
   final repo = ref.watch(settingsRepositoryProvider);

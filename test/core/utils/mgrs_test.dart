@@ -6,11 +6,13 @@ void main() {
   // toMGRS — Known coordinate conversions
   // -----------------------------------------------------------------------
   group('toMGRS', () {
-    test('Fort Liberty (Bragg) produces 17S XU grid square', () {
+    test('Fort Liberty (Bragg) produces 17S PU grid square', () {
       final result = toMGRS(35.1390, -79.0006);
       expect(result, startsWith('17S'));
-      // Grid square is XU for this implementation
-      expect(result.substring(3, 5), equals('XU'));
+      // 100km grid square is PU for Fort Bragg, confirmed after the
+      // grid-square-letter calculation fix in commit 2595e84 (the previous
+      // expectation of 'XU' came from a broken column-letter wrap).
+      expect(result.substring(3, 5), equals('PU'));
     });
 
     test('Washington DC produces 18S GZD', () {

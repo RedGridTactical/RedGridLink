@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Red Grid Link — Google Play Screenshots Compositor (7" tablet)</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: #000;
+    display: flex;
+    gap: 40px;
+    padding: 40px;
+    overflow-x: auto;
+    min-height: 100vh;
+    align-items: flex-start;
+    font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, 'Helvetica Neue', sans-serif;
+  }
+
+  /* Play Store 7" tablet slot: 1080×1920 portrait. */
+  .frame {
+    width: 1080px;
+    height: 1920px;
+    flex-shrink: 0;
+    position: relative;
+    overflow: hidden;
+    border-radius: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .frame-1 { background: linear-gradient(170deg, #0A0000 0%, #0A0000 20%, #8B0000 75%, #CC3333 100%); }
+  .frame-2 { background: linear-gradient(170deg, #001400 0%, #001400 25%, #006600 70%, #00BB00 100%); }
+  .frame-3 { background: linear-gradient(170deg, #000A14 0%, #000A14 25%, #005588 70%, #0099DD 100%); }
+  .frame-4 { background: linear-gradient(170deg, #F0F0F0 0%, #E0E0E0 25%, #990000 75%, #CC3333 100%); }
+  .frame-5 { background: linear-gradient(170deg, #0A0000 0%, #0A0000 20%, #991111 75%, #CC3333 100%); }
+  .frame-6 { background: linear-gradient(170deg, #0A0000 0%, #0A0000 20%, #8B0000 75%, #EE4444 100%); }
+  .frame-7 { background: linear-gradient(170deg, #001400 0%, #001400 25%, #007700 70%, #00DD00 100%); }
+  .frame-8 { background: linear-gradient(170deg, #000A14 0%, #000A14 25%, #006699 70%, #00BBEE 100%); }
+  .frame-9 { background: linear-gradient(170deg, #F0F0F0 0%, #E0E0E0 25%, #BB2222 75%, #EE4444 100%); }
+  .frame-10 { background: linear-gradient(170deg, #F0F0F0 0%, #E0E0E0 25%, #990000 75%, #CC3333 100%); }
+
+  .frame::before {
+    content: '';
+    position: absolute;
+    width: 800px;
+    height: 800px;
+    border-radius: 50%;
+    opacity: 0.07;
+    top: 220px;
+    left: -200px;
+    filter: blur(140px);
+    pointer-events: none;
+  }
+  .frame-1::before, .frame-5::before, .frame-6::before, .frame-9::before, .frame-10::before { background: #CC3333; }
+  .frame-2::before, .frame-7::before { background: #00CC00; }
+  .frame-3::before, .frame-8::before { background: #0099DD; }
+  .frame-4::before { background: #CC0000; }
+
+  .headline {
+    position: relative;
+    z-index: 2;
+    font-size: 68px;
+    font-weight: 800;
+    color: #ffffff;
+    text-align: center;
+    line-height: 1.12;
+    letter-spacing: -1.5px;
+    max-width: 940px;
+    padding: 80px 70px 0;
+    text-transform: uppercase;
+    text-shadow: 0 4px 30px rgba(0,0,0,0.5);
+  }
+
+  .subtitle {
+    position: relative;
+    z-index: 2;
+    font-size: 32px;
+    font-weight: 400;
+    color: rgba(255,255,255,0.72);
+    text-align: center;
+    margin-top: 20px;
+    max-width: 880px;
+    line-height: 1.4;
+    padding: 0 70px;
+    font-family: 'SF Mono', 'Menlo', monospace;
+    letter-spacing: 0.4px;
+  }
+
+  .frame-4 .headline, .frame-9 .headline, .frame-10 .headline { color: #111111; text-shadow: none; }
+  .frame-4 .subtitle, .frame-9 .subtitle, .frame-10 .subtitle { color: rgba(0,0,0,0.55); }
+
+  /* 7" tablet mockup — scaled to fit 1080×1920 output.
+     Inner screenshot preserves 1200:1920 (5:8) capture aspect.
+     Outer: 1008×1586, inner: 988×1566 (10px bezel). */
+  .tablet {
+    position: relative;
+    z-index: 2;
+    margin-top: 40px;
+    width: 1008px;
+    height: 1586px;
+    background: #1C1C1E;
+    border-radius: 30px;
+    border: 10px solid #3a3a3c;
+    overflow: hidden;
+    box-shadow:
+      0 40px 100px rgba(0,0,0,0.6),
+      0 0 0 1.5px rgba(255,255,255,0.04);
+    flex-shrink: 0;
+  }
+
+  .tablet img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+</style>
+</head>
+<body>
+
+<div class="frame frame-1">
+  <div class="headline">Your Team. One Map. No Signal Required.</div>
+  <div class="subtitle">Encrypted Bluetooth sync — zero infrastructure</div>
+  <div class="tablet"><img src="../../screenshots/raw_android/tablet7/01_map_team.png"></div>
+</div>
+
+<div class="frame frame-2">
+  <div class="headline">MGRS Precision Navigation</div>
+  <div class="subtitle">Live 10-digit military grid, 1-meter accuracy</div>
+  <div class="tablet"><img src="../../screenshots/raw_android/tablet7/02_grid_mgrs.png"></div>
+</div>
+
+<div class="frame frame-3">
+  <div class="headline">Field Link — Zero Infrastructure</div>
+  <div class="subtitle">AES-256 encrypted peer-to-peer coordination</div>
+  <div class="tablet"><img src="../../screenshots/raw_android/tablet7/03_field_link.png"></div>
+</div>
+
+<div class="frame frame-4">
+  <div class="headline">11 Tactical Field Tools</div>
+  <div class="subtitle">Dead reckoning, resection, coord converter + more</div>
+  <div class="tablet"><img src="../../screenshots/raw_android/tablet7/04_tools.png"></div>
+</div>
+
+<div class="frame frame-5">
+  <div class="headline">4 Tactical Display Themes</div>
+  <div class="subtitle">Red Light · NVG Green · Day White · Blue Force</div>
+  <div class="tablet"><img src="../../screenshots/raw_android/tablet7/05_themes.png"></div>
+</div>
+
+<div class="frame frame-6">
+  <div class="headline">Distance & Bearing at a Tap</div>
+  <div class="subtitle">Tactical info on every teammate</div>
+  <div class="tablet"><img src="../../screenshots/raw_android/tablet7/06_peer_popup.png"></div>
+</div>
+
+<div class="frame frame-7">
+  <div class="headline">Dead Reckoning Plotter</div>
+  <div class="subtitle">Heading + distance to MGRS destination</div>
+  <div class="tablet"><img src="../../screenshots/raw_android/tablet7/07_dead_reckoning.png"></div>
+</div>
+
+<div class="frame frame-8">
+  <div class="headline">Celestial Navigation</div>
+  <div class="subtitle">Sun and moon bearing — calibrate any compass</div>
+  <div class="tablet"><img src="../../screenshots/raw_android/tablet7/08_celestial.png"></div>
+</div>
+
+<div class="frame frame-9">
+  <div class="headline">Mark Boundaries & Search Sectors</div>
+  <div class="subtitle">Draw polygons and share with your team</div>
+  <div class="tablet"><img src="../../screenshots/raw_android/tablet7/09_search_area.png"></div>
+</div>
+
+<div class="frame frame-10">
+  <div class="headline">Team Roster with Roles</div>
+  <div class="subtitle">Lead · Scout · Medic · Comms — assign on the fly</div>
+  <div class="tablet"><img src="../../screenshots/raw_android/tablet7/10_roster.png"></div>
+</div>
+
+</body>
+</html>

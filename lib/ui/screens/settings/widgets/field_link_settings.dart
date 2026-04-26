@@ -5,6 +5,7 @@ import '../../../../core/constants/app_constants.dart';
 import '../../../../core/theme/tactical_colors.dart';
 import '../../../../core/theme/tactical_text_styles.dart';
 import '../../../../core/utils/haptics.dart';
+import '../../../../providers/field_link_provider.dart';
 import '../../../../providers/settings_provider.dart';
 import '../../../../providers/theme_provider.dart';
 import '../../../../providers/voice_callout_provider.dart';
@@ -74,8 +75,22 @@ class _FieldLinkSettingsState extends ConsumerState<FieldLinkSettings> {
                   isDense: true,
                 ),
                 onChanged: (value) {
-                  if (value.trim().isNotEmpty) {
-                    ref.read(displayNameProvider.notifier).set(value.trim());
+                  final trimmed = value.trim();
+                  if (trimmed.isEmpty) return;
+                  ref.read(displayNameProvider.notifier).set(trimmed);
+                  // If a Field Link session is currently active, push the
+                  // new callsign through immediately so peers see the
+                  // updated name. Without this, changing the display name
+                  // mid-session never reaches anyone — peers keep showing
+                  // the original name (or a truncated UUID if it was
+                  // never set when the session was created).
+                  try {
+                    final service = ref.read(fieldLinkServiceProvider);
+                    if (service.isSessionActive) {
+                      service.setCallsign(trimmed);
+                    }
+                  } catch (_) {
+                    // Service not overridden in widget tests — ignore.
                   }
                 },
               ),

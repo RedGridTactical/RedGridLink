@@ -21,32 +21,37 @@ void main() {
   });
 
   group('demoSessionProvider', () {
-    test('emits a fake active session with realistic metadata', () {
+    test('emits a fake active SAR session with realistic metadata', () {
       final session = container.read(demoSessionProvider);
 
       expect(session.id, 'demo-session-0001');
-      expect(session.name, 'DEMO PATROL');
+      expect(session.name, 'RIDGE SWEEP');
       expect(session.isActive, isTrue);
       expect(session.securityMode, SecurityMode.pin);
-      expect(session.pin, '0426');
+      expect(session.pin, '7492');
       expect(session.operationalMode, OperationalMode.sar);
-      expect(session.peers.length, 4);
-      expect(session.peers, contains('demo-alpha'));
-      expect(session.peers, contains('demo-bravo'));
-      expect(session.peers, contains('demo-charlie'));
+      // demo-local + four connected peers
+      expect(session.peers.length, 5);
+      expect(session.peers, contains('demo-local'));
+      expect(session.peers, contains('demo-viper'));
+      expect(session.peers, contains('demo-nomad'));
+      expect(session.peers, contains('demo-falcon'));
+      expect(session.peers, contains('demo-reaper'));
     });
   });
 
   group('demoPeersProvider', () {
-    test('emits three connected peers with distinct callsigns + roles', () {
+    test('emits four connected peers with distinct callsigns + roles', () {
       final peers = container.read(demoPeersProvider);
 
-      expect(peers.length, 3);
-      expect(peers.map((p) => p.callsign).toList(), ['ALPHA', 'BRAVO', 'CHARLIE']);
+      expect(peers.length, 4);
+      expect(peers.map((p) => p.callsign).toList(),
+          ['VIPER', 'NOMAD', 'FALCON', 'REAPER']);
       expect(peers.map((p) => p.role).toList(), [
         TeamRole.scout,
         TeamRole.medic,
         TeamRole.comms,
+        TeamRole.scout,
       ]);
 
       for (final p in peers) {
@@ -57,44 +62,47 @@ void main() {
       }
     });
 
-    test('peer positions are distinct and near the Washington Monument', () {
+    test('peer positions are distinct and near the Shenandoah NP reference',
+        () {
       final peers = container.read(demoPeersProvider);
 
-      // Washington Monument reference
-      const refLat = 38.8895;
-      const refLon = -77.0353;
+      // Shenandoah National Park demo reference (matches
+      // demo_data_provider.dart).
+      const refLat = 38.5225;
+      const refLon = -78.4352;
 
       final distances = <double>[];
       for (final p in peers) {
         final pos = p.position!;
-        // Rough haversine — at 100m scale, simple pythagorean is fine
+        // Rough squared-distance in metres².  Exact math is unnecessary —
+        // we only need a sanity bound ("within ~1 km of reference").
         final dLat = (pos.lat - refLat) * 111132.0;
-        final dLon = (pos.lon - refLon) * 111320.0 * 0.776;
+        final dLon = (pos.lon - refLon) * 111320.0 * 0.783; // cos(38.5°)
         final d = (dLat * dLat + dLon * dLon);
         distances.add(d);
-        // Within 1 km of reference
+        // Within 1 km (1_000_000 m²).
         expect(d < 1000000, isTrue,
             reason: '${p.callsign} too far from reference');
       }
 
-      // No two peers at identical distance (ensures they're spread out)
+      // No two peers at identical distance (ensures they're spread out).
       final uniqueDistances = distances.toSet();
       expect(uniqueDistances.length, distances.length);
     });
   });
 
   group('demoGhostsProvider', () {
-    test('emits one faded DELTA ghost disconnected ~8 minutes ago', () {
+    test('emits one faded SPECTER ghost disconnected ~12 minutes ago', () {
       final ghosts = container.read(demoGhostsProvider);
 
       expect(ghosts.length, 1);
       final ghost = ghosts.first;
-      expect(ghost.peerId, 'demo-delta');
-      expect(ghost.displayName, 'DELTA');
+      expect(ghost.peerId, 'demo-specter');
+      expect(ghost.displayName, 'SPECTER');
       expect(ghost.ghostState, GhostState.faded);
 
       final elapsed = DateTime.now().difference(ghost.disconnectedAt);
-      expect(elapsed.inMinutes >= 7 && elapsed.inMinutes <= 9, isTrue);
+      expect(elapsed.inMinutes >= 11 && elapsed.inMinutes <= 13, isTrue);
     });
   });
 
@@ -110,7 +118,7 @@ void main() {
       expect(icons, contains(MarkerIcon.waypoint));
       expect(icons, contains(MarkerIcon.cache));
 
-      // Every marker must have a non-empty label and MGRS string
+      // Every marker must have a non-empty label and MGRS string.
       for (final m in markers) {
         expect(m.label.isNotEmpty, isTrue);
         expect(m.mgrs.isNotEmpty, isTrue);
@@ -126,14 +134,14 @@ void main() {
   });
 
   group('demoAnnotationsProvider', () {
-    test('emits a boundary polygon with four points', () {
+    test('emits a Search Sector Alpha boundary polygon with four points', () {
       final annotations = container.read(demoAnnotationsProvider);
 
       expect(annotations.length, 1);
       final boundary = annotations.first;
       expect(boundary.type, AnnotationType.boundary);
       expect(boundary.points.length, 4);
-      expect(boundary.label, 'AO BOUNDARY');
+      expect(boundary.label, 'SEARCH SECTOR ALPHA');
       expect(boundary.id, 'demo-b1');
     });
   });

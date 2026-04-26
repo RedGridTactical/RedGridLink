@@ -878,12 +878,30 @@ class FieldLinkService {
         _onSyncStateChanged(_syncEngine.currentState);
         break;
       case 'emergency':
-        _emergencyBeacon.handleRemoteEmergency(event.senderId, event.data);
-        onEmergencyStateChanged?.call(true);
+        // Only fire the UI state change when this is a genuinely NEW
+        // emergency. The originator retransmits the same payload every
+        // 30s for late-joining peers, and stale copies can arrive AFTER
+        // a cancel via mesh re-delivery; re-firing for those would flip
+        // the alert overlay back on after the user already cancelled.
+        final isNewEmergency = _emergencyBeacon.handleRemoteEmergency(
+          event.senderId,
+          event.data,
+        );
+        if (isNewEmergency) {
+          onEmergencyStateChanged?.call(true);
+        }
         break;
       case 'emergency_cancel':
-        _emergencyBeacon.handleRemoteCancel(event.senderId);
-        onEmergencyStateChanged?.call(false);
+        // Only fire the UI state change when the cancel actually applied
+        // (i.e. the cancelling sender owned the active beacon). Suppresses
+        // spurious false-positive cancels from non-owning peers.
+        final didCancel = _emergencyBeacon.handleRemoteCancel(
+          event.senderId,
+          event.data,
+        );
+        if (didCancel) {
+          onEmergencyStateChanged?.call(false);
+        }
         break;
       case 'message':
         final callsign = _roleManager.callsignForPeer(event.senderId);
@@ -936,6 +954,15 @@ class FieldLinkService {
       'evt': 'join_response',
       'accepted': accepted,
       'targetDeviceId': senderId,
+      // Include the host's session metadata so the joiner can mirror it
+      // locally — without these the joiner's UI shows hardcoded defaults
+      // ("Joined Session" name, SAR mode) that don't match the host.
+      if (accepted) 'name': _activeSession!.name,
+      if (accepted) 'mode': _activeSession!.operationalMode.id,
+      // Tell the joiner who the lead is so they accept future role_assign
+      // messages from us. Without this, the joiner's RoleManager doesn't
+      // know we're lead and silently ignores promotions / role changes.
+      if (accepted) 'lead': _localDeviceId,
     });
 
     if (!accepted) {
@@ -963,6 +990,44 @@ class FieldLinkService {
       leaveSession();
       // Notify listeners of the rejection via an error status.
       _setStatus(FieldLinkStatus.error);
+      return;
+    }
+
+    // Mirror the host's session metadata locally so this device's UI
+    // (mode-aware labels, session name, lead-only controls) matches the
+    // host's. Without this, joiners show hardcoded defaults from
+    // joinSession() and never reflect the actual session state.
+    final hostName = data['name'] as String?;
+    final hostModeId = data['mode'] as String?;
+    final hostLeadId = data['lead'] as String?;
+
+    if (_activeSession != null) {
+      OperationalMode? hostMode;
+      if (hostModeId != null) {
+        hostMode = OperationalMode.values.firstWhere(
+          (m) => m.id == hostModeId,
+          orElse: () => _activeSession!.operationalMode,
+        );
+      }
+      _activeSession = _activeSession!.copyWith(
+        name: hostName,
+        operationalMode: hostMode,
+      );
+      // Persist so the next launch / activeSessionProvider refresh
+      // reads the correct values.
+      _sessionRepository.updateSession(_activeSession!).catchError((_) => false);
+      _emitSession();
+    }
+
+    // Trust the host's role assignments. Without recording the host as
+    // lead, RoleManager's `_isLeader(senderId)` check rejects every
+    // subsequent role_assign / promotion message from the host.
+    if (hostLeadId != null && hostLeadId != _localDeviceId) {
+      _roleManager.applyRemoteRoleChange(
+        hostLeadId,
+        TeamRole.lead,
+        fromLeader: hostLeadId,
+      );
     }
   }
 
