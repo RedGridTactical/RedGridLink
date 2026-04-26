@@ -1,5 +1,5 @@
 {
-  "_comment": "Localized App Store screenshot copy for Red Grid Link. 10 frames × N locales. Headlines should fit ~3 lines at 88px on a 1290px frame. Subtitles ~1 line at 42px. Military proper nouns (MGRS, NATO, NVG, Bluetooth, AES-256, FixPhrase) stay in English.",
+  "_comment": "Localized App Store screenshot copy for Red Grid Link. 39 ASC locales × 10 frames. Headlines fit ~3 lines at 88px on a 1290px frame. Subtitles ~1 line at 42px. Military proper nouns (MGRS, NATO, NVG, Bluetooth, AES-256, FixPhrase, SAR, P2P) stay in English everywhere.",
 
   "en-US": {
     "01_map_team":         { "headline": "Your Team. One Map. No Signal Required.", "subtitle": "Encrypted Bluetooth sync — zero infrastructure" },
@@ -14,12 +14,51 @@
     "10_roster":           { "headline": "Team Roster with Roles",                   "subtitle": "Lead · Scout · Medic · Comms — assign on the fly" }
   },
 
+  "en-GB": {
+    "01_map_team":         { "headline": "Your Team. One Map. No Signal Required.", "subtitle": "Encrypted Bluetooth sync — zero infrastructure" },
+    "02_grid_mgrs":        { "headline": "MGRS Precision Navigation",                "subtitle": "Live 10-digit military grid, 1-metre accuracy" },
+    "03_field_link":       { "headline": "Field Link — Zero Infrastructure",         "subtitle": "AES-256 encrypted peer-to-peer coordination" },
+    "04_tools":            { "headline": "11 Tactical Field Tools",                  "subtitle": "Dead reckoning, resection, coord converter + more" },
+    "05_themes":           { "headline": "4 Tactical Display Themes",                "subtitle": "Red Light · NVG Green · Day White · Blue Force" },
+    "06_peer_popup":       { "headline": "Distance & Bearing at a Tap",              "subtitle": "Tactical info on every teammate" },
+    "07_dead_reckoning":   { "headline": "Dead Reckoning Plotter",                   "subtitle": "Heading + distance to MGRS destination" },
+    "08_celestial":        { "headline": "Celestial Navigation",                     "subtitle": "Sun and moon bearing — calibrate any compass" },
+    "09_search_area":      { "headline": "Mark Boundaries & Search Sectors",         "subtitle": "Draw polygons and share with your team" },
+    "10_roster":           { "headline": "Team Roster with Roles",                   "subtitle": "Lead · Scout · Medic · Comms — assign on the fly" }
+  },
+
+  "en-AU": {
+    "01_map_team":         { "headline": "Your Team. One Map. No Signal Required.", "subtitle": "Encrypted Bluetooth sync — zero infrastructure" },
+    "02_grid_mgrs":        { "headline": "MGRS Precision Navigation",                "subtitle": "Live 10-digit military grid, 1-metre accuracy" },
+    "03_field_link":       { "headline": "Field Link — Zero Infrastructure",         "subtitle": "AES-256 encrypted peer-to-peer coordination" },
+    "04_tools":            { "headline": "11 Tactical Field Tools",                  "subtitle": "Dead reckoning, resection, coord converter + more" },
+    "05_themes":           { "headline": "4 Tactical Display Themes",                "subtitle": "Red Light · NVG Green · Day White · Blue Force" },
+    "06_peer_popup":       { "headline": "Distance & Bearing at a Tap",              "subtitle": "Tactical info on every teammate" },
+    "07_dead_reckoning":   { "headline": "Dead Reckoning Plotter",                   "subtitle": "Heading + distance to MGRS destination" },
+    "08_celestial":        { "headline": "Celestial Navigation",                     "subtitle": "Sun and moon bearing — calibrate any compass" },
+    "09_search_area":      { "headline": "Mark Boundaries & Search Sectors",         "subtitle": "Draw polygons and share with your team" },
+    "10_roster":           { "headline": "Team Roster with Roles",                   "subtitle": "Lead · Scout · Medic · Comms — assign on the fly" }
+  },
+
+  "en-CA": {
+    "01_map_team":         { "headline": "Your Team. One Map. No Signal Required.", "subtitle": "Encrypted Bluetooth sync — zero infrastructure" },
+    "02_grid_mgrs":        { "headline": "MGRS Precision Navigation",                "subtitle": "Live 10-digit military grid, 1-metre accuracy" },
+    "03_field_link":       { "headline": "Field Link — Zero Infrastructure",         "subtitle": "AES-256 encrypted peer-to-peer coordination" },
+    "04_tools":            { "headline": "11 Tactical Field Tools",                  "subtitle": "Dead reckoning, resection, coord converter + more" },
+    "05_themes":           { "headline": "4 Tactical Display Themes",                "subtitle": "Red Light · NVG Green · Day White · Blue Force" },
+    "06_peer_popup":       { "headline": "Distance & Bearing at a Tap",              "subtitle": "Tactical info on every teammate" },
+    "07_dead_reckoning":   { "headline": "Dead Reckoning Plotter",                   "subtitle": "Heading + distance to MGRS destination" },
+    "08_celestial":        { "headline": "Celestial Navigation",                     "subtitle": "Sun and moon bearing — calibrate any compass" },
+    "09_search_area":      { "headline": "Mark Boundaries & Search Sectors",         "subtitle": "Draw polygons and share with your team" },
+    "10_roster":           { "headline": "Team Roster with Roles",                   "subtitle": "Lead · Scout · Medic · Comms — assign on the fly" }
+  },
+
   "de-DE": {
     "01_map_team":         { "headline": "Dein Team. Eine Karte. Ohne Signal.",      "subtitle": "Verschlüsselte Bluetooth-Sync — ohne Infrastruktur" },
     "02_grid_mgrs":        { "headline": "MGRS Präzisionsnavigation",                "subtitle": "10-stelliges Militär-Gitter, 1-Meter-Präzision" },
-    "03_field_link":       { "headline": "Field Link — Ohne Infrastruktur",          "subtitle": "AES-256 verschlüsselte Peer-to-Peer-Koordination" },
+    "03_field_link":       { "headline": "Field Link — Ohne Infrastruktur",          "subtitle": "AES-256 verschlüsselte P2P-Koordination" },
     "04_tools":            { "headline": "11 Taktische Werkzeuge",                   "subtitle": "Koppelnavigation, Resektion, Koordinaten + mehr" },
-    "05_themes":           { "headline": "4 Taktische Anzeige-Themes",               "subtitle": "Rotlicht · NVG-Grün · Tag-Weiß · Blue Force" },
+    "05_themes":           { "headline": "4 Taktische Themes",                       "subtitle": "Rotlicht · NVG-Grün · Tag-Weiß · Blue Force" },
     "06_peer_popup":       { "headline": "Entfernung & Peilung per Tipp",            "subtitle": "Taktische Info zu jedem Teammitglied" },
     "07_dead_reckoning":   { "headline": "Koppelnavigation",                         "subtitle": "Kurs + Distanz zum MGRS-Ziel" },
     "08_celestial":        { "headline": "Astronavigation",                          "subtitle": "Sonnen- und Mondpeilung — jeden Kompass kalibrieren" },
@@ -54,6 +93,19 @@
   },
 
   "fr-FR": {
+    "01_map_team":         { "headline": "Votre Équipe. Une Carte. Sans Réseau.",    "subtitle": "Sync Bluetooth chiffrée — zéro infrastructure" },
+    "02_grid_mgrs":        { "headline": "Navigation MGRS de Précision",             "subtitle": "Grille militaire 10 chiffres, précision 1 m" },
+    "03_field_link":       { "headline": "Field Link — Zéro Infrastructure",         "subtitle": "Coordination P2P chiffrée AES-256" },
+    "04_tools":            { "headline": "11 Outils Tactiques",                      "subtitle": "Estime, résection, convertisseur de coordonnées + plus" },
+    "05_themes":           { "headline": "4 Thèmes Tactiques",                       "subtitle": "Lumière Rouge · NVG Vert · Jour Blanc · Blue Force" },
+    "06_peer_popup":       { "headline": "Distance & Azimut en un Toucher",          "subtitle": "Info tactique pour chaque coéquipier" },
+    "07_dead_reckoning":   { "headline": "Plotter Navigation à l'Estime",            "subtitle": "Cap + distance vers la destination MGRS" },
+    "08_celestial":        { "headline": "Navigation Céleste",                       "subtitle": "Azimut solaire et lunaire — calibrer toute boussole" },
+    "09_search_area":      { "headline": "Limites & Secteurs de Recherche",          "subtitle": "Dessinez des polygones et partagez-les" },
+    "10_roster":           { "headline": "Liste d'Équipe avec Rôles",                "subtitle": "Chef · Éclaireur · Médic · Comms — à la volée" }
+  },
+
+  "fr-CA": {
     "01_map_team":         { "headline": "Votre Équipe. Une Carte. Sans Réseau.",    "subtitle": "Sync Bluetooth chiffrée — zéro infrastructure" },
     "02_grid_mgrs":        { "headline": "Navigation MGRS de Précision",             "subtitle": "Grille militaire 10 chiffres, précision 1 m" },
     "03_field_link":       { "headline": "Field Link — Zéro Infrastructure",         "subtitle": "Coordination P2P chiffrée AES-256" },
@@ -118,6 +170,19 @@
     "10_roster":           { "headline": "Roster da Equipe com Funções",             "subtitle": "Líder · Batedor · Médico · Comms — em movimento" }
   },
 
+  "pt-PT": {
+    "01_map_team":         { "headline": "A Tua Equipa. Um Mapa. Sem Sinal.",        "subtitle": "Sync Bluetooth encriptada — zero infraestrutura" },
+    "02_grid_mgrs":        { "headline": "Navegação MGRS de Precisão",               "subtitle": "Grelha militar 10 dígitos, precisão 1 metro" },
+    "03_field_link":       { "headline": "Field Link — Zero Infraestrutura",         "subtitle": "Coordenação P2P encriptada AES-256" },
+    "04_tools":            { "headline": "11 Ferramentas Tácticas",                  "subtitle": "Navegação estimada, ressecção, conversor + mais" },
+    "05_themes":           { "headline": "4 Temas Tácticos",                         "subtitle": "Luz Vermelha · NVG Verde · Dia Branco · Blue Force" },
+    "06_peer_popup":       { "headline": "Distância e Marcação ao Toque",            "subtitle": "Info táctica de cada companheiro" },
+    "07_dead_reckoning":   { "headline": "Plotter de Navegação Estimada",            "subtitle": "Rumo + distância ao destino MGRS" },
+    "08_celestial":        { "headline": "Navegação Celeste",                        "subtitle": "Marcação solar e lunar — calibra qualquer bússola" },
+    "09_search_area":      { "headline": "Limites e Sectores de Busca",              "subtitle": "Desenha polígonos e partilha com a equipa" },
+    "10_roster":           { "headline": "Lista da Equipa com Funções",              "subtitle": "Líder · Batedor · Médico · Comms — em movimento" }
+  },
+
   "zh-Hans": {
     "01_map_team":         { "headline": "团队、一张地图、无需信号。",                       "subtitle": "蓝牙加密同步 — 零基础设施" },
     "02_grid_mgrs":        { "headline": "MGRS精准导航",                              "subtitle": "10位军用网格,1米精度" },
@@ -129,5 +194,317 @@
     "08_celestial":        { "headline": "天体导航",                                 "subtitle": "日月方位 — 校准任何指南针" },
     "09_search_area":      { "headline": "标记边界与搜索区域",                            "subtitle": "绘制多边形并与团队共享" },
     "10_roster":           { "headline": "带角色的团队名册",                             "subtitle": "领队 · 侦察 · 医务 · 通讯 — 随时分配" }
+  },
+
+  "zh-Hant": {
+    "01_map_team":         { "headline": "團隊、一張地圖、無需訊號。",                       "subtitle": "藍牙加密同步 — 零基礎設施" },
+    "02_grid_mgrs":        { "headline": "MGRS精準導航",                              "subtitle": "10位軍用網格,1米精度" },
+    "03_field_link":       { "headline": "Field Link — 零基礎設施",                     "subtitle": "AES-256加密點對點協作" },
+    "04_tools":            { "headline": "11種戰術工具",                              "subtitle": "航位推算、交會、座標轉換等" },
+    "05_themes":           { "headline": "4種戰術顯示主題",                            "subtitle": "紅光 · NVG綠 · 日間白 · 藍軍" },
+    "06_peer_popup":       { "headline": "一觸獲取距離與方位",                            "subtitle": "每位隊友的戰術資訊" },
+    "07_dead_reckoning":   { "headline": "航位推算繪圖器",                              "subtitle": "至MGRS目的地的方位與距離" },
+    "08_celestial":        { "headline": "天體導航",                                 "subtitle": "日月方位 — 校準任何指南針" },
+    "09_search_area":      { "headline": "標記邊界與搜索區域",                            "subtitle": "繪製多邊形並與團隊共享" },
+    "10_roster":           { "headline": "帶角色的團隊名冊",                             "subtitle": "領隊 · 偵察 · 醫務 · 通訊 — 隨時分配" }
+  },
+
+  "nl-NL": {
+    "01_map_team":         { "headline": "Jouw Team. Eén Kaart. Zonder Signaal.",    "subtitle": "Versleutelde Bluetooth-sync — geen infrastructuur" },
+    "02_grid_mgrs":        { "headline": "MGRS Precisienavigatie",                   "subtitle": "10-cijferig militair raster, 1-meter nauwkeurigheid" },
+    "03_field_link":       { "headline": "Field Link — Geen Infrastructuur",         "subtitle": "AES-256 versleutelde P2P-coördinatie" },
+    "04_tools":            { "headline": "11 Tactische Veldtools",                   "subtitle": "Gegist bestek, resectie, coördinatenconverter + meer" },
+    "05_themes":           { "headline": "4 Tactische Weergavethema's",              "subtitle": "Rood Licht · NVG Groen · Dag Wit · Blue Force" },
+    "06_peer_popup":       { "headline": "Afstand en Peiling met één Tik",           "subtitle": "Tactische info over elk teamlid" },
+    "07_dead_reckoning":   { "headline": "Gegist Bestek Plotter",                    "subtitle": "Koers + afstand naar MGRS-bestemming" },
+    "08_celestial":        { "headline": "Astronavigatie",                           "subtitle": "Zon- en maanpeiling — kalibreer elk kompas" },
+    "09_search_area":      { "headline": "Markeer Grenzen & Zoeksectoren",           "subtitle": "Teken polygonen en deel met je team" },
+    "10_roster":           { "headline": "Team-Roster met Rollen",                   "subtitle": "Lead · Scout · Medic · Comms — direct toewijzen" }
+  },
+
+  "sv": {
+    "01_map_team":         { "headline": "Ditt Lag. En Karta. Utan Signal.",         "subtitle": "Krypterad Bluetooth-sync — ingen infrastruktur" },
+    "02_grid_mgrs":        { "headline": "MGRS Precisionsnavigering",                "subtitle": "10-siffrigt militärt rutnät, 1-meters precision" },
+    "03_field_link":       { "headline": "Field Link — Ingen Infrastruktur",         "subtitle": "AES-256 krypterad P2P-koordinering" },
+    "04_tools":            { "headline": "11 Taktiska Fältverktyg",                  "subtitle": "Bestickräkning, resektion, koordinatkonverterare + mer" },
+    "05_themes":           { "headline": "4 Taktiska Skärmteman",                    "subtitle": "Rött Ljus · NVG Grön · Dag Vit · Blue Force" },
+    "06_peer_popup":       { "headline": "Avstånd & Bäring med ett Tryck",           "subtitle": "Taktisk info om varje lagmedlem" },
+    "07_dead_reckoning":   { "headline": "Bestickräkningsplotter",                   "subtitle": "Kurs + avstånd till MGRS-mål" },
+    "08_celestial":        { "headline": "Astronavigering",                          "subtitle": "Sol- och månbäring — kalibrera vilken kompass som helst" },
+    "09_search_area":      { "headline": "Markera Gränser och Sökområden",           "subtitle": "Rita polygoner och dela med ditt lag" },
+    "10_roster":           { "headline": "Lagroster med Roller",                     "subtitle": "Lead · Scout · Medic · Comms — tilldela på språng" }
+  },
+
+  "no": {
+    "01_map_team":         { "headline": "Ditt Lag. Ett Kart. Uten Signal.",         "subtitle": "Kryptert Bluetooth-sync — uten infrastruktur" },
+    "02_grid_mgrs":        { "headline": "MGRS Presisjonsnavigasjon",                "subtitle": "10-sifret militært rutenett, 1-meters presisjon" },
+    "03_field_link":       { "headline": "Field Link — Uten Infrastruktur",          "subtitle": "AES-256 kryptert P2P-koordinering" },
+    "04_tools":            { "headline": "11 Taktiske Feltverktøy",                  "subtitle": "Bestikkregning, resseksjon, koordinatkonverterer + mer" },
+    "05_themes":           { "headline": "4 Taktiske Skjermtemaer",                  "subtitle": "Rødt Lys · NVG Grønn · Dag Hvit · Blue Force" },
+    "06_peer_popup":       { "headline": "Avstand og Peiling med ett Trykk",         "subtitle": "Taktisk info om hvert lagmedlem" },
+    "07_dead_reckoning":   { "headline": "Bestikkregningsplotter",                   "subtitle": "Kurs + avstand til MGRS-mål" },
+    "08_celestial":        { "headline": "Astronavigasjon",                          "subtitle": "Sol- og månepeiling — kalibrer hvilket kompass som helst" },
+    "09_search_area":      { "headline": "Marker Grenser og Søkesektorer",           "subtitle": "Tegn polygoner og del med laget ditt" },
+    "10_roster":           { "headline": "Lagsroster med Roller",                    "subtitle": "Lead · Scout · Medic · Comms — tildel raskt" }
+  },
+
+  "da": {
+    "01_map_team":         { "headline": "Dit Hold. Ét Kort. Uden Signal.",          "subtitle": "Krypteret Bluetooth-sync — uden infrastruktur" },
+    "02_grid_mgrs":        { "headline": "MGRS Præcisionsnavigation",                "subtitle": "10-cifret militært gitter, 1-meters præcision" },
+    "03_field_link":       { "headline": "Field Link — Uden Infrastruktur",          "subtitle": "AES-256 krypteret P2P-koordinering" },
+    "04_tools":            { "headline": "11 Taktiske Feltværktøjer",                "subtitle": "Bestikregning, resektion, koordinatkonverter + mere" },
+    "05_themes":           { "headline": "4 Taktiske Skærmtemaer",                   "subtitle": "Rødt Lys · NVG Grøn · Dag Hvid · Blue Force" },
+    "06_peer_popup":       { "headline": "Afstand & Pejling med ét Tryk",            "subtitle": "Taktisk info om hvert holdmedlem" },
+    "07_dead_reckoning":   { "headline": "Bestikregningsplotter",                    "subtitle": "Kurs + afstand til MGRS-destination" },
+    "08_celestial":        { "headline": "Astronavigation",                          "subtitle": "Sol- og månepejling — kalibrer ethvert kompas" },
+    "09_search_area":      { "headline": "Marker Grænser og Søgesektorer",           "subtitle": "Tegn polygoner og del med dit hold" },
+    "10_roster":           { "headline": "Holdroster med Roller",                    "subtitle": "Lead · Scout · Medic · Comms — tildel hurtigt" }
+  },
+
+  "fi": {
+    "01_map_team":         { "headline": "Tiimisi. Yksi Kartta. Ilman Verkkoa.",     "subtitle": "Salattu Bluetooth-sync — ilman infrastruktuuria" },
+    "02_grid_mgrs":        { "headline": "MGRS Tarkkuusnavigointi",                  "subtitle": "10-numeroinen sotilasruudukko, 1 metrin tarkkuus" },
+    "03_field_link":       { "headline": "Field Link — Ilman Infraa",                "subtitle": "AES-256 salattu P2P-koordinointi" },
+    "04_tools":            { "headline": "11 Taktista Kenttätyökalua",               "subtitle": "Suuntimo, leikkaussuunnistus, koordinaattimuunnin + lisää" },
+    "05_themes":           { "headline": "4 Taktista Näyttötilateemaa",              "subtitle": "Punainen · NVG Vihreä · Päivä Valk · Blue Force" },
+    "06_peer_popup":       { "headline": "Etäisyys ja Suuntima Napautuksella",       "subtitle": "Taktista tietoa jokaisesta tiimiläisestä" },
+    "07_dead_reckoning":   { "headline": "Suuntimopiirturi",                         "subtitle": "Kurssi + etäisyys MGRS-määränpäähän" },
+    "08_celestial":        { "headline": "Tähtinavigointi",                          "subtitle": "Aurinko- ja kuusuuntima — kalibroi mikä tahansa kompassi" },
+    "09_search_area":      { "headline": "Merkitse Rajat ja Etsintäsektorit",        "subtitle": "Piirrä polygoneja ja jaa tiimisi kanssa" },
+    "10_roster":           { "headline": "Tiimirosteri Rooleilla",                   "subtitle": "Lead · Scout · Medic · Comms — määritä lennossa" }
+  },
+
+  "pl": {
+    "01_map_team":         { "headline": "Twój Zespół. Jedna Mapa. Bez Sygnału.",    "subtitle": "Szyfrowana sync Bluetooth — bez infrastruktury" },
+    "02_grid_mgrs":        { "headline": "Nawigacja Precyzyjna MGRS",                "subtitle": "10-cyfrowa siatka wojskowa, dokładność 1 m" },
+    "03_field_link":       { "headline": "Field Link — Bez Infrastruktury",          "subtitle": "Koordynacja P2P szyfrowana AES-256" },
+    "04_tools":            { "headline": "11 Narzędzi Taktycznych",                  "subtitle": "Nawigacja zliczeniowa, rezekcja, konwerter + więcej" },
+    "05_themes":           { "headline": "4 Taktyczne Motywy Wyświetlania",          "subtitle": "Czerwone · NVG Zielone · Dzień Białe · Blue Force" },
+    "06_peer_popup":       { "headline": "Odległość i Namiar Jednym Dotknięciem",    "subtitle": "Informacje taktyczne o każdym członku" },
+    "07_dead_reckoning":   { "headline": "Ploter Nawigacji Zliczeniowej",            "subtitle": "Kurs + odległość do celu MGRS" },
+    "08_celestial":        { "headline": "Nawigacja Astronomiczna",                  "subtitle": "Namiar słońca i księżyca — skalibruj dowolny kompas" },
+    "09_search_area":      { "headline": "Oznacz Granice i Sektory Poszukiwań",      "subtitle": "Rysuj wielokąty i udostępniaj zespołowi" },
+    "10_roster":           { "headline": "Skład Zespołu z Rolami",                   "subtitle": "Lead · Scout · Medic · Comms — przydzielaj na bieżąco" }
+  },
+
+  "ru": {
+    "01_map_team":         { "headline": "Команда. Карта. Без Связи.",               "subtitle": "Шифрованная Bluetooth-синхронизация — без инфраструктуры" },
+    "02_grid_mgrs":        { "headline": "Точная Навигация MGRS",                    "subtitle": "10-значная военная сетка, точность 1 метр" },
+    "03_field_link":       { "headline": "Field Link — Без Инфраструктуры",          "subtitle": "Координация P2P с шифрованием AES-256" },
+    "04_tools":            { "headline": "11 Тактических Инструментов",              "subtitle": "Счисление, засечка, конвертер координат + больше" },
+    "05_themes":           { "headline": "4 Тактические Темы",                       "subtitle": "Красный · NVG Зелёный · День Белый · Blue Force" },
+    "06_peer_popup":       { "headline": "Дистанция и Пеленг Одним Касанием",        "subtitle": "Тактическая информация о каждом" },
+    "07_dead_reckoning":   { "headline": "Плоттер Счисления Пути",                   "subtitle": "Курс + дистанция до цели MGRS" },
+    "08_celestial":        { "headline": "Астронавигация",                           "subtitle": "Пеленг солнца и луны — калибровка компаса" },
+    "09_search_area":      { "headline": "Границы и Поисковые Сектора",              "subtitle": "Рисуйте полигоны и делитесь с командой" },
+    "10_roster":           { "headline": "Список Команды с Ролями",                  "subtitle": "Лидер · Разведка · Медик · Связь — на лету" }
+  },
+
+  "tr": {
+    "01_map_team":         { "headline": "Ekibin. Tek Harita. Sinyal Gerekmez.",     "subtitle": "Şifreli Bluetooth senkronizasyonu — altyapı yok" },
+    "02_grid_mgrs":        { "headline": "MGRS Hassas Navigasyon",                   "subtitle": "10 haneli askeri ızgara, 1 metre hassasiyet" },
+    "03_field_link":       { "headline": "Field Link — Sıfır Altyapı",               "subtitle": "AES-256 şifreli eşler arası koordinasyon" },
+    "04_tools":            { "headline": "11 Taktik Saha Aracı",                     "subtitle": "Tahmini seyir, çizgilemek, koordinat dönüştürücü + daha fazlası" },
+    "05_themes":           { "headline": "4 Taktik Ekran Teması",                    "subtitle": "Kırmızı · NVG Yeşil · Gündüz Beyaz · Blue Force" },
+    "06_peer_popup":       { "headline": "Tek Dokunuşla Mesafe & Yön",               "subtitle": "Her ekip üyesi hakkında taktik bilgi" },
+    "07_dead_reckoning":   { "headline": "Tahmini Seyir Çizici",                     "subtitle": "Yön + MGRS hedefine mesafe" },
+    "08_celestial":        { "headline": "Gök Cisimleri Navigasyonu",                "subtitle": "Güneş ve ay yönü — herhangi bir pusulayı kalibre et" },
+    "09_search_area":      { "headline": "Sınırları ve Arama Bölgelerini İşaretle",  "subtitle": "Çokgenler çiz ve ekibinle paylaş" },
+    "10_roster":           { "headline": "Rolleri ile Ekip Kadrosu",                 "subtitle": "Lider · Keşif · Medic · İletişim — anında ata" }
+  },
+
+  "ar-SA": {
+    "01_map_team":         { "headline": "فريقك. خريطة واحدة. بدون إشارة.",            "subtitle": "مزامنة Bluetooth مشفرة — بدون بنية تحتية" },
+    "02_grid_mgrs":        { "headline": "ملاحة MGRS دقيقة",                         "subtitle": "شبكة عسكرية من 10 أرقام، دقة 1 متر" },
+    "03_field_link":       { "headline": "Field Link — بدون بنية تحتية",              "subtitle": "تنسيق نظير لنظير مشفر AES-256" },
+    "04_tools":            { "headline": "11 أداة ميدانية تكتيكية",                   "subtitle": "حساب التيه، التقاطع، محول إحداثيات + المزيد" },
+    "05_themes":           { "headline": "4 سمات عرض تكتيكية",                       "subtitle": "أحمر · NVG أخضر · أبيض النهار · Blue Force" },
+    "06_peer_popup":       { "headline": "المسافة والاتجاه بنقرة",                    "subtitle": "معلومات تكتيكية لكل عضو" },
+    "07_dead_reckoning":   { "headline": "راسم حساب التيه",                          "subtitle": "الاتجاه + المسافة إلى وجهة MGRS" },
+    "08_celestial":        { "headline": "ملاحة فلكية",                             "subtitle": "اتجاه الشمس والقمر — معايرة أي بوصلة" },
+    "09_search_area":      { "headline": "حدد الحدود وقطاعات البحث",                  "subtitle": "ارسم مضلعات وشاركها مع فريقك" },
+    "10_roster":           { "headline": "قائمة الفريق مع الأدوار",                   "subtitle": "قائد · كشاف · مسعف · اتصالات — عيِّن فورًا" }
+  },
+
+  "he": {
+    "01_map_team":         { "headline": "הצוות שלך. מפה אחת. ללא אות.",              "subtitle": "סנכרון Bluetooth מוצפן — ללא תשתית" },
+    "02_grid_mgrs":        { "headline": "ניווט MGRS מדויק",                          "subtitle": "רשת צבאית 10 ספרות, דיוק 1 מטר" },
+    "03_field_link":       { "headline": "Field Link — ללא תשתית",                    "subtitle": "תיאום P2P מוצפן AES-256" },
+    "04_tools":            { "headline": "11 כלי שטח טקטיים",                          "subtitle": "ניווט באומדן, הצלבה, ממיר קואורדינטות + עוד" },
+    "05_themes":           { "headline": "4 ערכות תצוגה טקטיות",                       "subtitle": "אדום · NVG ירוק · יום לבן · Blue Force" },
+    "06_peer_popup":       { "headline": "מרחק וכיוון בנגיעה",                         "subtitle": "מידע טקטי על כל חבר צוות" },
+    "07_dead_reckoning":   { "headline": "פלוטר ניווט באומדן",                         "subtitle": "כיוון + מרחק ליעד MGRS" },
+    "08_celestial":        { "headline": "ניווט אסטרונומי",                            "subtitle": "כיוון שמש וירח — כייל כל מצפן" },
+    "09_search_area":      { "headline": "סמן גבולות ומגזרי חיפוש",                     "subtitle": "צייר מצולעים ושתף עם הצוות" },
+    "10_roster":           { "headline": "סגל צוות עם תפקידים",                        "subtitle": "מוביל · סייר · חובש · קשר — שיוך מיידי" }
+  },
+
+  "el": {
+    "01_map_team":         { "headline": "Η Ομάδα σου. Ένας Χάρτης. Χωρίς Σήμα.",     "subtitle": "Κρυπτογραφημένη Bluetooth-σύγχρ. — χωρίς υποδομή" },
+    "02_grid_mgrs":        { "headline": "Πλοήγηση Ακριβείας MGRS",                  "subtitle": "10ψήφιο στρατιωτικό πλέγμα, ακρίβεια 1 μέτρου" },
+    "03_field_link":       { "headline": "Field Link — Χωρίς Υποδομή",               "subtitle": "Κρυπτογραφημένος συντονισμός P2P AES-256" },
+    "04_tools":            { "headline": "11 Τακτικά Εργαλεία Πεδίου",               "subtitle": "Πλοήγηση εκτίμησης, αντίστροφη, μετατροπέας + άλλα" },
+    "05_themes":           { "headline": "4 Τακτικά Θέματα Οθόνης",                  "subtitle": "Κόκκινο · NVG Πράσινο · Λευκό · Blue Force" },
+    "06_peer_popup":       { "headline": "Απόσταση & Κατεύθυνση με Άγγιγμα",          "subtitle": "Τακτική πληροφορία για κάθε μέλος" },
+    "07_dead_reckoning":   { "headline": "Πλότερ Πλοήγησης Εκτίμησης",                "subtitle": "Πορεία + απόσταση σε προορισμό MGRS" },
+    "08_celestial":        { "headline": "Ουράνια Πλοήγηση",                          "subtitle": "Κατεύθυνση ήλιου-σελήνης — βαθμονόμηση πυξίδας" },
+    "09_search_area":      { "headline": "Όρια και Τομείς Αναζήτησης",                "subtitle": "Σχεδίαση πολυγώνων και κοινοποίηση" },
+    "10_roster":           { "headline": "Λίστα Ομάδας με Ρόλους",                    "subtitle": "Lead · Scout · Medic · Comms — άμεση ανάθεση" }
+  },
+
+  "hi": {
+    "01_map_team":         { "headline": "आपकी टीम। एक नक्शा। सिग्नल नहीं चाहिए।",           "subtitle": "एन्क्रिप्टेड Bluetooth सिंक — कोई इन्फ्रा नहीं" },
+    "02_grid_mgrs":        { "headline": "MGRS परिशुद्ध नेविगेशन",                       "subtitle": "10-अंकीय सैन्य ग्रिड, 1-मीटर सटीकता" },
+    "03_field_link":       { "headline": "Field Link — कोई इन्फ्रा नहीं",                  "subtitle": "AES-256 एन्क्रिप्टेड P2P समन्वय" },
+    "04_tools":            { "headline": "11 सामरिक फील्ड टूल्स",                          "subtitle": "डेड रेकनिंग, रेसेक्शन, कोऑर्ड कन्वर्टर + अधिक" },
+    "05_themes":           { "headline": "4 सामरिक डिस्प्ले थीम",                          "subtitle": "रेड लाइट · NVG ग्रीन · डे व्हाइट · Blue Force" },
+    "06_peer_popup":       { "headline": "एक टैप पर दूरी और दिशा",                         "subtitle": "हर साथी की सामरिक जानकारी" },
+    "07_dead_reckoning":   { "headline": "डेड रेकनिंग प्लॉटर",                            "subtitle": "MGRS गंतव्य तक दिशा + दूरी" },
+    "08_celestial":        { "headline": "खगोलीय नेविगेशन",                              "subtitle": "सूर्य और चंद्र दिशा — किसी भी कम्पास का अंशांकन" },
+    "09_search_area":      { "headline": "सीमाएँ और खोज क्षेत्र चिह्नित करें",                "subtitle": "बहुभुज बनाएँ और टीम के साथ साझा करें" },
+    "10_roster":           { "headline": "भूमिकाओं वाली टीम सूची",                          "subtitle": "लीड · स्काउट · मेडिक · कॉम्स — तुरंत असाइन" }
+  },
+
+  "th": {
+    "01_map_team":         { "headline": "ทีมของคุณ แผนที่เดียว ไม่ต้องใช้สัญญาณ",           "subtitle": "ซิงค์ Bluetooth เข้ารหัส — ไม่ต้องมีโครงสร้างพื้นฐาน" },
+    "02_grid_mgrs":        { "headline": "นำทาง MGRS ความแม่นยำสูง",                     "subtitle": "ตารางทหาร 10 หลัก ความแม่นยำ 1 เมตร" },
+    "03_field_link":       { "headline": "Field Link — ไม่ต้องมีโครงสร้างพื้นฐาน",            "subtitle": "ประสานงาน P2P เข้ารหัส AES-256" },
+    "04_tools":            { "headline": "11 เครื่องมือยุทธวิธีภาคสนาม",                      "subtitle": "เดินเรือโดยประมาณ ตัดเส้น แปลงพิกัด และอื่น ๆ" },
+    "05_themes":           { "headline": "4 ธีมแสดงผลยุทธวิธี",                            "subtitle": "แดง · NVG เขียว · กลางวันขาว · Blue Force" },
+    "06_peer_popup":       { "headline": "ระยะและทิศแค่แตะเดียว",                          "subtitle": "ข้อมูลยุทธวิธีของเพื่อนทีมทุกคน" },
+    "07_dead_reckoning":   { "headline": "พลอตเตอร์เดินเรือโดยประมาณ",                       "subtitle": "ทิศ + ระยะถึงปลายทาง MGRS" },
+    "08_celestial":        { "headline": "การเดินเรือทางดาว",                              "subtitle": "ทิศดวงอาทิตย์-ดวงจันทร์ — สอบเทียบเข็มทิศ" },
+    "09_search_area":      { "headline": "ทำเครื่องหมายขอบเขตและพื้นที่ค้นหา",                 "subtitle": "วาดรูปหลายเหลี่ยมและแชร์กับทีม" },
+    "10_roster":           { "headline": "รายชื่อทีมพร้อมบทบาท",                            "subtitle": "ผู้นำ · สอดแนม · แพทย์ · สื่อสาร — กำหนดได้ทันที" }
+  },
+
+  "vi": {
+    "01_map_team":         { "headline": "Đội của Bạn. Một Bản Đồ. Không Cần Sóng.", "subtitle": "Đồng bộ Bluetooth mã hoá — không cần hạ tầng" },
+    "02_grid_mgrs":        { "headline": "Định Vị Chính Xác MGRS",                  "subtitle": "Lưới quân sự 10 chữ số, độ chính xác 1 mét" },
+    "03_field_link":       { "headline": "Field Link — Không Cần Hạ Tầng",          "subtitle": "Phối hợp P2P mã hoá AES-256" },
+    "04_tools":            { "headline": "11 Công Cụ Chiến Thuật Dã Chiến",         "subtitle": "Định hướng ước lượng, giao hội, chuyển đổi tọa độ + nữa" },
+    "05_themes":           { "headline": "4 Chủ Đề Hiển Thị Chiến Thuật",           "subtitle": "Đỏ · NVG Xanh · Ngày Trắng · Blue Force" },
+    "06_peer_popup":       { "headline": "Khoảng Cách & Hướng Một Chạm",            "subtitle": "Thông tin chiến thuật của mỗi đồng đội" },
+    "07_dead_reckoning":   { "headline": "Bộ Vẽ Định Hướng Ước Lượng",              "subtitle": "Hướng + khoảng cách đến đích MGRS" },
+    "08_celestial":        { "headline": "Định Vị Thiên Văn",                       "subtitle": "Hướng Mặt Trời và Mặt Trăng — hiệu chuẩn la bàn" },
+    "09_search_area":      { "headline": "Đánh Dấu Ranh Giới và Khu Tìm Kiếm",      "subtitle": "Vẽ đa giác và chia sẻ với đội" },
+    "10_roster":           { "headline": "Danh Sách Đội Có Vai Trò",                "subtitle": "Lead · Scout · Medic · Comms — phân công nhanh" }
+  },
+
+  "id": {
+    "01_map_team":         { "headline": "Tim Anda. Satu Peta. Tanpa Sinyal.",       "subtitle": "Sinkronisasi Bluetooth terenkripsi — tanpa infrastruktur" },
+    "02_grid_mgrs":        { "headline": "Navigasi Presisi MGRS",                    "subtitle": "Grid militer 10 digit, akurasi 1 meter" },
+    "03_field_link":       { "headline": "Field Link — Tanpa Infrastruktur",         "subtitle": "Koordinasi P2P terenkripsi AES-256" },
+    "04_tools":            { "headline": "11 Alat Lapangan Taktis",                  "subtitle": "Navigasi taksiran, reseksi, konverter koordinat + lainnya" },
+    "05_themes":           { "headline": "4 Tema Tampilan Taktis",                   "subtitle": "Merah · NVG Hijau · Siang Putih · Blue Force" },
+    "06_peer_popup":       { "headline": "Jarak & Arah dengan Sekali Sentuh",        "subtitle": "Info taktis tiap rekan tim" },
+    "07_dead_reckoning":   { "headline": "Plotter Navigasi Taksiran",                "subtitle": "Haluan + jarak ke tujuan MGRS" },
+    "08_celestial":        { "headline": "Navigasi Bintang",                         "subtitle": "Arah matahari & bulan — kalibrasi kompas apa pun" },
+    "09_search_area":      { "headline": "Tandai Batas & Sektor Pencarian",          "subtitle": "Gambar poligon dan bagikan ke tim" },
+    "10_roster":           { "headline": "Daftar Tim dengan Peran",                  "subtitle": "Lead · Scout · Medic · Comms — tugaskan cepat" }
+  },
+
+  "ms": {
+    "01_map_team":         { "headline": "Pasukan Anda. Satu Peta. Tanpa Isyarat.",  "subtitle": "Penyegerakan Bluetooth disulitkan — tiada infrastruktur" },
+    "02_grid_mgrs":        { "headline": "Navigasi Tepat MGRS",                      "subtitle": "Grid tentera 10 digit, ketepatan 1 meter" },
+    "03_field_link":       { "headline": "Field Link — Tanpa Infrastruktur",         "subtitle": "Koordinasi P2P disulitkan AES-256" },
+    "04_tools":            { "headline": "11 Alat Lapangan Taktikal",                "subtitle": "Navigasi anggaran, reseksi, penukar koordinat + lagi" },
+    "05_themes":           { "headline": "4 Tema Paparan Taktikal",                  "subtitle": "Merah · NVG Hijau · Siang Putih · Blue Force" },
+    "06_peer_popup":       { "headline": "Jarak & Bering dengan Sekali Sentuh",      "subtitle": "Info taktikal setiap rakan pasukan" },
+    "07_dead_reckoning":   { "headline": "Pemplot Navigasi Anggaran",                "subtitle": "Haluan + jarak ke destinasi MGRS" },
+    "08_celestial":        { "headline": "Navigasi Cakerawala",                      "subtitle": "Bering matahari & bulan — kalibrasi mana-mana kompas" },
+    "09_search_area":      { "headline": "Tanda Sempadan & Sektor Carian",           "subtitle": "Lukis poligon dan kongsi dengan pasukan" },
+    "10_roster":           { "headline": "Roster Pasukan dengan Peranan",            "subtitle": "Lead · Scout · Medic · Comms — tugaskan pantas" }
+  },
+
+  "uk": {
+    "01_map_team":         { "headline": "Ваша Команда. Одна Карта. Без Сигналу.",   "subtitle": "Шифрована Bluetooth-синхронізація — без інфраструктури" },
+    "02_grid_mgrs":        { "headline": "Точна Навігація MGRS",                     "subtitle": "10-значна військова сітка, точність 1 метр" },
+    "03_field_link":       { "headline": "Field Link — Без Інфраструктури",          "subtitle": "Координація P2P із шифруванням AES-256" },
+    "04_tools":            { "headline": "11 Тактичних Інструментів",                "subtitle": "Числення, засічка, конвертер координат + більше" },
+    "05_themes":           { "headline": "4 Тактичні Теми",                          "subtitle": "Червоний · NVG Зелений · День Білий · Blue Force" },
+    "06_peer_popup":       { "headline": "Відстань і Пеленг Одним Дотиком",          "subtitle": "Тактична інформація про кожного" },
+    "07_dead_reckoning":   { "headline": "Плотер Числення Шляху",                    "subtitle": "Курс + відстань до MGRS-цілі" },
+    "08_celestial":        { "headline": "Астронавігація",                           "subtitle": "Пеленг сонця та місяця — калібрувати компас" },
+    "09_search_area":      { "headline": "Межі та Сектори Пошуку",                   "subtitle": "Малюйте полігони та діліться з командою" },
+    "10_roster":           { "headline": "Список Команди з Ролями",                  "subtitle": "Lead · Scout · Медик · Зв'язок — миттєво" }
+  },
+
+  "ca": {
+    "01_map_team":         { "headline": "El Teu Equip. Un Mapa. Sense Senyal.",     "subtitle": "Sincronització Bluetooth xifrada — sense infraestructura" },
+    "02_grid_mgrs":        { "headline": "Navegació de Precisió MGRS",               "subtitle": "Quadrícula militar 10 dígits, precisió 1 metre" },
+    "03_field_link":       { "headline": "Field Link — Sense Infraestructura",       "subtitle": "Coordinació P2P xifrada AES-256" },
+    "04_tools":            { "headline": "11 Eines Tàctiques",                       "subtitle": "Estima, intersecció, convertidor de coordenades + més" },
+    "05_themes":           { "headline": "4 Temes Tàctics",                          "subtitle": "Vermella · NVG Verd · Dia Blanc · Blue Force" },
+    "06_peer_popup":       { "headline": "Distància i Rumb d'un Toc",                "subtitle": "Informació tàctica de cada company" },
+    "07_dead_reckoning":   { "headline": "Plotter de Navegació Estimada",            "subtitle": "Rumb + distància a la destinació MGRS" },
+    "08_celestial":        { "headline": "Navegació Celest",                         "subtitle": "Rumb solar i lunar — calibra qualsevol brúixola" },
+    "09_search_area":      { "headline": "Marca Perímetres i Sectors",               "subtitle": "Dibuixa polígons i comparteix amb l'equip" },
+    "10_roster":           { "headline": "Llista d'Equip amb Rols",                  "subtitle": "Líder · Explorador · Mèdic · Comms — al moment" }
+  },
+
+  "cs": {
+    "01_map_team":         { "headline": "Tvůj Tým. Jedna Mapa. Bez Signálu.",       "subtitle": "Šifrovaná Bluetooth-sync — bez infrastruktury" },
+    "02_grid_mgrs":        { "headline": "Přesná Navigace MGRS",                     "subtitle": "10místná vojenská síť, přesnost 1 metr" },
+    "03_field_link":       { "headline": "Field Link — Bez Infrastruktury",          "subtitle": "Šifrovaná P2P koordinace AES-256" },
+    "04_tools":            { "headline": "11 Taktických Nástrojů",                   "subtitle": "Odhad polohy, resekce, převodník souřadnic + více" },
+    "05_themes":           { "headline": "4 Taktická Témata Zobrazení",              "subtitle": "Červená · NVG Zelená · Den Bílá · Blue Force" },
+    "06_peer_popup":       { "headline": "Vzdálenost a Azimut Jedním Klepnutím",     "subtitle": "Taktické informace o každém členovi" },
+    "07_dead_reckoning":   { "headline": "Plotter Odhadu Polohy",                    "subtitle": "Kurz + vzdálenost k cíli MGRS" },
+    "08_celestial":        { "headline": "Astronomická Navigace",                    "subtitle": "Azimut slunce a měsíce — kalibrace kompasu" },
+    "09_search_area":      { "headline": "Hranice a Pátrací Sektory",                "subtitle": "Kreslete polygony a sdílejte s týmem" },
+    "10_roster":           { "headline": "Týmový Roster s Rolemi",                   "subtitle": "Lead · Scout · Medic · Comms — okamžitě" }
+  },
+
+  "hr": {
+    "01_map_team":         { "headline": "Tvoj Tim. Jedna Karta. Bez Signala.",      "subtitle": "Šifrirana Bluetooth-sync — bez infrastrukture" },
+    "02_grid_mgrs":        { "headline": "Precizna MGRS Navigacija",                 "subtitle": "10-znamenkasta vojna mreža, točnost 1 metar" },
+    "03_field_link":       { "headline": "Field Link — Bez Infrastrukture",          "subtitle": "Šifrirana P2P koordinacija AES-256" },
+    "04_tools":            { "headline": "11 Taktičkih Terenskih Alata",             "subtitle": "Procjena položaja, presijecanje, pretvarač + više" },
+    "05_themes":           { "headline": "4 Taktičke Teme Prikaza",                  "subtitle": "Crvena · NVG Zelena · Dan Bijela · Blue Force" },
+    "06_peer_popup":       { "headline": "Udaljenost i Smjer Jednim Dodirom",        "subtitle": "Taktička info o svakom članu" },
+    "07_dead_reckoning":   { "headline": "Ploter Procjene Položaja",                 "subtitle": "Kurs + udaljenost do MGRS odredišta" },
+    "08_celestial":        { "headline": "Astronomska Navigacija",                   "subtitle": "Smjer sunca i mjeseca — kalibracija kompasa" },
+    "09_search_area":      { "headline": "Granice i Sektori Pretrage",               "subtitle": "Crtaj poligone i podijeli s timom" },
+    "10_roster":           { "headline": "Lista Tima s Ulogama",                     "subtitle": "Lead · Scout · Medic · Comms — odmah dodijeli" }
+  },
+
+  "hu": {
+    "01_map_team":         { "headline": "A Csapatod. Egy Térkép. Jel Nélkül.",      "subtitle": "Titkosított Bluetooth-szinkr. — infrastruktúra nélkül" },
+    "02_grid_mgrs":        { "headline": "MGRS Precíziós Navigáció",                 "subtitle": "10 jegyű katonai rács, 1 méteres pontosság" },
+    "03_field_link":       { "headline": "Field Link — Infrastruktúra Nélkül",       "subtitle": "AES-256 titkosított P2P koordináció" },
+    "04_tools":            { "headline": "11 Taktikai Terepeszköz",                  "subtitle": "Holttartás, hátsmetszés, koord. átváltó + több" },
+    "05_themes":           { "headline": "4 Taktikai Megjelenítési Téma",            "subtitle": "Vörös · NVG Zöld · Nappal Fehér · Blue Force" },
+    "06_peer_popup":       { "headline": "Távolság és Irány Egy Érintésre",          "subtitle": "Taktikai infó minden csapattagról" },
+    "07_dead_reckoning":   { "headline": "Holttartási Plotter",                      "subtitle": "Irány + távolság MGRS célhoz" },
+    "08_celestial":        { "headline": "Égi Navigáció",                            "subtitle": "Nap- és holdirány — bármely iránytű kalibrálása" },
+    "09_search_area":      { "headline": "Határok és Kutatási Szektorok",            "subtitle": "Rajzolj poligonokat és oszd meg a csapattal" },
+    "10_roster":           { "headline": "Csapatlista Szerepekkel",                  "subtitle": "Lead · Scout · Medic · Comms — azonnal kioszt" }
+  },
+
+  "ro": {
+    "01_map_team":         { "headline": "Echipa Ta. O Hartă. Fără Semnal.",         "subtitle": "Sincronizare Bluetooth criptată — fără infrastructură" },
+    "02_grid_mgrs":        { "headline": "Navigație MGRS de Precizie",               "subtitle": "Grilă militară 10 cifre, precizie 1 metru" },
+    "03_field_link":       { "headline": "Field Link — Fără Infrastructură",         "subtitle": "Coordonare P2P criptată AES-256" },
+    "04_tools":            { "headline": "11 Unelte Tactice de Teren",               "subtitle": "Estimă, resecție, convertor coordonate + altele" },
+    "05_themes":           { "headline": "4 Teme Tactice de Afișare",                "subtitle": "Roșu · NVG Verde · Zi Alb · Blue Force" },
+    "06_peer_popup":       { "headline": "Distanță și Relevment cu o Atingere",      "subtitle": "Info tactică despre fiecare coleg" },
+    "07_dead_reckoning":   { "headline": "Plotter Navigație Estimată",               "subtitle": "Curs + distanță la destinație MGRS" },
+    "08_celestial":        { "headline": "Navigație Astronomică",                    "subtitle": "Relevment soare-lună — calibrează orice busolă" },
+    "09_search_area":      { "headline": "Marchează Limite și Sectoare de Căutare",  "subtitle": "Desenează poligoane și împarte cu echipa" },
+    "10_roster":           { "headline": "Listă Echipă cu Roluri",                   "subtitle": "Lead · Scout · Medic · Comms — atribuie rapid" }
+  },
+
+  "sk": {
+    "01_map_team":         { "headline": "Tvoj Tím. Jedna Mapa. Bez Signálu.",       "subtitle": "Šifrovaná Bluetooth-sync — bez infraštruktúry" },
+    "02_grid_mgrs":        { "headline": "Presná Navigácia MGRS",                    "subtitle": "10-miestna vojenská sieť, presnosť 1 meter" },
+    "03_field_link":       { "headline": "Field Link — Bez Infraštruktúry",          "subtitle": "Šifrovaná P2P koordinácia AES-256" },
+    "04_tools":            { "headline": "11 Taktických Nástrojov",                  "subtitle": "Odhad polohy, resekcia, prevodník súradníc + viac" },
+    "05_themes":           { "headline": "4 Taktické Témy Zobrazenia",               "subtitle": "Červená · NVG Zelená · Deň Biela · Blue Force" },
+    "06_peer_popup":       { "headline": "Vzdialenosť a Azimut Jedným Klepnutím",    "subtitle": "Taktická informácia o každom členovi" },
+    "07_dead_reckoning":   { "headline": "Plotter Odhadu Polohy",                    "subtitle": "Kurz + vzdialenosť k cieľu MGRS" },
+    "08_celestial":        { "headline": "Astronomická Navigácia",                   "subtitle": "Azimut slnka a mesiaca — kalibrácia kompasu" },
+    "09_search_area":      { "headline": "Hranice a Pátracie Sektory",               "subtitle": "Kreslite polygóny a zdieľajte s tímom" },
+    "10_roster":           { "headline": "Tímový Roster s Rolami",                   "subtitle": "Lead · Scout · Medic · Comms — okamžite" }
   }
 }
