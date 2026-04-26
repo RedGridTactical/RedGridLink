@@ -14,6 +14,7 @@ import '../../common/widgets/mode_selector.dart';
 import '../../common/widgets/section_header.dart';
 import '../../common/widgets/tactical_card.dart';
 import 'widgets/about_screen.dart';
+import 'widgets/diagnostics_screen.dart';
 import 'widgets/calibration_section.dart';
 import 'widgets/field_link_settings.dart';
 import 'widgets/subscription_section.dart';
@@ -280,6 +281,24 @@ class SettingsScreen extends ConsumerWidget {
                             onTap: () => Navigator.of(context).push(
                               MaterialPageRoute<void>(
                                 builder: (_) => const AboutScreen(),
+                              ),
+                            ),
+                          ),
+                          Divider(
+                            color: colors.border,
+                            height: 1,
+                            indent: 12,
+                            endIndent: 12,
+                          ),
+                          _NavRow(
+                            icon: Icons.bug_report_outlined,
+                            label: 'FIELD LINK DIAGNOSTICS',
+                            subtitle:
+                                'Real-time GPS / BLE / MPC state for support',
+                            colors: colors,
+                            onTap: () => Navigator.of(context).push(
+                              MaterialPageRoute<void>(
+                                builder: (_) => const DiagnosticsScreen(),
                               ),
                             ),
                           ),

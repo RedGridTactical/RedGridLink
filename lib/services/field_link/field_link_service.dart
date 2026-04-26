@@ -1178,4 +1178,9 @@ class FieldLinkService {
     if (transport is MultiTransport) return transport.bleTransport;
     return null;
   }
+
+  /// Public accessor for the underlying [BleTransport] used by the
+  /// in-app Diagnostics screen (v1.5.4+312). Returns null if BLE is
+  /// not part of the active transport stack.
+  BleTransport? get bleTransportOrNull => _resolveBleTransport();
 }

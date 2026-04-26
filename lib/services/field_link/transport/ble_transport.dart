@@ -198,6 +198,26 @@ class BleTransport implements TransportService {
   String? _diagLastError;
   String? get diagLastError => _diagLastError;
 
+  /// Per-central `maximumUpdateValueLength` map for the in-app
+  /// Diagnostics screen (v1.5.4+312). Read-only snapshot of the
+  /// internal state so the UI can show whether iOS reported the
+  /// negotiated MTU per subscribed central.
+  Map<String, int> get diagPeripheralCentralMaxUpdateLength =>
+      Map.unmodifiable(_peripheralCentralMaxUpdateLength);
+
+  /// Timestamp of the last successful `broadcast()` invocation (any
+  /// path). Used by the Diagnostics screen to show whether the local
+  /// heartbeat is firing.
+  DateTime? _diagLastBroadcastAt;
+  DateTime? get diagLastBroadcastAt => _diagLastBroadcastAt;
+
+  /// Timestamp of the last incoming `_onCharacteristicValueReceived`
+  /// (peripheral-mode central write OR central-mode notify). Used by
+  /// the Diagnostics screen to show whether peers are actually reaching
+  /// us at the BLE layer.
+  DateTime? _diagLastReceivedAt;
+  DateTime? get diagLastReceivedAt => _diagLastReceivedAt;
+
   // ---------------------------------------------------------------------------
   // MTU
   // ---------------------------------------------------------------------------
@@ -640,6 +660,7 @@ class BleTransport implements TransportService {
   void _onCharacteristicValueReceived(String deviceId, Uint8List value) {
     if (value.isEmpty) return;
     _diagMessagesReceived++;
+    _diagLastReceivedAt = DateTime.now();
 
     // Chunking protocol:
     //   byte 0: flags  (0x00 = complete, 0x01 = first chunk, 0x02 = mid,
@@ -744,6 +765,7 @@ class BleTransport implements TransportService {
   @override
   Future<void> broadcast(Uint8List data) async {
     final errors = <String>[];
+    _diagLastBroadcastAt = DateTime.now();
 
     // Send to central-mode connections (flutter_blue_plus — we connected to them).
     for (final deviceId in _connectedDevices.keys.toList()) {
