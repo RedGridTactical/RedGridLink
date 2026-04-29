@@ -1,7 +1,7 @@
 name: red_grid_link
 description: Offline-first MGRS-native proximity coordination platform
 publish_to: 'none'
-version: 1.5.4+317
+version: 1.5.4+318
 
 environment:
   sdk: '>=3.2.0 <4.0.0'
@@ -60,7 +60,7 @@ flutter_launcher_icons:
   ios: true
   image_path: "assets/icon/app_icon.png"
   min_sdk_android: 24
-  adaptive_icon_background: "#0A0A0A"
+  adaptive_icon_background: "#B13131"
   adaptive_icon_foreground: "assets/icon/app_icon.png"
   remove_alpha_ios: true
   web:
