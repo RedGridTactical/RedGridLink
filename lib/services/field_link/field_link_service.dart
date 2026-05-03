@@ -896,6 +896,13 @@ class FieldLinkService {
     _autoConnectSub = null;
     _reconnectTimer?.cancel();
     _reconnectTimer = null;
+    // Codex review round 2 P3: cancel the wrong-PIN/QR fail-closed
+    // timer here too. Without this, a join that was waiting for
+    // `join_response` when the service was disposed will still fire
+    // its 8s timer afterward and try to call leaveSession on already-
+    // disposed transport / sync resources.
+    _joinAcceptTimer?.cancel();
+    _joinAcceptTimer = null;
     _stopRssiPolling();
     _stopBatteryPolling();
     _syncEngine.dispose();
@@ -942,11 +949,18 @@ class FieldLinkService {
           // the host can't decrypt) gets surfaced to the UI as a
           // rejection instead of an indefinite "discovering" spinner.
           _joinAcceptTimer?.cancel();
-          _joinAcceptTimer = Timer(_joinAcceptTimeout, () {
+          _joinAcceptTimer = Timer(_joinAcceptTimeout, () async {
             if (_activeSession == null) return;
             // If we already got accepted, _handleJoinResponse will have
             // cleared the timer. Reaching here means no response.
-            leaveSession();
+            //
+            // Codex review round 2 P2: await leaveSession BEFORE
+            // emitting the error status. leaveSession ends with
+            // _setStatus(FieldLinkStatus.idle); if we don't await it,
+            // the idle emission races behind our error emission and
+            // overwrites it, so status-driven UI never sees the
+            // rejection.
+            await leaveSession();
             _setStatus(FieldLinkStatus.error);
           });
         }
