@@ -958,10 +958,22 @@ class FieldLinkService {
             // emitting the error status. leaveSession ends with
             // _setStatus(FieldLinkStatus.idle); if we don't await it,
             // the idle emission races behind our error emission and
-            // overwrites it, so status-driven UI never sees the
-            // rejection.
-            await leaveSession();
-            _setStatus(FieldLinkStatus.error);
+            // overwrites it.
+            //
+            // Codex review round 3 P2: wrap the cleanup in try/finally
+            // so the rejection is surfaced to the UI even if
+            // leaveSession's transport teardown / repository
+            // deactivation throws — otherwise the unhandled error
+            // inside the Timer callback would leave the joiner stuck
+            // in their previous status.
+            try {
+              await leaveSession();
+            } catch (_) {
+              // Best-effort cleanup; the error status below is the
+              // real signal the UI cares about.
+            } finally {
+              _setStatus(FieldLinkStatus.error);
+            }
           });
         }
         break;
