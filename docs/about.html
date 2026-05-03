@@ -96,8 +96,8 @@
   <section class="section fade-in" aria-label="Transparent security">
     <div class="container" style="max-width: 800px;">
       <h2 class="section-title">Transparent Security</h2>
-      <p class="mb-3">We believe security tools should be verifiable. The encryption in Red Grid apps uses industry-standard AES-256-GCM with ECDH P-256 key exchange. No proprietary black boxes. No security through obscurity. Every packet is encrypted with military-grade cryptography, and we publish detailed documentation of our security architecture so you can verify our claims.</p>
-      <p>Your data stays on your device. No analytics, no tracking, no cloud sync, no accounts. Field Link sessions are ephemeral. When you disconnect, the session data disappears. That's not a feature we advertise. It's a design principle.</p>
+      <p class="mb-3">We believe security tools should be verifiable. PIN and QR Field Link sessions wrap every payload in industry-standard AES-256-GCM derived from an ECDH P-256 session key — no proprietary black boxes, no security through obscurity. Open mode is intentionally unencrypted for training and demo use. We publish detailed documentation of our security architecture so you can verify our claims.</p>
+      <p>Your operational data stays on your device. No accounts, no analytics, no advertising networks. Field Link encryption keys are ephemeral and discarded on session end; the data they protected (sessions, markers, tracks) persists locally until you delete it. Optional release-only crash diagnostics use Sentry with PII off and GPS coordinates stripped. That's not a feature we advertise. It's a design principle.</p>
     </div>
   </section>
 

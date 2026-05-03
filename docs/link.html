@@ -61,7 +61,7 @@
       "name": "How does Field Link work?",
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": "Field Link uses Bluetooth Low Energy and peer-to-peer Wi-Fi to auto-discover nearby teammates and share encrypted position data. No pairing, no configuration. AES-256-GCM encryption with ECDH P-256 ephemeral session keys. New keys are generated for every session."
+        "text": "Field Link uses Bluetooth Low Energy on every platform with Apple Multipeer Connectivity (AWDL) on iOS and Google Play Services Nearby Connections on Android as a parallel higher-bandwidth transport. PIN and QR sessions wrap every payload in AES-256-GCM derived from an ECDH P-256 session key; Open sessions auto-join without encryption for training and demo use. Session keys are derived per session and discarded on session end."
       }
     },
     {
@@ -77,7 +77,7 @@
       "name": "What data do you collect?",
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": "None. No accounts, no analytics, no cloud sync, no tracking. Location data stays on your device. Field Link session data is ephemeral and disappears when the session ends."
+        "text": "No accounts, no analytics, no advertising networks. Operational data (sessions, markers, tracks) stays on your device until you delete it. Field Link encryption keys are ephemeral and discarded on session end. Optional release-only crash diagnostics use Sentry with PII off and GPS coordinates stripped."
       }
     },
     {
@@ -200,11 +200,11 @@
       <div class="grid-3">
         <div class="card">
           <h3>Field Link — Encrypted Team Sync</h3>
-          <p>Auto-discover teammates via BLE + peer-to-peer Wi-Fi. AES-256-GCM encrypted with ECDH ephemeral keys. No servers, no pairing, no configuration. Sync positions with 2-8 team members in real time.</p>
+          <p>Auto-discover teammates via BLE on every platform with Apple Multipeer Connectivity (AWDL) on iOS and Google Play Services Nearby Connections on Android. PIN and QR sessions wrap every payload in AES-256-GCM with ECDH P-256 session keys; Open mode auto-joins for training and demos. No servers, no pairing, no configuration. Sync positions with 2-8 team members in real time.</p>
         </div>
         <div class="card">
           <h3>Offline MGRS Maps</h3>
-          <p>Download USGS Topo and OpenTopoMap regions. MGRS grid overlay at all zoom levels. Full offline operation with MBTiles. Never depend on cell service for maps.</p>
+          <p>Download offline region packs from OpenStreetMap or OpenTopoMap with throttling that respects the public-tile-server usage policy. MGRS grid overlay at all zoom levels. Full offline operation with MBTiles. Native USGS / Mapbox / MapTiler integrations are on the roadmap.</p>
         </div>
         <div class="card">
           <h3>11 Tactical Tools</h3>
@@ -434,7 +434,7 @@
       <div style="max-width: 800px; margin: 0 auto;">
         <details class="faq-item">
           <summary>How does Field Link work?</summary>
-          <p>Field Link uses Bluetooth Low Energy and peer-to-peer Wi-Fi to auto-discover nearby teammates and share encrypted position data. No pairing, no configuration needed. AES-256-GCM encryption with ECDH P-256 ephemeral session keys means new cryptographic keys are generated for every session. Data syncs peer-to-peer with no servers involved.</p>
+          <p>Field Link uses Bluetooth Low Energy on every platform with Apple Multipeer Connectivity (AWDL) on iOS and Google Play Services Nearby Connections on Android as a parallel higher-bandwidth transport. PIN and QR sessions wrap every payload in AES-256-GCM derived from an ECDH P-256 session key; Open mode auto-joins without encryption for training, demos, and trusted environments. Session keys are derived per session and discarded on session end. All data syncs peer-to-peer with no servers involved.</p>
         </details>
         <details class="faq-item">
           <summary>Does it work without cell service?</summary>
@@ -442,7 +442,7 @@
         </details>
         <details class="faq-item">
           <summary>What data do you collect?</summary>
-          <p>None. No accounts, no analytics, no cloud sync, no tracking. Your location data never leaves your device. Field Link session data is ephemeral and disappears when the session ends. We have no servers to store data on even if we wanted to.</p>
+          <p>No accounts, no analytics, no advertising networks. Operational data (sessions, markers, tracks) stays on your device until you delete it. Field Link encryption keys are ephemeral and discarded on session end; the data they protected persists locally. Optional release-only crash diagnostics use Sentry with PII off and GPS coordinates stripped — opt out by using a build compiled without a Sentry DSN. We have no servers to store operational data on.</p>
         </details>
         <details class="faq-item">
           <summary>How is this different from ATAK?</summary>

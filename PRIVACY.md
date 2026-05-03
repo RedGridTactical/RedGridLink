@@ -32,7 +32,7 @@ Red Grid Link requests access to your device's GPS location **while the app is i
 
 ## Field Link (Proximity Sync) Data
 
-Field Link uses Bluetooth Low Energy (BLE) to sync position, marker, and annotation data between nearby devices. On iOS, Apple Multipeer Connectivity (which uses AWDL) is used as a secondary transport so peers remain discoverable when the app is backgrounded. Android currently uses BLE only; Wi-Fi Direct / Nearby Connections is planned and is not active in the shipped build.
+Field Link uses Bluetooth Low Energy (BLE) to sync position, marker, and annotation data between nearby devices. On iOS, Apple Multipeer Connectivity (which uses AWDL) runs in parallel as a higher-bandwidth secondary transport so peers stay discoverable when the app is backgrounded. On Android, Google Play Services Nearby Connections runs in parallel where Play Services is available; on devices without Play Services the stack falls back to BLE-only.
 
 - Field Link communication is **end-to-end between paired devices** — no data passes through any server or relay
 - In **PIN** and **QR** session modes, Field Link payloads are **encrypted with AES-256-GCM** using session keys derived from an ECDH P-256 key exchange between paired peers
@@ -115,7 +115,7 @@ To opt out: use a build that was compiled without a Sentry DSN. Direct downloads
 | Location (While Using App) | Display MGRS coordinates, share position via Field Link | Foreground |
 | Location (Always) | Maintain Field Link sync during background operation | Optional, user-enabled |
 | Bluetooth | Field Link device discovery and low-power data sync | Active sessions only |
-| Nearby Devices (Android) | Required to scan for BLE peers; Nearby Connections API integration is planned but not yet active | Active sessions only |
+| Nearby Devices (Android) | Required to scan for BLE peers and to use Google Play Services Nearby Connections as a parallel transport | Active sessions only |
 | Local Network (iOS) | Field Link peer discovery via Multipeer Connectivity | Active sessions only |
 | Wi-Fi (iOS) | Multipeer Connectivity uses Wi-Fi for high-bandwidth peer transport when available | Active sessions only |
 | Storage / Files | Save downloaded map packs and After-Action Reports | Local only |

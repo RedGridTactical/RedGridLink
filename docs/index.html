@@ -48,7 +48,7 @@
       "name": "How does Field Link work?",
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": "Field Link uses Bluetooth Low Energy and peer-to-peer Wi-Fi to auto-discover nearby teammates and share encrypted position data. No pairing, no configuration. AES-256-GCM encryption with ECDH ephemeral session keys."
+        "text": "Field Link uses Bluetooth Low Energy on every platform, with Apple Multipeer Connectivity (AWDL) on iOS and Google Play Services Nearby Connections on Android as a parallel higher-bandwidth transport. PIN and QR sessions wrap every payload in AES-256-GCM derived from an ECDH P-256 session key; Open sessions auto-join without encryption for training and demo use."
       }
     },
     {
@@ -64,7 +64,7 @@
       "name": "What data does Red Grid Link collect?",
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": "None. No accounts, no analytics, no cloud sync, no tracking. Location data stays on your device. Field Link session data is ephemeral and disappears when the session ends."
+        "text": "No accounts, no analytics, no advertising networks. Operational data (sessions, markers, tracks) stays on your device until you delete it. Field Link encryption keys are ephemeral and discarded on session end. Optional release-only crash diagnostics use Sentry with PII off and GPS coordinates stripped."
       }
     },
     {
@@ -164,7 +164,7 @@
           <img src="images/icon.png" alt="Red Grid Link icon" class="ecosystem-icon" width="64" height="64">
           <h2>Red Grid Link</h2>
           <p class="ecosystem-subtitle">Team Coordinator</p>
-          <p>Encrypted Bluetooth team sync with real-time position sharing, waypoint coordination, and after-action reports. BLE + peer-to-peer Wi-Fi proximity sync keeps your team on the map without cell towers or servers.</p>
+          <p>BLE-based team sync with real-time position sharing, waypoint coordination, and after-action reports. PIN and QR sessions encrypt every payload with AES-256-GCM. Apple Multipeer Connectivity (iOS) and Google Play Services Nearby Connections (Android) run alongside BLE for higher-bandwidth peer transport. No cell towers, no servers.</p>
           <a href="link.html" class="btn btn-primary">Learn More</a>
           <div class="app-badges">
             <a href="https://apps.apple.com/app/id6760084718" class="btn btn-secondary">Download on App Store</a>
@@ -248,11 +248,11 @@
       <div class="grid-2">
         <div class="card">
           <h3>Field Link Protocol</h3>
-          <p>Custom BLE + peer-to-peer Wi-Fi proximity sync with CRDT-based state management. Delta-encoded updates under 200 bytes each.</p>
+          <p>Custom BLE on every platform with Apple Multipeer Connectivity (AWDL) on iOS and Google Play Services Nearby Connections on Android as a parallel transport. CRDT-based state management with delta-encoded updates under 200 bytes each.</p>
         </div>
         <div class="card">
           <h3>Military-Grade Encryption</h3>
-          <p>AES-256-GCM with ECDH P-256 ephemeral key exchange. New session keys every connection. No pre-shared secrets.</p>
+          <p>PIN and QR sessions wrap every payload in AES-256-GCM with ECDH P-256 session keys derived per session. Open mode auto-joins without encryption for training and demo use.</p>
         </div>
         <div class="card">
           <h3>MGRS Navigation Engine</h3>
@@ -260,7 +260,7 @@
         </div>
         <div class="card">
           <h3>Offline Maps</h3>
-          <p>MBTiles-based offline maps with USGS Topo and OpenTopoMap. Download regions over WiFi, use offline forever.</p>
+          <p>MBTiles-based offline region downloads from OpenStreetMap or OpenTopoMap with throttling that respects the public-tile-server usage policy. Native USGS / Mapbox / MapTiler integrations are on the roadmap.</p>
         </div>
       </div>
     </div>

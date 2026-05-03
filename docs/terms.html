@@ -22,7 +22,7 @@
   <div class="container">
     <a href="index.html" class="back">&larr; Back to Red Grid Link</a>
     <h1>Terms of Use</h1>
-    <p class="updated">Last updated: March 2026</p>
+    <p class="updated">Last updated: May 2026</p>
 
     <h2>1. Acceptance of Terms</h2>
     <p>By downloading, installing, or using Red Grid Link ("the App"), you agree to be bound by these Terms of Use. If you do not agree to these terms, do not use the App.</p>
@@ -32,11 +32,11 @@
     <p>You may not use this App for any unlawful purpose or in any way that could damage, disable, or impair the App.</p>
 
     <h2>3. Privacy &amp; Data</h2>
-    <p>Red Grid Link is offline-first. No user data is collected, transmitted to, or stored on any external server. All position data, session data, and configuration remain on your device.</p>
-    <p>Field Link peer-to-peer communication occurs directly between devices via Bluetooth and peer-to-peer Wi-Fi. Position data shared during a session is encrypted with AES-256 and is not retained after the session ends on peer devices.</p>
+    <p>Red Grid Link is offline-first. No operational data (position, session, or configuration) is transmitted to or stored on any server controlled by us or any third party. Optional release-only crash diagnostics may transmit stack traces and device model info to Sentry; PII is disabled and GPS coordinates are stripped before transmission. See the <a href="privacy.html">Privacy Policy</a> for the full disclosure.</p>
+    <p>Field Link peer-to-peer communication occurs directly between devices via Bluetooth Low Energy on every platform, with Apple Multipeer Connectivity (AWDL) on iOS and Google Play Services Nearby Connections on Android as a parallel transport. PIN and QR sessions wrap every payload in AES-256-GCM derived from an ECDH P-256 session key; Open mode is intentionally unencrypted for training and demos. Operational data persists locally as part of session history until you delete it; the encryption keys themselves are ephemeral and discarded on session end.</p>
 
     <h2>4. Field Link Limitations</h2>
-    <p>The Field Link feature uses Bluetooth Low Energy and peer-to-peer Wi-Fi for peer-to-peer communication. Actual range depends on terrain, vegetation, weather, and device hardware.</p>
+    <p>The Field Link feature uses Bluetooth Low Energy on every platform with the platform-specific secondary transport described above. Actual range depends on terrain, vegetation, weather, and device hardware.</p>
     <p>Field Link is not a substitute for proper communication equipment (radios, satellite communicators). Do not rely on Field Link for life-safety communications.</p>
 
     <h2>5. In-App Purchases &amp; Subscriptions</h2>
