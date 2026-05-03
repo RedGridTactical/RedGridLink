@@ -458,10 +458,16 @@ class FieldLinkService {
   /// sessions returns a key both peers can compute independently:
   ///   - QR mode  : the session secret embedded in the QR (host
   ///                generated, joiner scanned).
-  ///   - PIN mode : `hashPin(PIN + ":" + sessionId)`. The PIN is short
-  ///                (4 digits) so we mix it with the session id to bind
-  ///                the key to this specific session and prevent the
-  ///                same PIN producing the same key across sessions.
+  ///   - PIN mode : `hashPin('field-link-pin:' + PIN)`. The host
+  ///                session id is intentionally NOT mixed in: when the
+  ///                joiner is constructed from a discovery result that
+  ///                lacks `device.sessionId` (iOS BLE peripheral mode,
+  ///                Android Nearby pre-handshake), `session.id` on the
+  ///                joiner is the BLE/Nearby device id rather than the
+  ///                host's session tag. Mixing it in produced different
+  ///                keys on each side and silently broke PIN joins.
+  ///                Codex review 2026-05-03 P1.
+  ///
   /// Audit 2026-05-03 P0: previously the SyncEngine ran in plaintext
   /// regardless of security mode despite PRIVACY.md claiming AES-GCM
   /// for Field Link sync.
@@ -476,7 +482,10 @@ class FieldLinkService {
       case SecurityMode.pin:
         final pin = session.pin;
         if (pin == null || pin.isEmpty) return null;
-        return hashPin('$pin:${session.id}');
+        // Fixed namespace prefix instead of the session id — see method
+        // doc above for why. Both peers know the PIN; both compute the
+        // same key without needing to agree on the session tag first.
+        return hashPin('field-link-pin:$pin');
     }
   }
 
@@ -489,6 +498,25 @@ class FieldLinkService {
   /// the host can verify the joiner actually scanned the right QR rather
   /// than guessing a session id. Cleared after validation completes.
   String? _pendingJoinKey;
+
+  /// Timer that fires if the host hasn't sent a `join_response` within a
+  /// reasonable window after we transmit the encrypted `join_request`.
+  ///
+  /// Codex review 2026-05-03 P2: when the joiner has the wrong PIN or
+  /// QR key, the encrypted `join_request` GCM-tag-fails on the host,
+  /// the host drops it during unwrap, and `_handleJoinRequest` is never
+  /// reached — so the host never sends `accepted:false`. Without this
+  /// timer the joiner UI would sit forever in "discovering". On expiry
+  /// we behave the same as an explicit rejection: leave the session and
+  /// surface a [FieldLinkStatus.error] so the UI can show
+  /// "INCORRECT PIN" / "INVALID QR" and let the user try again.
+  Timer? _joinAcceptTimer;
+
+  /// Window the joiner waits for `join_response` after sending its
+  /// encrypted `join_request`. Long enough to cover BLE retry + GATT
+  /// notify chunking on slow devices, short enough that a wrong-PIN
+  /// joiner doesn't sit there for tens of seconds.
+  static const Duration _joinAcceptTimeout = Duration(seconds: 8);
 
   /// Leave the current session.
   ///
@@ -505,6 +533,11 @@ class FieldLinkService {
     _reconnectTimer?.cancel();
     _reconnectTimer = null;
     _reconnectAttempts = 0;
+    // Drop the wrong-PIN/wrong-QR fail-closed timer; the user has
+    // explicitly left the session, so the rejection-by-timeout path
+    // shouldn't fire afterward.
+    _joinAcceptTimer?.cancel();
+    _joinAcceptTimer = null;
 
     // Stop sub-services in order.
     _stopRssiPolling();
@@ -904,6 +937,18 @@ class FieldLinkService {
           });
           _pendingJoinPin = null;
           _pendingJoinKey = null;
+          // Codex review 2026-05-03 P2: arm a fail-closed timer so a
+          // joiner with a wrong PIN/QR key (whose encrypted join_request
+          // the host can't decrypt) gets surfaced to the UI as a
+          // rejection instead of an indefinite "discovering" spinner.
+          _joinAcceptTimer?.cancel();
+          _joinAcceptTimer = Timer(_joinAcceptTimeout, () {
+            if (_activeSession == null) return;
+            // If we already got accepted, _handleJoinResponse will have
+            // cleared the timer. Reaching here means no response.
+            leaveSession();
+            _setStatus(FieldLinkStatus.error);
+          });
         }
         break;
       case TransportState.discovering:
@@ -1125,6 +1170,12 @@ class FieldLinkService {
 
     // Only process responses addressed to us.
     if (targetId != null && targetId != _localDeviceId) return;
+
+    // Cancel the fail-closed wrong-PIN/wrong-QR timeout — we got SOME
+    // response from the host (accepted or rejected). Codex review
+    // 2026-05-03 P2.
+    _joinAcceptTimer?.cancel();
+    _joinAcceptTimer = null;
 
     if (!accepted) {
       // PIN was wrong — leave the session.

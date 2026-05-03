@@ -615,16 +615,21 @@ class SyncEngine {
         // exports and survive restart. Audit 2026-05-03 P0: this case
         // was previously a no-op, so received annotations were dropped
         // on the floor as soon as the CRDT state was discarded.
+        //
+        // Codex review 2026-05-03 P2: do NOT also call
+        // `_state.upsertAnnotation` / `deleteAnnotation` here.
+        // `_state = _state.applyDelta(payload)` ran above
+        // (line ~539) and already merged the payload using the
+        // sender's timestamp. Re-mutating the CRDT state in this case
+        // would re-stamp the entry with the receiver's `DateTime.now()`,
+        // and an out-of-order create arriving after a delete tombstone
+        // would resurrect the deleted annotation. We only persist to
+        // SQLite here.
         final annoRepo = _annotationRepository;
         if (annoRepo == null) break;
         try {
           if (payload.data['_deleted'] == true) {
             await annoRepo.deleteAnnotation(payload.data['id'] as String);
-            // Reflect tombstone in local CRDT state too.
-            _state = _state.deleteAnnotation(
-              payload.senderId,
-              payload.data['id'] as String,
-            );
           } else {
             final annotation = Annotation.fromJson(payload.data);
             final existing = await annoRepo.getAnnotationById(annotation.id);
@@ -639,8 +644,6 @@ class SyncEngine {
                 sessionId: _sessionId,
               );
             }
-            // Keep CRDT state in sync with the persisted row.
-            _state = _state.upsertAnnotation(payload.senderId, annotation);
           }
         } catch (_) {
           // Persist failure is non-fatal; the message is dropped but

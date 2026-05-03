@@ -27,7 +27,10 @@ import 'package:red_grid_link/services/field_link/battery/battery_manager.dart';
 import 'package:red_grid_link/services/field_link/field_link_service.dart';
 import 'package:red_grid_link/services/field_link/ghost/ghost_manager.dart';
 import 'package:red_grid_link/services/field_link/sync/sync_engine.dart';
-import 'package:red_grid_link/services/field_link/transport/android_p2p_transport.dart';
+// android_p2p_transport.dart: scaffolded but intentionally not wired
+// here yet (see transport-stack comment below for the Codex review
+// finding). Import re-added when Nearby Connections publishes the
+// per-session id in discovery events.
 import 'package:red_grid_link/services/field_link/transport/ble_transport.dart';
 import 'package:red_grid_link/services/field_link/transport/ios_p2p_transport.dart';
 import 'package:red_grid_link/services/field_link/transport/multi_transport.dart';
@@ -103,17 +106,19 @@ void main() async {
   // ---------------------------------------------------------------------------
 
   // The transport stack runs BLE everywhere with a platform-specific
-  // higher-bandwidth secondary running in parallel:
+  // higher-bandwidth secondary on iOS:
   //   - iOS: Apple Multipeer Connectivity (AWDL) keeps peers
   //     discoverable when iOS suppresses BLE service-UUID emission
   //     in the background (motivated the v1.5.4 reviewer reports).
-  //   - Android: Google Play Services Nearby Connections via the
-  //     existing native NearbyConnectionsChannel. The Dart wrapper
-  //     [AndroidP2pTransport] talks to that channel; on devices
-  //     without Play Services it returns empty discovery and the
-  //     [MultiTransport] falls back to BLE-only behaviour.
-  // Audit 2026-05-03: AndroidP2pTransport was scaffolded but not wired
-  // into production; this connects it.
+  //   - Android: BLE only. AndroidP2pTransport (Nearby Connections)
+  //     remains in the tree but is NOT wired here — Codex review
+  //     2026-05-03 P1 flagged that the native NearbyConnectionsChannel
+  //     advertises the shared SERVICE_ID without the per-session id, so
+  //     two Android teams in proximity would auto-connect across
+  //     sessions. Re-enable this path only after the native channel
+  //     publishes `sessionId` in DiscoveredDevice / connection events
+  //     so the existing `device.sessionId` filters in FieldLinkService
+  //     can drop foreign sessions.
   final BleTransport bleTransport = BleTransport();
   final TransportService transport;
   if (Platform.isIOS) {
@@ -121,13 +126,8 @@ void main() async {
       primary: bleTransport,
       secondaries: [IosP2pTransport()],
     );
-  } else if (Platform.isAndroid) {
-    transport = MultiTransport(
-      primary: bleTransport,
-      secondaries: [AndroidP2pTransport()],
-    );
   } else {
-    // Other platforms (desktop / web in tests): BLE only.
+    // Android + other platforms: BLE only.
     transport = bleTransport;
   }
 
