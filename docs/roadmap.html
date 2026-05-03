@@ -4,14 +4,14 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Roadmap — Red Grid Tactical</title>
-<meta name="description" content="See what's coming next for Red Grid Link and Red Grid MGRS. Android launch, BLE Long Range, Meshtastic integration, ATAK interop, and more.">
+<meta name="description" content="Where Red Grid Link and Red Grid MGRS are going next. Field Readiness Preflight, Mission Packets, SAR Pro, Coverage Confidence, Role-Based Layers, Meshtastic MVP, CalTopo Companion Mode, Local Command Post, and Training/Instructor Pack.">
 <meta name="author" content="Red Grid Tactical">
 <link rel="canonical" href="https://redgridtactical.com/roadmap.html">
 <link rel="icon" type="image/png" href="images/icon.png">
 
 <!-- Open Graph -->
 <meta property="og:title" content="Roadmap — Red Grid Tactical">
-<meta property="og:description" content="See what's coming next for Red Grid Link and Red Grid MGRS. Android launch, BLE Long Range, Meshtastic integration, ATAK interop, and more.">
+<meta property="og:description" content="Where Red Grid Link and Red Grid MGRS are going next. Field Readiness Preflight, Mission Packets, SAR Pro, Coverage Confidence, Role-Based Layers, Meshtastic MVP, CalTopo Companion Mode, Local Command Post, and Training/Instructor Pack.">
 <meta property="og:image" content="https://redgridtactical.com/images/social-preview.png">
 <meta property="og:url" content="https://redgridtactical.com/roadmap.html">
 <meta property="og:type" content="website">
@@ -20,7 +20,7 @@
 <!-- Twitter Card -->
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Roadmap — Red Grid Tactical">
-<meta name="twitter:description" content="See what's coming next for Red Grid Link and Red Grid MGRS. Android launch, BLE Long Range, Meshtastic integration, ATAK interop, and more.">
+<meta name="twitter:description" content="Where Red Grid Link and Red Grid MGRS are going next. Field Readiness Preflight, Mission Packets, SAR Pro, Coverage Confidence, Role-Based Layers, Meshtastic MVP, CalTopo Companion Mode, Local Command Post, and Training/Instructor Pack.">
 <meta name="twitter:image" content="https://redgridtactical.com/images/social-preview.png">
 
 <link rel="stylesheet" href="styles.css?v=3">
@@ -160,66 +160,99 @@
             <li>V1.5.2 Android production submission to Google Play — full iOS feature parity, first production build since v1.3.1 closed beta</li>
             <li>V1.5.3 patch: expanded in-app location disclosure to clearly explain what location data is accessed, how it is used, and that it stays on your device</li>
             <li>V1.5.4 patch: Field Link reliability — joining iOS-to-iOS sessions now works, position broadcasts are properly chunked so iOS no longer truncates them, joiners inherit the host's operational mode, lead promotion propagates correctly, display name changes update connected teammates live, and waypoints / search areas / boundaries persist across leave-and-rejoin. Multipeer Connectivity runs alongside BLE on iOS, GPS holds a fix when stationary, and emergency SOS no longer re-displays after acknowledgement</li>
+            <li>V1.5.5 — Trust hardening: AES-256-GCM payload encryption is now actually wrapped around every Field Link sync packet in PIN and QR sessions; QR mode finally authenticates the joiner against a host-validated key; track recording is wired into session lifecycle so After-Action Reports include real GPS routes; annotation persistence survives restart; release-only Sentry crash diagnostics with PII off and GPS coordinates stripped (disclosed in privacy policy); offline tile downloads throttle and cap region size to respect public-tile-server policies; production print() calls replaced with a structured logger that suppresses in release. Plus 6 rounds of independent code review fixes on the encryption envelope, partial-cleanup robustness, wrong-PIN/QR rejection UX, iOS session startup, and engine state guarantees</li>
           </ul>
         </div>
 
         <div class="timeline-item current">
-          <div class="timeline-version">V1.6 — Meshtastic Bridge + Android Launch</div>
+          <div class="timeline-version">V1.6 — Field Reliability + Android + Meshtastic MVP</div>
           <div class="timeline-date">Q2 2026</div>
           <ul class="timeline-features">
-            <li>Meshtastic BLE bridge for multi-kilometer LoRa range</li>
-            <li>Android production release on Google Play</li>
-            <li>F-Droid submission</li>
-            <li>Session templates for SAR, hunting, and training</li>
+            <li><strong>Field Readiness Preflight</strong>: one-tap pre-mission check that confirms downloaded AO map coverage, GPS permission, background location, Bluetooth, local network, notifications, battery mode, storage, encryption mode, team roster, and last successful peer test. Each teammate shows as Ready / Partial / Not Ready, and the readiness snapshot lands in the AAR</li>
+            <li><strong>Mission Packets</strong> (extending session templates): operational mode, roster roles, security mode, check-in cadence, rally point, boundaries/sectors, required map region, quick messages, and AAR schema in one shareable bundle. Templates for SAR Hasty Search, Training Lane, Hunting Party, Guide Trip, Event Safety, Family Hike. Share by QR, local file, AirDrop / Nearby Share, or Field Link</li>
+            <li><strong>Map Health</strong>: per-teammate AO coverage, missing zooms, stale layers, storage impact, attribution, and a "will work offline" status. Lead can see whether teammates have the same AO downloaded</li>
+            <li><strong>Licensed offline tile provider</strong>: provider abstraction supporting demo OSM, licensed offline providers, self-hosted PMTiles / vector tiles, and USGS where allowed. Replaces the public-tile fallback for paid users</li>
+            <li><strong>Meshtastic BLE bridge MVP</strong>: position, status, and SOS over LoRa for multi-kilometer team awareness. Tight scope first; chat and richer assignment payloads later</li>
+            <li><strong>Android production release</strong> on Google Play with full physical-device QA. Field Link reliability on Android required before public ship</li>
+            <li><strong>Team diagnostics export</strong>: one-tap radio / location / permission state snapshot for support, with sensitive fields redacted</li>
+            <li><strong>Hard claims gate</strong>: every public claim mapped to implemented-and-tested, beta/limited, or removed-from-copy</li>
           </ul>
         </div>
 
         <div class="timeline-item planned">
-          <div class="timeline-version">V2.0 — Team Awareness + SAR Mode Pro</div>
+          <div class="timeline-version">V2.0 — SAR Pro MVP</div>
           <div class="timeline-date">Q3 2026</div>
           <ul class="timeline-features">
-            <li>Buddy system pairing with separation alerts</li>
-            <li>Check-in timer with missed check-in escalation</li>
-            <li>Team status board (Green/Amber/Red/Black)</li>
-            <li>Sector assignment and search pattern generation</li>
-            <li>Photo sharing with team (GPS-tagged, encrypted)</li>
-            <li>ATAK/CoT team sync (bidirectional team SA)</li>
-            <li>ICS form generation (201, 202, 204)</li>
+            <li><strong>Coverage Confidence Engine</strong>: auto-classify track segments as searching, transit, stationary, vehicle, uncertain, or stale using speed, role, mode, heading variance, and user-selected modality. Lead sets swath width per modality / person / dog team. Renders searched area and unsearched gaps; highlights low-confidence segments where GPS accuracy or missing updates make coverage uncertain. Coverage confidence lands in AAR and ICS-style exports</li>
+            <li><strong>Role-Based Layers</strong> with need-to-know visibility: Team Visible, Lead Only, Trainers Only, Evidence/Clues, Medical/Safety, Public/Client. Per-marker and per-annotation visibility. Lead can push only the assignment layer to field teams while keeping planning notes private</li>
+            <li><strong>Team Accountability Pack</strong>: buddy pairs, PAR / check-in timer with missed-check-in escalation, status board (Green/Amber/Red/Black + Moving/Stationary/Offline/Low Battery), low-battery and no-motion alerts, last voice/radio contact timestamp, "Last known good" card for every member</li>
+            <li><strong>Sector assignment + search pattern generation</strong>: assignment lifecycle from draft to debriefed</li>
+            <li><strong>Clue / Hazard / Evidence workflow</strong>: clue marker with photo, notes, MGRS, timestamp, finder, confidence, action taken, visibility, status. Hazard marker with severity / radius / required action. Evidence marker hidden by default from field teams unless Lead shares. Sync thumbnail + metadata over low bandwidth, full-resolution media stays local / export. AAR + ICS attachments</li>
+            <li><strong>ICS form generation</strong> (201, 202, 204) with assignment summaries</li>
+            <li><strong>Replay MVP</strong>: timeline scrubber over team tracks, markers, status changes, and check-ins. Demonstrates value for AAR and training</li>
+            <li><strong>CalTopo-compatible export formats</strong> (GPX/KML/GeoJSON) so SAR teams already centered on CalTopo can use Link as the field-team endpoint</li>
           </ul>
         </div>
 
         <div class="timeline-item planned">
-          <div class="timeline-version">V2.1 — Command &amp; Control</div>
+          <div class="timeline-version">V2.1 — Interoperability Pack</div>
           <div class="timeline-date">Q4 2026</div>
           <ul class="timeline-features">
-            <li>Task assignment with waypoints and instructions</li>
-            <li>Voice clips over BLE/LoRa mesh</li>
-            <li>Live tactical drawing on shared map</li>
-            <li>Cascading alert escalation</li>
-            <li>Line-of-sight calculator between team members</li>
+            <li><strong>CoT Lite</strong>: emit Cursor-on-Target position, marker, route, and SOS events. Import basic CoT positions/markers. Local UDP multicast on shared Wi-Fi. Clear security labels when data leaves Field Link encryption</li>
+            <li><strong>CalTopo Companion Mode</strong>: import sectors / assignments from GPX/KML/GeoJSON (and later CalTopo Team API where appropriate). Export tracks, clues, assignments, and AAR data back to GPX/KML/GeoJSON/CSV. Field teams use Link offline; command staff can keep CalTopo/TAK as system of record</li>
+            <li><strong>Local command-post bridge</strong>: Meshtastic / APRS / CoT translation for positions / status / SOS that lets a local hub forward team data to existing command systems</li>
+            <li><strong>Task management</strong> tied to assignments and AAR</li>
+            <li><strong>Freehand / live tactical drawing</strong> on shared map with role/layer permissions</li>
+            <li><strong>Line-of-sight calculator</strong> (team comms planning use)</li>
+          </ul>
+        </div>
+
+        <div class="timeline-item planned">
+          <div class="timeline-version">V2.2 — Training &amp; Instructor Pack</div>
+          <div class="timeline-date">Q1 2027</div>
+          <ul class="timeline-features">
+            <li><strong>Scenario builder</strong> with reusable training lanes</li>
+            <li><strong>Instructor mode</strong>: hidden subject route / clues, observer view of all teams, evaluator notes, team comparison</li>
+            <li><strong>Injected events</strong> during exercise: casualty, clue, no-go zone, comms outage, weather shift</li>
+            <li><strong>Real-time scoring</strong>: time to objective, route efficiency, check-in compliance, clue response, grid accuracy</li>
+            <li><strong>Training AAR / certificate</strong> exports per participant</li>
+            <li>Moved earlier from V4.0 because training budgets are predictable and instructor mode showcases team awareness, replay, hidden layers, and AARs better than a consumer hike</li>
           </ul>
         </div>
 
         <div class="timeline-item planned">
           <div class="timeline-version">V3.0 — Connected Operations</div>
-          <div class="timeline-date">Q1 2027</div>
+          <div class="timeline-date">Q2 2027</div>
           <ul class="timeline-features">
-            <li>Cloud session relay (encrypted, optional)</li>
-            <li>Web dashboard for incident commanders</li>
-            <li>Multi-team bridging with shared Lead overlay</li>
-            <li>Shift handoff between team leads</li>
-            <li>External observer mode (read-only)</li>
+            <li><strong>Local Command Post Mode ships first</strong>: one phone / tablet / laptop acts as local hub over BLE, AWDL/Nearby, Wi-Fi LAN, or Meshtastic gateway. Local dashboard shows roster, map, assignments, check-ins, SOS, track health, and AAR builder. No account required</li>
+            <li><strong>Optional encrypted cloud relay</strong> for teams that sometimes regain connectivity or need remote command visibility. Cloud never sees plaintext in strict mode</li>
+            <li><strong>Web dashboard</strong> for incident commanders (local-first first, cloud second)</li>
+            <li><strong>Multi-team bridging</strong> for mutual aid and large training</li>
+            <li><strong>Shift handoff</strong> between team leads</li>
+            <li><strong>External observer mode</strong> (read-only)</li>
+            <li><strong>Organization licensing</strong>: signed team license file, QR enrollment, offline grace period, admin roster / callsign defaults, seat export/import. Hosted portal layered on top</li>
+            <li><strong>Garmin inReach integration</strong> as team awareness source</li>
           </ul>
         </div>
 
         <div class="timeline-item planned">
-          <div class="timeline-version">V4.0 — Training &amp; Simulation</div>
-          <div class="timeline-date">Q3 2027</div>
+          <div class="timeline-version">V3.1+ — Sensors &amp; Advanced Intelligence</div>
+          <div class="timeline-date">Q4 2027</div>
           <ul class="timeline-features">
-            <li>Training scenario builder</li>
-            <li>Real-time scoring for land nav exercises</li>
-            <li>Instructor mode with event injection</li>
-            <li>Performance analytics dashboard</li>
+            <li>External GPS as a higher-quality team position source</li>
+            <li>Selective environmental sensors only when they feed team safety or incident records</li>
+            <li>Heart-rate and biometrics deferred until clear team demand and privacy policy support</li>
+          </ul>
+        </div>
+
+        <div class="timeline-item planned">
+          <div class="timeline-version">V4.0 — Advanced Simulation</div>
+          <div class="timeline-date">2028</div>
+          <ul class="timeline-features">
+            <li>Larger scenario library and multi-incident exercises</li>
+            <li>Simulated peer swarms (multi-team exercise simulation)</li>
+            <li>Performance analytics dashboard across cohorts</li>
+            <li>Solo land-nav drills and individual practice live in Red Grid MGRS, not Link</li>
           </ul>
         </div>
 
