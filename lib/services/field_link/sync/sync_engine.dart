@@ -244,32 +244,52 @@ class SyncEngine {
   /// Stop the sync engine and release resources.
   ///
   /// Broadcasts a leave control message before shutting down.
+  ///
+  /// Codex review round 6 P2: every state-clearing line below MUST run
+  /// even if any individual cleanup step throws. Previously a throw in
+  /// the broadcast or in `_incomingSub?.cancel()` would skip
+  /// `_isRunning = false`, which made `start()` early-return on the
+  /// next session attempt and silently attached the retry to the stale
+  /// engine (transport stack still wired into the dead listener,
+  /// stream controllers still holding the previous session's state).
+  /// The flag mutations now happen in a `finally` so a partial failure
+  /// can never leave the engine half-running.
   Future<void> stop() async {
     if (!_isRunning) return;
 
-    // Broadcast leave before shutting down.
-    if (_sessionId != null) {
-      try {
-        final leavePayload = _encoder.encodeControl(
-          _localDeviceId,
-          'leave',
-          {'sessionId': _sessionId!},
-          _state.sequenceCounter.countFor(_localDeviceId),
-        );
-        await _transport.broadcast(_wireBytes(leavePayload.toBytes()));
-      } catch (_) {
-        // Best-effort; transport may already be closed.
+    try {
+      // Broadcast leave before shutting down.
+      if (_sessionId != null) {
+        try {
+          final leavePayload = _encoder.encodeControl(
+            _localDeviceId,
+            'leave',
+            {'sessionId': _sessionId!},
+            _state.sequenceCounter.countFor(_localDeviceId),
+          );
+          await _transport.broadcast(_wireBytes(leavePayload.toBytes()));
+        } catch (_) {
+          // Best-effort; transport may already be closed.
+        }
       }
-    }
 
-    _heartbeatTimer?.cancel();
-    _heartbeatTimer = null;
-    await _incomingSub?.cancel();
-    _incomingSub = null;
-    _isRunning = false;
-    _sessionId = null;
-    _encryptor = null;
-    _encryptionKey = null;
+      _heartbeatTimer?.cancel();
+      _heartbeatTimer = null;
+      try {
+        await _incomingSub?.cancel();
+      } catch (_) {
+        // Subscription cancel can throw on transports whose stream
+        // controller is already torn down; we still need the rest of
+        // the cleanup to run.
+      }
+      _incomingSub = null;
+    } finally {
+      // Guarantee these run even if any awaited cleanup above threw.
+      _isRunning = false;
+      _sessionId = null;
+      _encryptor = null;
+      _encryptionKey = null;
+    }
   }
 
   /// Wrap a plaintext sync payload in the on-the-wire envelope.
