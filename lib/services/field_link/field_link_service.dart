@@ -21,6 +21,7 @@ import 'package:red_grid_link/services/field_link/boundary_manager.dart';
 import 'package:red_grid_link/services/field_link/emergency_beacon_service.dart';
 import 'package:red_grid_link/services/field_link/ghost/ghost_manager.dart';
 import 'package:red_grid_link/services/field_link/message_service.dart';
+import 'package:red_grid_link/services/field_link/platform/foreground_service.dart';
 import 'package:red_grid_link/services/field_link/role_manager.dart';
 import 'package:red_grid_link/services/field_link/security/key_exchange_manager.dart';
 import 'package:red_grid_link/services/field_link/sync/crdt/crdt_state.dart';
@@ -258,6 +259,15 @@ class FieldLinkService {
     // Audit 2026-05-03 P0: track recording was previously never invoked.
     await _locationService?.startTracking(sessionId);
 
+    // Android: keep the BLE/Nearby radios running while the app is
+    // backgrounded by promoting Field Link work into a foreground
+    // service. iOS handles this through the bluetooth-central /
+    // bluetooth-peripheral background modes declared in Info.plist
+    // and so the call is a no-op there.
+    // Audit 2026-05-03 P1: ForegroundService had a Dart wrapper but
+    // was never invoked from session lifecycle.
+    await ForegroundService.start();
+
     _setStatus(FieldLinkStatus.discovering);
 
     return session;
@@ -433,6 +443,10 @@ class FieldLinkService {
     // Audit 2026-05-03 P0: track recording was previously never invoked.
     await _locationService?.startTracking(sessionId);
 
+    // Same Android-only foreground service promotion as createSession;
+    // keeps the joiner's radios alive when the user backgrounds the app.
+    await ForegroundService.start();
+
     _setStatus(FieldLinkStatus.discovering);
 
     return true;
@@ -498,6 +512,10 @@ class FieldLinkService {
     // into a deactivated session row in the track table.
     // Audit 2026-05-03 P0: track lifecycle was previously not wired.
     await _locationService?.stopTracking();
+    // Tear down the Android foreground service so the persistent
+    // notification disappears and the OS can reclaim the wakelock.
+    // No-op on iOS / desktop.
+    await ForegroundService.stop();
     await _syncEngine.stop();
     await _transport.disconnectAll();
     await _transport.stopDiscovery();

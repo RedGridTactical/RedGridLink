@@ -27,6 +27,7 @@ import 'package:red_grid_link/services/field_link/battery/battery_manager.dart';
 import 'package:red_grid_link/services/field_link/field_link_service.dart';
 import 'package:red_grid_link/services/field_link/ghost/ghost_manager.dart';
 import 'package:red_grid_link/services/field_link/sync/sync_engine.dart';
+import 'package:red_grid_link/services/field_link/transport/android_p2p_transport.dart';
 import 'package:red_grid_link/services/field_link/transport/ble_transport.dart';
 import 'package:red_grid_link/services/field_link/transport/ios_p2p_transport.dart';
 import 'package:red_grid_link/services/field_link/transport/multi_transport.dart';
@@ -101,12 +102,18 @@ void main() async {
   // Field Link sub-services
   // ---------------------------------------------------------------------------
 
-  // The transport stack runs BLE everywhere. On iOS, Multipeer Connectivity
-  // is added as a parallel transport so the two phones have two independent
-  // ways to find each other in proximity. iOS suppresses BLE service-UUID
-  // emission while the app is backgrounded; MPC keeps working in that
-  // state and so prevents the "we paired but now nobody can see anyone"
-  // failure mode that motivated the v1.5.4 reviewer reports.
+  // The transport stack runs BLE everywhere with a platform-specific
+  // higher-bandwidth secondary running in parallel:
+  //   - iOS: Apple Multipeer Connectivity (AWDL) keeps peers
+  //     discoverable when iOS suppresses BLE service-UUID emission
+  //     in the background (motivated the v1.5.4 reviewer reports).
+  //   - Android: Google Play Services Nearby Connections via the
+  //     existing native NearbyConnectionsChannel. The Dart wrapper
+  //     [AndroidP2pTransport] talks to that channel; on devices
+  //     without Play Services it returns empty discovery and the
+  //     [MultiTransport] falls back to BLE-only behaviour.
+  // Audit 2026-05-03: AndroidP2pTransport was scaffolded but not wired
+  // into production; this connects it.
   final BleTransport bleTransport = BleTransport();
   final TransportService transport;
   if (Platform.isIOS) {
@@ -114,9 +121,13 @@ void main() async {
       primary: bleTransport,
       secondaries: [IosP2pTransport()],
     );
+  } else if (Platform.isAndroid) {
+    transport = MultiTransport(
+      primary: bleTransport,
+      secondaries: [AndroidP2pTransport()],
+    );
   } else {
-    // Android: BLE only for now. Nearby Connections (AndroidP2pTransport)
-    // is a planned addition; no native plugin is wired yet.
+    // Other platforms (desktop / web in tests): BLE only.
     transport = bleTransport;
   }
 

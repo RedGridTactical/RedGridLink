@@ -2,6 +2,8 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io' show Platform;
 
+import 'package:red_grid_link/l10n/app_localizations.dart';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -396,7 +398,7 @@ class _SessionJoinCardState extends ConsumerState<SessionJoinCard> {
         children: [
           // Title
           Text(
-            'JOIN SESSION',
+            AppLocalizations.of(context)?.joinSession ?? 'JOIN SESSION',
             style: TacticalTextStyles.subheading(colors).copyWith(
               fontWeight: FontWeight.bold,
               color: colors.text,

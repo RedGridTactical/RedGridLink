@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:red_grid_link/l10n/app_localizations.dart';
 import 'package:flutter_blue_plus/flutter_blue_plus.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:qr_flutter/qr_flutter.dart';
@@ -209,7 +210,7 @@ class _SessionCreateCardState extends ConsumerState<SessionCreateCard> {
         children: [
           // Title
           Text(
-            'CREATE SESSION',
+            AppLocalizations.of(context)?.createSession ?? 'CREATE SESSION',
             style: TacticalTextStyles.subheading(colors).copyWith(
               fontWeight: FontWeight.bold,
               color: colors.text,

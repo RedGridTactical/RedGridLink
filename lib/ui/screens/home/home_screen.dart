@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:red_grid_link/l10n/app_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/theme/tactical_text_styles.dart';
@@ -157,26 +158,30 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                 fontFamily: 'monospace',
                 letterSpacing: 1,
               ),
-              items: const [
+              // Audit 2026-05-03 P1 fix: bottom-nav labels were
+              // hardcoded English even though every locale ARB ships
+              // tabMap/tabGrid/tabLink/tabTools/tabSettings keys.
+              items: [
                 BottomNavigationBarItem(
-                  icon: Icon(Icons.map),
-                  label: 'MAP',
+                  icon: const Icon(Icons.map),
+                  label: AppLocalizations.of(context)?.tabMap ?? 'MAP',
                 ),
                 BottomNavigationBarItem(
-                  icon: Icon(Icons.grid_on),
-                  label: 'GRID',
+                  icon: const Icon(Icons.grid_on),
+                  label: AppLocalizations.of(context)?.tabGrid ?? 'GRID',
                 ),
                 BottomNavigationBarItem(
-                  icon: Icon(Icons.bluetooth),
-                  label: 'LINK',
+                  icon: const Icon(Icons.bluetooth),
+                  label: AppLocalizations.of(context)?.tabLink ?? 'LINK',
                 ),
                 BottomNavigationBarItem(
-                  icon: Icon(Icons.build),
-                  label: 'TOOLS',
+                  icon: const Icon(Icons.build),
+                  label: AppLocalizations.of(context)?.tabTools ?? 'TOOLS',
                 ),
                 BottomNavigationBarItem(
-                  icon: Icon(Icons.settings),
-                  label: 'SETTINGS',
+                  icon: const Icon(Icons.settings),
+                  label:
+                      AppLocalizations.of(context)?.tabSettings ?? 'SETTINGS',
                 ),
               ],
             ),
