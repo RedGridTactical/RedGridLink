@@ -324,13 +324,18 @@ class _SessionJoinCardState extends ConsumerState<SessionJoinCard> {
     tapHeavy();
 
     try {
-      // Parse the QR payload JSON to extract session ID, PIN, and mode.
-      // The QR contains: {id, name, sec, pin, mode}
+      // Parse the QR payload JSON to extract session ID, PIN, key, and mode.
+      // Versioned schema (v=1) shipped 2026-05-03 with audit fix:
+      //   {"v":1, "id":"<sessionId>", "key":"<sessionKey>",
+      //    "pin":"<pin>", "sec":"<open|pin|qr>", "mode":"..."}
+      // The "key" field is what makes QR mode actually authenticate,
+      // not just look pretty.
       final Map<String, dynamic> payload;
       try {
         payload = jsonDecode(qrData) as Map<String, dynamic>;
       } catch (_) {
-        // Not valid JSON — treat the raw string as a session ID (fallback).
+        // Not valid JSON — treat the raw string as a session ID (fallback
+        // for very early QR codes that pre-dated the JSON envelope).
         final service = ref.read(fieldLinkServiceProvider);
         await service.joinSession(qrData);
         return;
@@ -338,9 +343,19 @@ class _SessionJoinCardState extends ConsumerState<SessionJoinCard> {
 
       final sessionId = payload['id'] as String? ?? qrData;
       final pin = payload['pin'] as String?;
+      final sec = payload['sec'] as String?;
 
       final service = ref.read(fieldLinkServiceProvider);
-      final success = await service.joinSession(sessionId, pin: pin);
+      // If the QR claims `sec: "qr"`, route through the qrData parameter
+      // so [FieldLinkService.joinSession] runs the fail-closed parser
+      // and stores the host-verifiable session key. Otherwise fall back
+      // to the PIN/Open path so PIN-only QRs still work.
+      final bool success;
+      if (sec == 'qr') {
+        success = await service.joinSession(sessionId, qrData: qrData);
+      } else {
+        success = await service.joinSession(sessionId, pin: pin);
+      }
 
       final dn = ref.read(displayNameProvider);
       if (dn.isNotEmpty) service.setCallsign(dn);

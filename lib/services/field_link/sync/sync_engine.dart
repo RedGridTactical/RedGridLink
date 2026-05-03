@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:typed_data';
 
 import 'package:red_grid_link/data/models/annotation.dart';
 import 'package:red_grid_link/data/models/marker.dart';
@@ -7,10 +8,22 @@ import 'package:red_grid_link/data/models/session_config.dart';
 import 'package:red_grid_link/data/models/sync_payload.dart';
 import 'package:red_grid_link/data/repositories/annotation_repository.dart';
 import 'package:red_grid_link/data/repositories/marker_repository.dart';
+import 'package:red_grid_link/core/logging/red_log.dart';
 import 'package:red_grid_link/data/repositories/peer_repository.dart';
+import 'package:red_grid_link/services/field_link/security/message_encryptor.dart';
 import 'package:red_grid_link/services/field_link/sync/crdt/crdt_state.dart';
 import 'package:red_grid_link/services/field_link/sync/delta_encoder.dart';
 import 'package:red_grid_link/services/field_link/transport/transport_service.dart';
+
+/// Single-byte magic prefix identifying an encrypted Field Link envelope.
+///
+/// SyncPayload plaintext is JSON UTF-8 and therefore always begins with
+/// `{` (0x7B). Any byte other than 0x7B in position 0 is unambiguously
+/// not a plaintext payload, so a magic byte makes encrypted-vs-plaintext
+/// dispatch reliable without parsing.
+///
+/// Wire format (encrypted): `[0xE7][12-byte IV][ciphertext + 16-byte GCM tag]`
+const int _kEncryptedEnvelopeMagic = 0xE7;
 
 /// A control message received from a peer via the sync engine.
 class ControlMessage {
@@ -47,6 +60,17 @@ class SyncEngine {
   CrdtState _state;
   String? _sessionId;
   bool _isRunning = false;
+
+  /// Optional encryptor — set by [start] when the session has a key
+  /// (PIN or QR mode). When null, payloads are sent as plaintext.
+  ///
+  /// Audit 2026-05-03 P0: previously encryption was completely absent
+  /// from the sync path despite being claimed in PRIVACY.md.
+  MessageEncryptor? _encryptor;
+
+  /// Symmetric key used by [_encryptor]. Derived from PIN+sessionId or
+  /// scanned from a QR. Held only in-process; never persisted.
+  String? _encryptionKey;
 
   Timer? _heartbeatTimer;
   StreamSubscription<TransportMessage>? _incomingSub;
@@ -132,12 +156,25 @@ class SyncEngine {
   ///
   /// Subscribes to the transport's incoming message stream and starts
   /// the heartbeat timer.
-  Future<void> start(SessionConfig config, {required String sessionId}) async {
+  ///
+  /// [encryptionKey], when supplied, switches the engine into encrypted
+  /// envelope mode: outbound payloads are AES-256-GCM encrypted and
+  /// prefixed with [_kEncryptedEnvelopeMagic]; inbound payloads with the
+  /// magic prefix are decrypted and verified, while inbound payloads
+  /// without the magic are dropped. Open-mode sessions pass null and
+  /// continue to use plaintext.
+  Future<void> start(
+    SessionConfig config, {
+    required String sessionId,
+    String? encryptionKey,
+  }) async {
     if (_isRunning) return;
 
     _sessionId = sessionId;
     _isRunning = true;
     _state = const CrdtState();
+    _encryptionKey = encryptionKey;
+    _encryptor = encryptionKey != null ? MessageEncryptor() : null;
 
     // Re-hydrate the CRDT state from any markers / annotations already
     // persisted for this session so a user who leaves and rejoins the
@@ -168,7 +205,7 @@ class SyncEngine {
         {'sessionId': sessionId},
         _state.sequenceCounter.countFor(_localDeviceId),
       );
-      await _transport.broadcast(joinPayload.toBytes());
+      await _transport.broadcast(_wireBytes(joinPayload.toBytes()));
     } catch (_) {
       // No peers connected yet; that's expected at session start.
     }
@@ -219,7 +256,7 @@ class SyncEngine {
           {'sessionId': _sessionId!},
           _state.sequenceCounter.countFor(_localDeviceId),
         );
-        await _transport.broadcast(leavePayload.toBytes());
+        await _transport.broadcast(_wireBytes(leavePayload.toBytes()));
       } catch (_) {
         // Best-effort; transport may already be closed.
       }
@@ -231,6 +268,56 @@ class SyncEngine {
     _incomingSub = null;
     _isRunning = false;
     _sessionId = null;
+    _encryptor = null;
+    _encryptionKey = null;
+  }
+
+  /// Wrap a plaintext sync payload in the on-the-wire envelope.
+  ///
+  /// In encrypted mode (PIN / QR sessions): returns
+  /// `[0xE7][12-byte IV][AES-256-GCM ciphertext + 16-byte tag]`.
+  /// In plaintext mode (Open sessions): returns the input unchanged.
+  Uint8List _wireBytes(Uint8List plaintext) {
+    final encryptor = _encryptor;
+    final key = _encryptionKey;
+    if (encryptor == null || key == null) return plaintext;
+    final cipher = encryptor.encrypt(plaintext, key);
+    final wrapped = Uint8List(cipher.length + 1);
+    wrapped[0] = _kEncryptedEnvelopeMagic;
+    wrapped.setRange(1, wrapped.length, cipher);
+    return wrapped;
+  }
+
+  /// Recover the plaintext sync payload from on-the-wire bytes.
+  ///
+  /// Returns null when the bytes cannot be decrypted (wrong key,
+  /// tampered ciphertext) or when the session is encrypted but the
+  /// inbound bytes lack the magic envelope prefix (a peer running an
+  /// older plaintext-only build, which we drop to fail closed).
+  Uint8List? _unwrapBytes(Uint8List wire) {
+    final encryptor = _encryptor;
+    final key = _encryptionKey;
+    if (encryptor == null || key == null) {
+      // Open / non-encrypted session — accept everything as plaintext.
+      // Reject anything sporting the encrypted envelope so a hostile
+      // peer can't trick us into running ciphertext through the JSON
+      // parser.
+      if (wire.isNotEmpty && wire[0] == _kEncryptedEnvelopeMagic) {
+        return null;
+      }
+      return wire;
+    }
+    // Encrypted session — require the envelope.
+    if (wire.isEmpty || wire[0] != _kEncryptedEnvelopeMagic) {
+      return null;
+    }
+    try {
+      return encryptor.decrypt(wire.sublist(1), key);
+    } catch (_) {
+      // Decrypt failures are silently dropped; an attacker shouldn't be
+      // able to learn anything from how we react.
+      return null;
+    }
   }
 
   /// Dispose all resources. The engine should not be used after this.
@@ -261,7 +348,7 @@ class SyncEngine {
       _state.sequenceCounter.countFor(_localDeviceId),
       callsign: localCallsign.isNotEmpty ? localCallsign : null,
     );
-    await _transport.broadcast(payload.toBytes());
+    await _transport.broadcast(_wireBytes(payload.toBytes()));
 
     _emitState();
   }
@@ -281,7 +368,7 @@ class SyncEngine {
       marker,
       _state.sequenceCounter.countFor(_localDeviceId),
     );
-    await _transport.broadcast(payload.toBytes());
+    await _transport.broadcast(_wireBytes(payload.toBytes()));
 
     // Persist locally.
     if (_sessionId != null) {
@@ -296,6 +383,25 @@ class SyncEngine {
   Future<void> addAnnotation(Annotation annotation) async {
     _state = _state.upsertAnnotation(_localDeviceId, annotation);
 
+    // Persist locally so the annotation survives restart and shows up in
+    // After-Action Reports. Audit 2026-05-03 P0: annotations were
+    // previously held only in CRDT memory and silently dropped on session
+    // end. Persistence is best-effort — DB failure shouldn't kill the
+    // sync path.
+    final annoRepo = _annotationRepository;
+    if (annoRepo != null && _sessionId != null) {
+      try {
+        final existing = await annoRepo.getAnnotationById(annotation.id);
+        if (existing == null) {
+          await annoRepo.createAnnotation(annotation, sessionId: _sessionId);
+        } else {
+          await annoRepo.updateAnnotation(annotation, sessionId: _sessionId);
+        }
+      } catch (_) {
+        // Persist failure is non-fatal — CRDT state still holds the value.
+      }
+    }
+
     if (!_isRunning) {
       _emitState();
       return;
@@ -306,7 +412,7 @@ class SyncEngine {
       annotation,
       _state.sequenceCounter.countFor(_localDeviceId),
     );
-    await _transport.broadcast(payload.toBytes());
+    await _transport.broadcast(_wireBytes(payload.toBytes()));
 
     _emitState();
   }
@@ -325,7 +431,7 @@ class SyncEngine {
       markerId,
       _state.sequenceCounter.countFor(_localDeviceId),
     );
-    await _transport.broadcast(payload.toBytes());
+    await _transport.broadcast(_wireBytes(payload.toBytes()));
 
     // Remove from local DB.
     await _markerRepository.deleteMarker(markerId);
@@ -337,6 +443,17 @@ class SyncEngine {
   Future<void> removeAnnotation(String annotationId) async {
     _state = _state.deleteAnnotation(_localDeviceId, annotationId);
 
+    // Mirror removeMarker: when the user deletes an annotation, also
+    // remove it from the local DB so the deletion survives restart.
+    final annoRepo = _annotationRepository;
+    if (annoRepo != null) {
+      try {
+        await annoRepo.deleteAnnotation(annotationId);
+      } catch (_) {
+        // Non-fatal.
+      }
+    }
+
     if (!_isRunning) {
       _emitState();
       return;
@@ -347,7 +464,7 @@ class SyncEngine {
       annotationId,
       _state.sequenceCounter.countFor(_localDeviceId),
     );
-    await _transport.broadcast(payload.toBytes());
+    await _transport.broadcast(_wireBytes(payload.toBytes()));
 
     _emitState();
   }
@@ -366,7 +483,7 @@ class SyncEngine {
       _state.sequenceCounter.countFor(_localDeviceId),
     );
     try {
-      await _transport.broadcast(payload.toBytes());
+      await _transport.broadcast(_wireBytes(payload.toBytes()));
     } catch (_) {
       // Best-effort broadcast.
     }
@@ -387,7 +504,20 @@ class SyncEngine {
   Future<void> _handleIncomingMessage(TransportMessage message) async {
     _diagMessagesReceived++;
     try {
-      final payload = SyncPayload.fromBytes(message.data);
+      // Decrypt-or-fail-closed before parsing. _unwrapBytes returns null
+      // if the wire bytes don't match what the current session expects
+      // (e.g. plaintext arriving on an encrypted session). Dropping is
+      // the right call: a tampered or wrong-key message is exactly the
+      // thing the audit's "fail closed in secure modes" requirement
+      // asks us to refuse.
+      final plaintext = _unwrapBytes(message.data);
+      if (plaintext == null) {
+        _diagMessagesFailed++;
+        _diagLastError = 'unwrap rejected: wrong key or unencrypted on '
+            'encrypted session';
+        return;
+      }
+      final payload = SyncPayload.fromBytes(plaintext);
 
       // Ignore messages from ourselves.
       if (payload.senderId == _localDeviceId) return;
@@ -424,8 +554,16 @@ class SyncEngine {
     } catch (e) {
       _diagMessagesFailed++;
       _diagLastError = e.toString();
-      print('[SyncEngine] DECODE FAILED: $e (data: ${message.data.length} bytes, '
-          'first 50: ${String.fromCharCodes(message.data.take(50))})');
+      // Bytes deliberately not echoed in production: with the encrypted
+      // envelope wired the message body is ciphertext + tag, but even
+      // plaintext payloads carry sender id and position. Diagnostics
+      // capture (length only) is enough for troubleshooting; full body
+      // dumps belong in the in-app diagnostics buffer (planned).
+      RedLog.e(
+        'SyncEngine',
+        'DECODE FAILED (data: ${message.data.length} bytes)',
+        e,
+      );
     }
   }
 
@@ -472,8 +610,42 @@ class SyncEngine {
         break;
 
       case SyncPayloadType.annotation:
-        // Annotations don't have a dedicated repository yet; the CRDT
-        // state holds them in memory. Phase 4 will add persistence.
+        // Mirror the marker handler: persist tombstones as deletes and
+        // upsert the local row so remote annotations show up in AAR
+        // exports and survive restart. Audit 2026-05-03 P0: this case
+        // was previously a no-op, so received annotations were dropped
+        // on the floor as soon as the CRDT state was discarded.
+        final annoRepo = _annotationRepository;
+        if (annoRepo == null) break;
+        try {
+          if (payload.data['_deleted'] == true) {
+            await annoRepo.deleteAnnotation(payload.data['id'] as String);
+            // Reflect tombstone in local CRDT state too.
+            _state = _state.deleteAnnotation(
+              payload.senderId,
+              payload.data['id'] as String,
+            );
+          } else {
+            final annotation = Annotation.fromJson(payload.data);
+            final existing = await annoRepo.getAnnotationById(annotation.id);
+            if (existing != null) {
+              await annoRepo.updateAnnotation(
+                annotation.copyWith(isSynced: true),
+                sessionId: _sessionId,
+              );
+            } else {
+              await annoRepo.createAnnotation(
+                annotation.copyWith(isSynced: true),
+                sessionId: _sessionId,
+              );
+            }
+            // Keep CRDT state in sync with the persisted row.
+            _state = _state.upsertAnnotation(payload.senderId, annotation);
+          }
+        } catch (_) {
+          // Persist failure is non-fatal; the message is dropped but
+          // sync_engine continues running.
+        }
         break;
 
       case SyncPayloadType.control:
@@ -509,7 +681,7 @@ class SyncEngine {
       callsign: localCallsign.isNotEmpty ? localCallsign : null,
     );
     try {
-      await _transport.broadcast(payload.toBytes());
+      await _transport.broadcast(_wireBytes(payload.toBytes()));
     } catch (_) {
       // Best-effort broadcast; transport may be temporarily unavailable.
     }

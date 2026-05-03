@@ -25,12 +25,23 @@ class QrDisplaySheet extends StatelessWidget {
   final TacticalColorScheme colors;
 
   /// Build the QR payload containing session join information.
+  ///
+  /// Schema (versioned, must match [FieldLinkService.joinSession] parser):
+  /// ```json
+  /// {"v":1, "id":"<sessionId>", "key":"<sessionKey>", "pin":"<pin>",
+  ///  "name":"...", "sec":"...", "mode":"..."}
+  /// ```
+  /// `key` is what the host validates the joiner against in QR-secured
+  /// sessions; without it, the QR mode would be UI-only theatre as
+  /// flagged in the 2026-05-03 audit.
   String _qrPayload() {
     return jsonEncode({
+      'v': 1,
       'id': session.id,
+      if (session.sessionKey != null) 'key': session.sessionKey,
       'name': session.name,
       'sec': session.securityMode.name,
-      'pin': session.pin,
+      if (session.pin != null) 'pin': session.pin,
       'mode': session.operationalMode.id,
     });
   }

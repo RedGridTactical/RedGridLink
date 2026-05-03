@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:red_grid_link/core/errors/app_exceptions.dart';
+import 'package:red_grid_link/core/logging/red_log.dart';
 import 'package:red_grid_link/data/models/peer.dart';
 import 'package:red_grid_link/services/field_link/transport/transport_service.dart';
 
@@ -338,11 +339,8 @@ class IosP2pTransport implements TransportService {
         // anything — masking the BLE notify bug it was supposed to
         // compensate for. Per the v1.5.4 audit, this was a contributing
         // factor to the iPad↔iPhone Field Link regression.
-        if (kDebugMode) {
-          final msg = data['message'] as String? ?? '<no message>';
-          // ignore: avoid_print
-          print('[IosP2pTransport] native error: $msg');
-        }
+        final msg = data['message'] as String? ?? '<no message>';
+        RedLog.w('IosP2pTransport', 'native error: $msg');
         _setState(TransportState.error);
     }
   }

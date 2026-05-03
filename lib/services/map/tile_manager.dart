@@ -176,6 +176,21 @@ class TileManager {
       return;
     }
 
+    // Audit 2026-05-03 P1: hard cap on tile count per region. Without
+    // this, a user accidentally selecting a country-sized rectangle at
+    // z=16 can drop a multi-GB request on a public OSM tile server,
+    // which both violates OSMF's tile usage policy and gets the user's
+    // IP throttled or blocked.
+    if (tiles.length > MapConstants.maxTilesPerRegionDownload) {
+      _isDownloading = false;
+      _cancelCompleter = null;
+      throw StateError(
+        'Region too large: ${tiles.length} tiles requested, max '
+        '${MapConstants.maxTilesPerRegionDownload}. Reduce the bounding '
+        'box or lower the max zoom.',
+      );
+    }
+
     // Prepare the MBTiles file path and ensure directory exists
     final tilesDir = await getTilesDirectory();
     final filePath = p.join(tilesDir, '${region.id}.mbtiles');
@@ -215,6 +230,8 @@ class TileManager {
     final totalTiles = tiles.length;
     int downloadedCount = 0;
 
+    final policy = MapConstants.tilePolicyFor(tileSource);
+
     try {
       for (final tile in tiles) {
         // Check for cancellation
@@ -252,6 +269,16 @@ class TileManager {
 
         downloadedCount++;
         yield downloadedCount / totalTiles;
+
+        // Audit 2026-05-03 P1: throttle tile downloads when the source
+        // is a public donation-funded server. The OSMF tile usage
+        // policy explicitly limits sustained heavy users; 100 ms
+        // between requests = 10 req/s, well within acceptable use.
+        if (!policy.allowsBulkOffline) {
+          await Future<void>.delayed(
+            const Duration(milliseconds: MapConstants.interTileDelayMs),
+          );
+        }
       }
     } finally {
       mbtiles.dispose();

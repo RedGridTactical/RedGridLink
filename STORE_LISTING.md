@@ -20,7 +20,7 @@ Track your team offline over Bluetooth. Encrypted GPS sharing, no cell needed.
 
 Track your team anywhere -- no cell service, no internet, no accounts.
 
-Red Grid Link turns nearby phones into a private team GPS network using Bluetooth and peer-to-peer Wi-Fi. See everyone's position on a shared map, drop waypoints, set boundaries, and coordinate -- all without cell towers or internet. Your data never leaves your devices.
+Red Grid Link turns nearby phones into a private team GPS network using Bluetooth (with Apple Multipeer Connectivity on iOS for higher-bandwidth peer transport). See everyone's position on a shared map, drop waypoints, set boundaries, and coordinate -- all without cell towers or internet. Your operational data stays on your devices.
 
 Built by an active duty Army officer for the people who actually need it: search & rescue volunteers, hunting parties, backcountry hiking groups, and field training teams.
 
@@ -33,14 +33,14 @@ WHO IT'S FOR:
 HOW IT WORKS:
 Open the app, start a session, and every teammate within Bluetooth range appears on your map. No pairing, no configuration, no internet required.
 
-- Devices discover each other automatically over Bluetooth and peer-to-peer Wi-Fi
-- Positions update every few seconds with military-grade AES-256 encryption
+- Devices discover each other automatically over Bluetooth (iOS adds Multipeer Connectivity for backgrounded peers)
+- PIN and QR sessions wrap every position and marker delta in AES-256-GCM with ECDH P-256 session keys; Open mode skips encryption for trusted training and demo use
 - Works on both iPhone and Android in the same session
 - Battery-saver modes last all day (<2% per hour in Expedition mode)
 - Ghost markers show last-known positions when someone moves out of range
 
 OFFLINE MAPS:
-Download topographic maps before you leave service. Full USGS Topo and OpenTopoMap coverage, stored on your phone. Navigate with MGRS grid overlay -- the same military grid system used by NATO.
+Download region packs before you leave service from OpenStreetMap or OpenTopoMap, stored on your phone as MBTiles. Navigate with the MGRS grid overlay -- the same military grid system used by NATO. (Region downloads are throttled to respect public-tile-server usage policies; native USGS / Mapbox / MapTiler integrations are on the roadmap.)
 
 TEAM COORDINATION:
 - Assign roles: Lead, Scout, Medic, Comms, or custom
@@ -61,9 +61,9 @@ Red Light (night vision safe), NVG Green, Day White, and Blue Force. All designe
 PRIVACY BY DESIGN:
 - No accounts, no sign-up, no login
 - No cloud, no servers, no tracking, no ads
-- All data stays on your device
-- Session data is ephemeral -- gone when the session ends
-- AES-256-GCM encryption on all team communication
+- Operational data (sessions, markers, tracks) stays on your device until you delete it
+- AES-256-GCM encryption on PIN and QR sessions (Open sessions are unencrypted by design for training / demo use)
+- Optional release-only crash diagnostics (Sentry) with PII off and GPS coordinates stripped — see Privacy Policy
 - In-app purchases handled by Apple/Google only
 
 PRICING:
@@ -171,13 +171,13 @@ Red Grid Link v1.0 -- initial release:
 - NATO phonetic voice readout
 
 ## Privacy Highlights
-- No data collected
-- No tracking
-- No analytics
-- All data stays on device
-- Location used only when app is in foreground (and for Field Link background sync)
-- Field Link shares position only with nearby peers via encrypted BLE/peer-to-peer Wi-Fi
-- No server communication required for any feature
+- No accounts, no analytics, no advertising networks
+- Operational data (sessions, markers, tracks) stays on your device until you delete it
+- Location used only when the app is in foreground (and during active Field Link sessions when background mode is enabled)
+- Field Link shares position only with nearby peers; PIN and QR sessions are AES-256-GCM encrypted, Open sessions are plaintext
+- Optional release-only crash diagnostics via Sentry, with PII off and GPS coordinates stripped
+- Map tile downloads are standard HTTPS requests to public OSM / OpenTopoMap servers (URL path only, no cookies, no identifiers)
+- No operational data is ever sent to any server controlled by Red Grid Link or any third party
 
 ## Privacy URL
 https://redgridtactical.com/privacy.html

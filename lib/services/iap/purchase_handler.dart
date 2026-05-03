@@ -1,6 +1,7 @@
 import 'package:in_app_purchase/in_app_purchase.dart';
 import 'package:red_grid_link/data/models/entitlement.dart';
 import 'package:red_grid_link/data/repositories/settings_repository.dart';
+import 'package:red_grid_link/services/iap/purchase_validator.dart';
 
 /// Callback signature for entitlement changes.
 typedef EntitlementCallback = Future<void> Function(String entitlementName);
@@ -8,79 +9,46 @@ typedef EntitlementCallback = Future<void> Function(String entitlementName);
 /// Handles purchase verification and entitlement persistence.
 ///
 /// Responsibilities:
-/// - Basic receipt validation (full server-side validation is future work)
+/// - Receipt validation via a pluggable [PurchaseValidator] (defaults to
+///   [ClientOnlyPurchaseValidator]; production deployments should
+///   inject a server-backed validator instead).
 /// - Entitlement granting and persistence via [SettingsRepository]
-/// - Subscription expiry checking
+/// - Subscription expiry checking that prefers the validator's
+///   authoritative expiry over fixed-duration heuristics.
 /// - Error reporting for purchase failures
 class PurchaseHandler {
   final SettingsRepository _settingsRepository;
+  final PurchaseValidator _validator;
 
   /// Optional callback fired when entitlement changes.
   /// Used by providers to update state reactively.
   final EntitlementCallback? onEntitlementChanged;
 
+  /// The most recent expiry returned by [_validator.verify], if any.
+  /// Stored to make [isSubscriptionExpired] prefer authoritative data
+  /// over the local timestamp+duration heuristic.
+  DateTime? _lastValidatedExpiry;
+
   PurchaseHandler({
     required SettingsRepository settingsRepository,
     this.onEntitlementChanged,
-  }) : _settingsRepository = settingsRepository;
+    PurchaseValidator validator = const ClientOnlyPurchaseValidator(),
+  })  : _settingsRepository = settingsRepository,
+        _validator = validator;
 
   // ---------------------------------------------------------------------------
   // Purchase verification
   // ---------------------------------------------------------------------------
 
-  /// Verify a purchase receipt.
-  ///
-  /// Performs basic client-side validation. Full server-side receipt
-  /// validation is planned for a future release. For now, this checks:
-  /// - The purchase has a valid product ID
-  /// - The purchase status is purchased or restored
-  /// - Platform-specific receipt data is present
-  ///
-  /// Returns true if the purchase passes basic validation.
+  /// Verify a purchase receipt by delegating to the configured
+  /// [PurchaseValidator]. When the validator returns an authoritative
+  /// expiry, it is captured for later use by [isSubscriptionExpired].
   Future<bool> verifyPurchase(PurchaseDetails purchase) async {
-    // Validate product ID is one of ours.
-    final validProductIds = {
-      'pro_monthly',
-      'pro_annual',
-      'pro_link_monthly',
-      'pro_link_annual',
-      'team_annual',
-      'lifetime',
-    };
-    if (!validProductIds.contains(purchase.productID)) {
-      return false;
+    final result = await _validator.verify(purchase);
+    if (result.isValid && result.expiry != null) {
+      _lastValidatedExpiry = result.expiry;
     }
-
-    // Check the purchase status is valid.
-    if (purchase.status != PurchaseStatus.purchased &&
-        purchase.status != PurchaseStatus.restored) {
-      return false;
-    }
-
-    // Verify platform-specific receipt data exists.
-    if (!_hasValidReceiptData(purchase)) {
-      return false;
-    }
-
-    // Basic validation passed.
-    // TODO: Add server-side receipt verification in a future phase.
-    // For iOS: validate with App Store /verifyReceipt endpoint.
-    // For Android: validate with Google Play Developer API.
-    return true;
-  }
-
-  /// Check whether platform-specific receipt data is present.
-  bool _hasValidReceiptData(PurchaseDetails purchase) {
-    final verificationData = purchase.verificationData;
-
-    // Local verification data should be present on both platforms.
-    if (verificationData.localVerificationData.isEmpty) {
-      return false;
-    }
-
-    // Server verification data is typically available too.
-    // We don't fail on its absence since we're doing client-side only.
-    return true;
+    return result.isValid;
   }
 
   // ---------------------------------------------------------------------------
@@ -138,12 +106,23 @@ class PurchaseHandler {
 
   /// Check if the current subscription has expired.
   ///
-  /// Uses locally stored purchase timestamp and product duration.
-  /// This is a basic client-side check; the store platform handles
-  /// actual subscription lifecycle.
+  /// Order of preference (audit 2026-05-03 P1):
+  ///   1. The validator's most recent authoritative expiry, when set.
+  ///      Server-backed validators return this from App Store Server API
+  ///      / Google Play Developer API and it correctly tracks renewals,
+  ///      grace periods, and refunds.
+  ///   2. Fallback: locally stored purchase timestamp + fixed duration.
+  ///      This is the legacy heuristic — it is wrong on month-to-month
+  ///      renewals and on every grace-period extension, but it is the
+  ///      only signal available with the [ClientOnlyPurchaseValidator].
   ///
-  /// Returns true if the subscription appears expired based on local data.
+  /// Returns true if the subscription appears expired.
   bool isSubscriptionExpired() {
+    final authoritativeExpiry = _lastValidatedExpiry;
+    if (authoritativeExpiry != null) {
+      return DateTime.now().isAfter(authoritativeExpiry);
+    }
+
     final timestamp = _getStoredTimestamp();
     if (timestamp == null) return false; // No purchase recorded.
 

@@ -48,10 +48,29 @@ definitions:
     - &code_gen
       name: Run Drift code generation
       script: dart run build_runner build --delete-conflicting-outputs
-    - &run_tests
-      name: Run tests
+    - &run_tests_strict
+      name: Run tests (fatal on failure)
+      script: flutter test
+    - &run_tests_lenient
+      name: Run tests (informational; PR/test workflow only)
       script: flutter test
       ignore_failure: true
+    - &print_version
+      name: Print version (single source of truth = pubspec.yaml)
+      script: |
+        # Build number must come from pubspec.yaml so the Play/ASC store
+        # version code is monotonic. Hard-coding here historically caused
+        # version-code-not-greater-than-previous upload rejections.
+        VERSION=$(grep -E '^version:' pubspec.yaml | awk '{print $2}')
+        BUILD_NAME=${VERSION%%+*}
+        BUILD_NUMBER=${VERSION##*+}
+        echo "Pubspec version: $VERSION"
+        echo "Build name:      $BUILD_NAME"
+        echo "Build number:    $BUILD_NUMBER"
+        if [ -z "$BUILD_NAME" ] || [ -z "$BUILD_NUMBER" ] || [ "$BUILD_NAME" = "$BUILD_NUMBER" ]; then
+          echo "ERROR: pubspec.yaml version must be of form NAME+NUMBER (e.g. 1.5.4+318)"
+          exit 1
+        fi
 
 workflows:
   # ===========================================================================
@@ -71,7 +90,8 @@ workflows:
     scripts:
       - *pub_get
       - *code_gen
-      - *run_tests
+      - *print_version
+      - *run_tests_strict
       - name: Set up Android keystore
         script: |
           # Decode the base64-encoded keystore into a file
@@ -86,9 +106,10 @@ workflows:
           EOF
       - name: Build Android App Bundle
         script: |
-          flutter build appbundle \
-            --release \
-            --build-number=275
+          # No --build-number flag: Flutter reads the +N suffix from
+          # pubspec.yaml. Hard-coding caused store-upload rejections
+          # because the literal value drifted behind the real pubspec.
+          flutter build appbundle --release
     artifacts:
       - build/app/outputs/bundle/release/*.aab
       - build/app/outputs/mapping/release/mapping.txt
@@ -120,6 +141,8 @@ workflows:
     scripts:
       - *pub_get
       - *code_gen
+      - *print_version
+      - *run_tests_strict
       - name: Install CocoaPods
         script: |
           cd ios
@@ -138,9 +161,11 @@ workflows:
           xcode-project use-profiles
       - name: Build IPA
         script: |
+          # No --build-number flag: Flutter reads the +N suffix from
+          # pubspec.yaml. Hard-coding caused store-upload rejections
+          # because the literal value drifted behind the real pubspec.
           flutter build ipa \
             --release \
-            --build-number=275 \
             --export-options-plist=/Users/builder/export_options.plist
     artifacts:
       - build/ios/ipa/*.ipa
@@ -175,4 +200,4 @@ workflows:
       - *code_gen
       - name: Run Flutter analyze
         script: flutter analyze --no-fatal-infos
-      - *run_tests
+      - *run_tests_lenient

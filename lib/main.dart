@@ -31,6 +31,7 @@ import 'package:red_grid_link/services/field_link/transport/ble_transport.dart';
 import 'package:red_grid_link/services/field_link/transport/ios_p2p_transport.dart';
 import 'package:red_grid_link/services/field_link/transport/multi_transport.dart';
 import 'package:red_grid_link/services/field_link/transport/transport_service.dart';
+import 'package:red_grid_link/services/location/location_service.dart';
 import 'package:red_grid_link/services/map/tile_manager.dart';
 
 /// Key used to persist the local device ID across launches.
@@ -129,6 +130,14 @@ void main() async {
     localDeviceId: deviceId,
   );
 
+  // Shared LocationService instance — one GPS subscription for the whole
+  // app. Used by FieldLinkService for session-scoped track recording AND
+  // by the UI via locationServiceProvider override below. Two instances
+  // would double GPS battery cost for no functional benefit.
+  final locationService = LocationService(
+    trackRepository: trackRepo,
+  );
+
   final fieldLinkService = FieldLinkService(
     transport: transport,
     syncEngine: syncEngine,
@@ -137,6 +146,7 @@ void main() async {
     sessionRepository: sessionRepo,
     peerRepository: peerRepo,
     localDeviceId: deviceId,
+    locationService: locationService,
   );
 
   // Wire up transport/sync state stream listeners so the service can
@@ -174,6 +184,7 @@ void main() async {
         fieldLinkService: fieldLinkService,
         tileManager: tileManager,
         waypointRepo: waypointRepo,
+        locationService: locationService,
       ),
     );
   } else {
@@ -187,6 +198,7 @@ void main() async {
       fieldLinkService: fieldLinkService,
       tileManager: tileManager,
       waypointRepo: waypointRepo,
+      locationService: locationService,
     );
   }
 }
@@ -202,6 +214,7 @@ void _launchApp({
   required FieldLinkService fieldLinkService,
   required TileManager tileManager,
   required WaypointRepository waypointRepo,
+  required LocationService locationService,
 }) {
   runApp(
     ProviderScope(
@@ -215,6 +228,10 @@ void _launchApp({
         fieldLinkServiceProvider.overrideWithValue(fieldLinkService),
         tileManagerProvider.overrideWithValue(tileManager),
         waypointRepositoryProvider.overrideWithValue(waypointRepo),
+        // Override the LocationService provider with the same instance
+        // FieldLinkService holds, so the UI position stream and the
+        // FieldLink track recorder share one GPS subscription.
+        locationServiceProvider.overrideWithValue(locationService),
       ],
       child: const RedGridLinkApp(),
     ),

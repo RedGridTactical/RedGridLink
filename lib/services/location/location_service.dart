@@ -3,6 +3,7 @@ import 'dart:io' show Platform;
 
 import 'package:flutter/foundation.dart';
 import 'package:geolocator/geolocator.dart' as geo;
+import 'package:red_grid_link/core/logging/red_log.dart';
 import 'package:red_grid_link/core/utils/mgrs.dart';
 import 'package:red_grid_link/data/models/position.dart';
 import 'package:red_grid_link/data/models/track_point.dart';
@@ -226,14 +227,13 @@ class LocationService {
   /// and [initialize] will start the stream on next invocation.
   Future<void> initialize() async {
     final status = await _permissionHandler.checkStatus();
-    if (kDebugMode) {
-      print('[LocationService] initialize: permission status = $status');
-    }
+    RedLog.d('LocationService', 'initialize: permission status = $status');
     if (status != LocationPermissionStatus.granted) {
-      if (kDebugMode) {
-        print('[LocationService] initialize: NOT starting stream — '
-            'permission $status (waiting for user grant via PermissionsPage)');
-      }
+      RedLog.d(
+        'LocationService',
+        'initialize: NOT starting stream — permission $status '
+            '(waiting for user grant via PermissionsPage)',
+      );
       return;
     }
 
@@ -294,10 +294,11 @@ class LocationService {
       );
     }
 
-    if (kDebugMode) {
-      print('[LocationService] _startStream: platform=${Platform.operatingSystem} '
-          'accuracy=$_accuracy distanceFilter=$_distanceFilter');
-    }
+    RedLog.d(
+      'LocationService',
+      '_startStream: platform=${Platform.operatingSystem} '
+          'accuracy=$_accuracy distanceFilter=$_distanceFilter',
+    );
 
     final stream = geo.GeolocatorPlatform.instance.getPositionStream(
       locationSettings: locationSettings,
@@ -308,9 +309,7 @@ class LocationService {
       onError: _onPositionError,
     );
 
-    if (kDebugMode) {
-      print('[LocationService] _startStream: subscription created');
-    }
+    RedLog.d('LocationService', '_startStream: subscription created');
   }
 
   /// Restart the GPS stream (e.g., after configuration changes).
@@ -322,10 +321,16 @@ class LocationService {
 
   /// Handle an incoming geolocator position update.
   void _onPositionUpdate(geo.Position geoPos) {
-    if (kDebugMode && _lastPosition == null) {
+    if (_lastPosition == null) {
       // Log only the FIRST fix — subsequent updates would spam.
-      print('[LocationService] FIRST FIX: lat=${geoPos.latitude} '
-          'lon=${geoPos.longitude} acc=${geoPos.accuracy}m');
+      // Coordinates are intentionally NOT logged here; per the audit's
+      // privacy guidance, we log accuracy class only so a debug session
+      // does not become a location trail. Use the in-app diagnostics
+      // panel (planned) for a redacted live position view if needed.
+      RedLog.i(
+        'LocationService',
+        'FIRST FIX: accuracy=${geoPos.accuracy.toStringAsFixed(1)}m',
+      );
     }
     final position = _convertPosition(geoPos);
     _lastPosition = position;

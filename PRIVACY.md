@@ -1,15 +1,17 @@
 # Privacy Policy
 
 **Red Grid Link**
-**Last updated: March 2026**
+**Last updated: May 2026**
 
-Red Grid Link is built on a simple principle: your data stays on your device. This policy describes exactly what data the app accesses and what it does with it.
+Red Grid Link is built on a simple principle: your operational data stays on your device. This policy describes exactly what data the app accesses and what it does with it.
 
 ---
 
 ## Data Collection Summary
 
-Red Grid Link collects **no personal data**. There are no accounts, no analytics, no crash reporting, no advertising networks, and no third-party SDKs that collect data. All app functionality works without any server communication.
+Red Grid Link does not collect personal data, does not run analytics, has no advertising networks, requires no account, and never transmits your operational data (positions, markers, sessions, tracks) to any server.
+
+The only optional outbound data is opt-in crash diagnostics, described below under **Crash Diagnostics**, which can be disabled by your IT/admin or omitted entirely from a build by your provider.
 
 ---
 
@@ -20,25 +22,37 @@ Red Grid Link requests access to your device's GPS location **while the app is i
 1. Calculate and display your current MGRS coordinates on the map
 2. Share your position with nearby teammates during an active Field Link session
 
-- Location data is **never sent to any server**
-- Location data is **never shared with any third party**
+- Location data is **never sent to any server** controlled by Red Grid Link or any third party
 - Location data is **stored locally only** in the active session database (Drift/SQLite)
-- When a session ends, Field Link position data is discarded unless saved in an After-Action Report
+- Position data persists locally as part of session history, saved tracks, markers, and After-Action Reports until you delete the session
 - Background location is used only during active Field Link sessions and can be disabled at any time
+- Crash diagnostics (if enabled in the build) explicitly strip location coordinates from any captured exception payload before transmission
 
 ---
 
 ## Field Link (Proximity Sync) Data
 
-Field Link uses Bluetooth Low Energy (BLE) and WiFi Direct (Android) / AWDL (iOS) to sync position and marker data between nearby devices.
+Field Link uses Bluetooth Low Energy (BLE) to sync position, marker, and annotation data between nearby devices. On iOS, Apple Multipeer Connectivity (which uses AWDL) is used as a secondary transport so peers remain discoverable when the app is backgrounded. Android currently uses BLE only; Wi-Fi Direct / Nearby Connections is planned and is not active in the shipped build.
 
-- All Field Link communication is **encrypted with AES-256-GCM** using ECDH P-256 ephemeral session keys
-- Session keys are rotated on every reconnect
+- Field Link communication is **end-to-end between paired devices** — no data passes through any server or relay
+- In **PIN** and **QR** session modes, Field Link payloads are **encrypted with AES-256-GCM** using session keys derived from an ECDH P-256 key exchange between paired peers
+- In **Open** session mode (auto-join, no PIN/QR), payloads are not encrypted; this mode is intended for training, demos, and trusted environments only
+- Session keys are derived per session and rotated when the session restarts
 - Data is exchanged **only between authenticated devices** in the active session
-- Session authentication is user-controlled: Open (auto-join), PIN (4-digit code), or QR code (session key encoded)
-- No data passes through any server or relay -- all communication is direct device-to-device
-- Field Link data is **ephemeral** -- position and marker sync data is not retained after the session ends
-- Ghost markers (last-known positions of disconnected teammates) are held in local memory only and cleared when the session ends
+
+### What Field Link persists locally
+
+These items are saved on your device for as long as you keep them:
+
+- The session record (id, name, security mode, operational mode, created timestamp)
+- Your peers' device IDs, callsigns, roles, and last-known positions
+- Markers, annotations, and tracks created during the session
+- After-Action Reports you generate from a session
+
+### What Field Link does NOT persist
+
+- Ephemeral keys (ECDH session secrets) are held in memory only and discarded when the session ends
+- Ghost markers (last-known positions of disconnected teammates that haven't been promoted to saved markers) are held in memory only and cleared on session end
 
 ---
 
@@ -63,19 +77,34 @@ All stored data lives **on your device only**. None of it is ever transmitted to
 
 ## Network Activity
 
-Red Grid Link makes network requests **only** for the following purposes:
+Red Grid Link makes network requests only for the following purposes:
 
-- **Map tile downloads:** Standard HTTPS requests to public tile servers (USGS National Map, OpenTopoMap) to download map packs for offline use. These are standard web requests with no authentication or tracking.
+- **Map tile downloads:** Standard HTTPS requests to the tile server you select (OpenStreetMap or OpenTopoMap by default) to download offline region packs. These are standard web requests with no authentication, cookies, or tracking. Public OpenStreetMap tile downloads are subject to that project's [Tile Usage Policy](https://operations.osmfoundation.org/policies/tiles/); for sustained heavy offline usage we recommend a licensed provider.
 - **In-app purchases:** Processed entirely by Apple (App Store) or Google (Play Store). Red Grid Link never sees your payment details and receives no personal data from these transactions.
+- **Crash diagnostics (optional, release-only):** If the build was compiled with a Sentry DSN supplied by your provider, uncaught exceptions and stack traces may be transmitted to Sentry to help us fix crashes. See **Crash Diagnostics** below.
 
 There is no:
 - Analytics or usage tracking
-- Crash reporting service
 - Advertising network
-- Account system or cloud sync
+- Account system or cloud sync of operational data
 - Telemetry or update check
 
 You can verify these claims by monitoring network traffic while using the app.
+
+---
+
+## Crash Diagnostics
+
+Red Grid Link uses [Sentry](https://sentry.io/) for optional crash and exception reporting **in release builds only**, and only when a Sentry DSN was compiled into the build by the provider. The integration is configured to:
+
+- Send `false` for `sendDefaultPii` so user-identifying request data is not transmitted
+- Strip GPS coordinates from captured exception payloads before transmission via a `beforeSend` hook
+- Sample 20% of trace events (not user-identifying)
+- Operate exclusively in release mode — debug and profile builds never initialize Sentry
+
+Crash diagnostics are not enabled in builds without a configured DSN. If you want to verify whether your build has Sentry enabled, see **Settings → Help & Support** for the build configuration display.
+
+To opt out: use a build that was compiled without a Sentry DSN. Direct downloads from the App Store and Play Store currently include Sentry; enterprise/source builds are at your provider's discretion.
 
 ---
 
@@ -86,9 +115,9 @@ You can verify these claims by monitoring network traffic while using the app.
 | Location (While Using App) | Display MGRS coordinates, share position via Field Link | Foreground |
 | Location (Always) | Maintain Field Link sync during background operation | Optional, user-enabled |
 | Bluetooth | Field Link device discovery and low-power data sync | Active sessions only |
-| Nearby Devices (Android) | Field Link peer discovery via Nearby Connections API | Active sessions only |
+| Nearby Devices (Android) | Required to scan for BLE peers; Nearby Connections API integration is planned but not yet active | Active sessions only |
 | Local Network (iOS) | Field Link peer discovery via Multipeer Connectivity | Active sessions only |
-| WiFi | High-bandwidth Field Link data transfer (map sync, AAR) | Active sessions only |
+| Wi-Fi (iOS) | Multipeer Connectivity uses Wi-Fi for high-bandwidth peer transport when available | Active sessions only |
 | Storage / Files | Save downloaded map packs and After-Action Reports | Local only |
 | Foreground Service (Android) | Maintain Field Link sync when app is in background | Active sessions only |
 
@@ -98,15 +127,14 @@ No other permissions are requested.
 
 ## Third Parties
 
-Red Grid Link contains **no third-party SDKs that collect data**. The app is built on the Flutter framework. In-app purchases use native Apple StoreKit and Google Play Billing APIs -- no third-party purchase SDK is included.
+Red Grid Link's third-party software components:
 
-Map tiles are sourced from:
-- **USGS National Map** (public domain, US government)
-- **OpenTopoMap** (CC-BY-SA, based on OpenStreetMap)
+- **Sentry** — Optional crash diagnostics in release builds only, when a DSN is compiled in. PII off, location stripped, opt-out via a Sentry-less build.
+- **Apple StoreKit / Google Play Billing** — Native in-app purchase APIs. Red Grid Link never sees your payment details.
+- **`pointycastle`** — Open-source Dart cryptography library (no data collection).
+- **OpenStreetMap / OpenTopoMap tile servers** — Receive standard HTTPS tile requests when you download an offline region pack. URL path only; no cookies, tokens, or identifying information.
 
-These tile servers receive standard HTTP requests (URL path only). No cookies, tokens, or identifying information are sent.
-
-Encryption is implemented using the `pointycastle` Dart library (open-source, no data collection).
+The app is built on the Flutter framework.
 
 ---
 
@@ -118,13 +146,15 @@ This app does not knowingly collect any data from anyone, including children. No
 
 ## Data Retention
 
-- **Field Link session data:** Discarded when the session ends
-- **Ghost markers:** Held in memory only, cleared on session end
-- **Map tiles:** Cached locally until the user deletes them
-- **After-Action Reports:** Stored locally until the user deletes them
+- **Operational session data (markers, annotations, tracks, peers):** Stored locally until you delete the session
+- **Ephemeral session secrets (encryption keys):** In-memory only, discarded on session end
+- **Ghost markers (in-memory):** Discarded on session end
+- **Map tiles:** Cached locally until you delete them
+- **After-Action Reports:** Stored locally until you delete them
 - **Preferences:** Stored locally until the app is uninstalled
+- **Crash diagnostics (when enabled):** Subject to [Sentry's data retention policy](https://docs.sentry.io/security-legal-pii/security/) — typically 30 to 90 days depending on plan
 
-No data is retained on any server because no data is ever sent to any server.
+No operational data is retained on any server because no operational data is ever sent to any server.
 
 ---
 

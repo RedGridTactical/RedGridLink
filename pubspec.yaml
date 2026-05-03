@@ -15,6 +15,11 @@ dependencies:
   flutter_riverpod: ^2.5.1
   flutter_map: ^7.0.2
   flutter_map_mbtiles: ^1.0.0
+  # Direct dep — tile_manager.dart imports `package:mbtiles/mbtiles.dart`
+  # for MBTiles writes during region downloads. Was previously transitive
+  # through flutter_map_mbtiles; declaring directly so a future drop of
+  # the transitive doesn't silently break offline tile downloads.
+  mbtiles: ^0.4.2
   latlong2: ^0.9.1
   drift: ^2.15.0
   sqlite3_flutter_libs: ^0.5.21

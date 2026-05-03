@@ -1,5 +1,7 @@
 import 'dart:async';
+import 'dart:convert';
 
+import 'package:red_grid_link/core/logging/red_log.dart';
 import 'package:red_grid_link/core/utils/crypto_utils.dart';
 import 'package:red_grid_link/data/models/annotation.dart';
 import 'package:red_grid_link/data/models/boundary_event.dart';
@@ -26,6 +28,7 @@ import 'package:red_grid_link/services/field_link/sync/sync_engine.dart';
 import 'package:red_grid_link/services/field_link/transport/ble_transport.dart';
 import 'package:red_grid_link/services/field_link/transport/multi_transport.dart';
 import 'package:red_grid_link/services/field_link/transport/transport_service.dart';
+import 'package:red_grid_link/services/location/location_service.dart';
 
 /// Connection status for the Field Link service.
 enum FieldLinkStatus {
@@ -63,6 +66,12 @@ class FieldLinkService {
   final SessionRepository _sessionRepository;
   final PeerRepository _peerRepository;
   final String _localDeviceId;
+
+  /// Optional — when supplied, session create/join start GPS track recording
+  /// against the active session id, and session leave stops it. Track points
+  /// then flow into [TrackRepository] for AAR generation. Optional so tests
+  /// and headless surfaces can construct the service without a GPS dependency.
+  final LocationService? _locationService;
   late final RoleManager _roleManager;
   late final BoundaryManager _boundaryManager;
   final EmergencyBeaconService _emergencyBeacon = EmergencyBeaconService();
@@ -124,13 +133,15 @@ class FieldLinkService {
     required SessionRepository sessionRepository,
     required PeerRepository peerRepository,
     required String localDeviceId,
+    LocationService? locationService,
   })  : _transport = transport,
         _syncEngine = syncEngine,
         _ghostManager = ghostManager,
         _batteryManager = batteryManager,
         _sessionRepository = sessionRepository,
         _peerRepository = peerRepository,
-        _localDeviceId = localDeviceId {
+        _localDeviceId = localDeviceId,
+        _locationService = locationService {
     _roleManager = RoleManager(localDeviceId: localDeviceId);
     _boundaryManager = BoundaryManager();
   }
@@ -224,19 +235,28 @@ class FieldLinkService {
       }
 
       try {
-        print('[FieldLink] Creator auto-connecting to ${device.id}...');
+        RedLog.d('FieldLink', 'Creator auto-connecting to ${device.id}');
         await _transport.connect(device.id);
-        print('[FieldLink] Creator connected to ${device.id}!');
+        RedLog.d('FieldLink', 'Creator connected to ${device.id}');
       } catch (e) {
-        print('[FieldLink] Creator connect failed: $e — will retry');
+        RedLog.w('FieldLink', 'Creator connect failed — will retry', e);
       }
     });
 
     await _transport.startDiscovery(sessionId);
 
-    await _syncEngine.start(config, sessionId: sessionId);
+    await _syncEngine.start(
+      config,
+      sessionId: sessionId,
+      encryptionKey: _deriveEncryptionKey(session),
+    );
     await _ghostManager.start();
     _startBatteryPolling();
+
+    // Start GPS track recording against this session id so position
+    // updates persist as TrackPoints and the AAR has a real route.
+    // Audit 2026-05-03 P0: track recording was previously never invoked.
+    await _locationService?.startTracking(sessionId);
 
     _setStatus(FieldLinkStatus.discovering);
 
@@ -269,11 +289,47 @@ class FieldLinkService {
       await leaveSession();
     }
 
+    // Parse QR data when supplied. Audit 2026-05-03 P0: qrData was
+    // previously accepted by the API but ignored — the security mode
+    // collapsed to PIN-or-Open regardless of how the user joined. Now:
+    //   - Valid QR payload (JSON {id, key, ...}) → SecurityMode.qr
+    //   - Invalid QR payload                     → fail closed (return false)
+    //   - No qrData supplied                     → fall back to PIN/Open
+    String? qrSessionKey;
+    SecurityMode resolvedSecurityMode;
+    if (qrData != null) {
+      try {
+        final payload = jsonDecode(qrData) as Map<String, dynamic>;
+        final qrId = payload['id'] as String?;
+        final qrKey = payload['key'] as String?;
+        if (qrId == null || qrKey == null || qrKey.isEmpty) {
+          // Malformed QR — refuse to join rather than silently downgrade
+          // to Open, which is what the previous code path did.
+          return false;
+        }
+        if (qrId != sessionId) {
+          // The QR is for a different session id than the caller asked
+          // us to join. Refuse — this is a likely sign of a swapped or
+          // stale QR.
+          return false;
+        }
+        qrSessionKey = qrKey;
+        resolvedSecurityMode = SecurityMode.qr;
+      } catch (_) {
+        // Not valid JSON. Fail closed: the caller asked for a QR-secured
+        // join but the bytes were unreadable, so we cannot prove identity.
+        return false;
+      }
+    } else {
+      resolvedSecurityMode = pin != null ? SecurityMode.pin : SecurityMode.open;
+    }
+
     final session = Session(
       id: sessionId,
       name: 'Joined Session',
-      securityMode: pin != null ? SecurityMode.pin : SecurityMode.open,
+      securityMode: resolvedSecurityMode,
       pin: pin,
+      sessionKey: qrSessionKey,
       createdAt: DateTime.now(),
       operationalMode: OperationalMode.sar,
       peers: [_localDeviceId],
@@ -292,6 +348,7 @@ class FieldLinkService {
 
     _activeSession = session.copyWith(isActive: true);
     _pendingJoinPin = pin;
+    _pendingJoinKey = qrSessionKey;
     _roleManager.initializeAsJoiner();
     _keyExchangeManager.initialize();
     _emitSession();
@@ -323,7 +380,7 @@ class FieldLinkService {
         // Best-effort: BLE peripheral advertising may not be available on
         // every device (some Android chipsets, older iOS hardware). The
         // joiner can still operate as a central-only client.
-        print('[FieldLink] Joiner startAdvertising failed: $e');
+        RedLog.w('FieldLink', 'Joiner startAdvertising failed', e);
       }
     }
 
@@ -347,9 +404,9 @@ class FieldLinkService {
       }
 
       try {
-        print('[FieldLink] Auto-connecting to ${device.id}...');
+        RedLog.d('FieldLink', 'Auto-connecting to ${device.id}');
         await _transport.connect(device.id);
-        print('[FieldLink] Connected to ${device.id}!');
+        RedLog.d('FieldLink', 'Connected to ${device.id}');
         // Only cancel the subscription AFTER a successful connect.
         // If connect fails, the subscription stays active so it can
         // retry on the next scan cycle.
@@ -357,24 +414,67 @@ class FieldLinkService {
         _autoConnectSub = null;
       } catch (e) {
         // Connection failed — keep listening for retry on next scan.
-        print('[FieldLink] Connect failed: $e — will retry');
+        RedLog.w('FieldLink', 'Connect failed — will retry', e);
       }
     });
 
     await _transport.startDiscovery(sessionId);
 
-    await _syncEngine.start(config, sessionId: sessionId);
+    await _syncEngine.start(
+      config,
+      sessionId: sessionId,
+      encryptionKey: _deriveEncryptionKey(session),
+    );
     await _ghostManager.start();
     _startBatteryPolling();
+
+    // Joiner also records its own GPS track for the session — both ends
+    // need their own track so the AAR can show every participant's route.
+    // Audit 2026-05-03 P0: track recording was previously never invoked.
+    await _locationService?.startTracking(sessionId);
 
     _setStatus(FieldLinkStatus.discovering);
 
     return true;
   }
 
+  /// Derive the symmetric encryption key for a session.
+  ///
+  /// Returns null for Open sessions (plaintext sync). For PIN and QR
+  /// sessions returns a key both peers can compute independently:
+  ///   - QR mode  : the session secret embedded in the QR (host
+  ///                generated, joiner scanned).
+  ///   - PIN mode : `hashPin(PIN + ":" + sessionId)`. The PIN is short
+  ///                (4 digits) so we mix it with the session id to bind
+  ///                the key to this specific session and prevent the
+  ///                same PIN producing the same key across sessions.
+  /// Audit 2026-05-03 P0: previously the SyncEngine ran in plaintext
+  /// regardless of security mode despite PRIVACY.md claiming AES-GCM
+  /// for Field Link sync.
+  String? _deriveEncryptionKey(Session session) {
+    switch (session.securityMode) {
+      case SecurityMode.open:
+        return null;
+      case SecurityMode.qr:
+        // The QR key is base64url; pass it through verbatim so both
+        // ends derive the same AES key inside MessageEncryptor's HKDF.
+        return session.sessionKey;
+      case SecurityMode.pin:
+        final pin = session.pin;
+        if (pin == null || pin.isEmpty) return null;
+        return hashPin('$pin:${session.id}');
+    }
+  }
+
   /// PIN sent by the joiner, held until the host responds with
   /// `join_response`. Cleared after validation completes.
   String? _pendingJoinPin;
+
+  /// Session key extracted from the QR code (joiner side), held until
+  /// the host responds with `join_response`. Sent in the join_request so
+  /// the host can verify the joiner actually scanned the right QR rather
+  /// than guessing a session id. Cleared after validation completes.
+  String? _pendingJoinKey;
 
   /// Leave the current session.
   ///
@@ -394,6 +494,10 @@ class FieldLinkService {
 
     // Stop sub-services in order.
     _stopRssiPolling();
+    // Stop GPS track recording so position updates don't keep flowing
+    // into a deactivated session row in the track table.
+    // Audit 2026-05-03 P0: track lifecycle was previously not wired.
+    await _locationService?.stopTracking();
     await _syncEngine.stop();
     await _transport.disconnectAll();
     await _transport.stopDiscovery();
@@ -770,15 +874,18 @@ class FieldLinkService {
         _startRssiPolling();
         // Broadcast ECDH public key to newly connected peers.
         _broadcastPublicKey();
-        // If we're a joiner with a pending PIN, send a join_request
-        // so the host can validate it via the BLE control channel.
-        if (_pendingJoinPin != null) {
+        // If we're a joiner with a pending PIN or QR key, send a
+        // join_request so the host can validate it via the BLE control
+        // channel.
+        if (_pendingJoinPin != null || _pendingJoinKey != null) {
           _syncEngine.broadcastControl({
             'evt': 'join_request',
-            'pin': _pendingJoinPin,
+            if (_pendingJoinPin != null) 'pin': _pendingJoinPin,
+            if (_pendingJoinKey != null) 'key': _pendingJoinKey,
             'deviceId': _localDeviceId,
           });
           _pendingJoinPin = null;
+          _pendingJoinKey = null;
         }
         break;
       case TransportState.discovering:
@@ -927,15 +1034,23 @@ class FieldLinkService {
 
   /// Handle an incoming `join_request` from a joiner (host side).
   ///
-  /// Validates the joiner's PIN against the real session PIN. If the
-  /// session is Open or the PIN matches, accepts the join. Otherwise
-  /// rejects and the joiner will disconnect.
+  /// Validates the joiner's PIN or QR key against the real session
+  /// credentials. If the session is Open, the PIN matches, or the QR
+  /// key matches, accepts the join. Otherwise rejects and the joiner
+  /// will disconnect.
+  ///
+  /// Audit 2026-05-03 P1 fix: the previous QR branch always accepted
+  /// without checking the joiner's key, so QR mode was UI-only theatre
+  /// — anyone who knew the (broadcast) session id could join a "QR"
+  /// session.
   void _handleJoinRequest(String senderId, Map<String, dynamic> data) {
     if (_activeSession == null) return;
 
     final sessionPin = _activeSession!.pin;
+    final sessionKey = _activeSession!.sessionKey;
     final securityMode = _activeSession!.securityMode;
     final joinerPin = data['pin'] as String?;
+    final joinerKey = data['key'] as String?;
 
     bool accepted;
     if (securityMode == SecurityMode.open) {
@@ -945,9 +1060,17 @@ class FieldLinkService {
       // PIN mode — validate.
       accepted = joinerPin != null && joinerPin == sessionPin;
     } else {
-      // QR mode — the QR payload contains the session ID which the
-      // joiner already used to find us. Accept.
-      accepted = true;
+      // QR mode — the joiner must have scanned the QR and so must know
+      // the session key the host generated. Compare directly. If the
+      // host has no session key on file (e.g. a session created before
+      // this fix shipped) we fall back to id-only acceptance to avoid
+      // bricking existing sessions, but reject malformed/missing keys
+      // when the host knows what to expect.
+      if (sessionKey == null || sessionKey.isEmpty) {
+        accepted = true;
+      } else {
+        accepted = joinerKey != null && joinerKey == sessionKey;
+      }
     }
 
     _syncEngine.broadcastControl({

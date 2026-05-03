@@ -7,6 +7,7 @@ import 'package:flutter_blue_plus/flutter_blue_plus.dart';
 import 'package:red_grid_link/core/constants/ble_constants.dart';
 import 'package:red_grid_link/core/constants/sync_constants.dart';
 import 'package:red_grid_link/core/errors/app_exceptions.dart';
+import 'package:red_grid_link/core/logging/red_log.dart';
 import 'package:red_grid_link/data/models/peer.dart';
 import 'package:red_grid_link/services/field_link/transport/ble_phy_service.dart';
 import 'package:red_grid_link/services/field_link/transport/transport_service.dart';
@@ -831,9 +832,7 @@ class BleTransport implements TransportService {
           );
         }
       } catch (e) {
-        if (kDebugMode) {
-          print('[BleTransport] peripheral broadcast failed: $e');
-        }
+        RedLog.w('BleTransport', 'peripheral broadcast failed', e);
         errors.add('peripheral-broadcast: $e');
       }
     }
@@ -917,17 +916,19 @@ class BleTransport implements TransportService {
           return;
         }
       } on PlatformException catch (e) {
-        if (kDebugMode) {
-          print('[BleTransport] _peripheralUpdateValue platform error '
-              'attempt=$attempt: ${e.message}');
-        }
+        RedLog.w(
+          'BleTransport',
+          '_peripheralUpdateValue platform error attempt=$attempt: '
+              '${e.message}',
+        );
       }
       await Future<void>.delayed(const Duration(milliseconds: 25));
     }
-    if (kDebugMode) {
-      print('[BleTransport] _peripheralUpdateValue: dropped after $maxRetries '
-          'retries (transmit queue stayed full)');
-    }
+    RedLog.w(
+      'BleTransport',
+      '_peripheralUpdateValue: dropped after $maxRetries retries '
+          '(transmit queue stayed full)',
+    );
   }
 
   /// Send [data] to all subscribed centrals using the chunking protocol
@@ -1166,10 +1167,11 @@ class BleTransport implements TransportService {
           // notify payloads so iOS doesn't silently truncate.
           final maxUpdateLen = (data['maxUpdateLength'] as num?)?.toInt() ??
               (BleConstants.minMtu - _attOverhead);
-          if (kDebugMode) {
-            print('[BleTransport] Central connected (peripheral): '
-                '$centralId maxUpdateLen=$maxUpdateLen');
-          }
+          RedLog.d(
+            'BleTransport',
+            'Central connected (peripheral): $centralId '
+                'maxUpdateLen=$maxUpdateLen',
+          );
           _peripheralCentrals.add(centralId);
           _peripheralCentralMaxUpdateLength[centralId] = maxUpdateLen;
           _setState(TransportState.connected);

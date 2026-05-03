@@ -45,11 +45,11 @@ Built on the MGRS engine from [Red Grid MGRS](https://github.com/RedGridTactical
 Live Military Grid Reference System coordinates with 1-meter precision. GPS Kalman filter for smooth, accurate position tracking. MGRS grid overlay on offline maps from GZD down to 100m resolution. Bearing, distance, dead reckoning, resection, pace count (with accelerometer step detection), declination, and coordinate conversion tools. NATO phonetic voice readout for hands-free grid calls.
 
 ### Field Link -- Team Sync Without Infrastructure
-Zero-config proximity sync over BLE + peer-to-peer Wi-Fi (Android) / AWDL (iOS). Devices within range automatically discover each other and share encrypted position and marker data. No internet required. No pairing codes. No servers.
+Zero-config proximity sync over BLE on all platforms, with Apple Multipeer Connectivity (AWDL) added on iOS for higher-bandwidth peer transport when the app is backgrounded. Devices within range automatically discover each other and share position, marker, and annotation data. No internet required. No pairing codes. No servers. (Android Wi-Fi Direct / Nearby Connections is on the roadmap; the shipping Android build is BLE-only.)
 
 - 2-8 devices per session
-- AES-256-GCM encryption with ECDH P-256 ephemeral session keys
-- Tiered session security: Open, PIN, or QR code authentication
+- AES-256-GCM encryption with ECDH P-256 ephemeral keys for PIN and QR sessions; Open sessions are unencrypted by design (training / demo use)
+- Tiered session security: Open (auto-join, no encryption), PIN (4-digit, encrypted), QR code (host-generated session secret, encrypted)
 - Delta payloads under 200 bytes per position update
 - Ghost markers with time-decay visualization when teammates disconnect
 - Velocity vectors project last-known movement direction
@@ -58,7 +58,7 @@ Zero-config proximity sync over BLE + peer-to-peer Wi-Fi (Android) / AWDL (iOS).
 - Auto-reconnect with exponential backoff on disconnect
 
 ### Offline Maps
-Download map packs from USGS Topo (public domain) and OpenTopoMap for full offline operation. Maps are cached locally as MBTiles with MGRS grid lines rendered as a dynamic overlay.
+Download map packs from OpenStreetMap or OpenTopoMap to MBTiles for offline operation, with MGRS grid lines rendered as a dynamic overlay. Region downloads are throttled to respect public-tile-server usage policies; for sustained heavy offline usage we recommend a licensed provider. (Native USGS / Mapbox / MapTiler integrations are on the roadmap.)
 
 ### 4 Operational Modes
 One engine, four presentation layers. Terminology, icons, and quick actions adapt to your mission:
@@ -96,7 +96,7 @@ Open Red Grid Link and your MGRS position appears on the offline map. Navigate u
 1. **Start a session** -- tap one button to begin broadcasting over BLE
 2. **Set security** -- choose Open, PIN, or QR code authentication
 3. **Teammates appear** -- any device running Red Grid Link within range (~100-300m standard, up to 1km with BLE Long Range) is automatically discovered
-4. **Positions sync** -- AES-256-GCM encrypted delta updates flow between all devices at configurable intervals
+4. **Positions sync** -- delta updates flow between all devices at configurable intervals; PIN and QR sessions wrap each delta in an AES-256-GCM envelope, Open sessions send plaintext
 5. **Ghosting** -- if a teammate moves out of range, their last-known position remains on your map with time-decay opacity (100% to outline over 30 minutes)
 6. **Reconnect** -- when a ghost comes back in range, their marker snaps to live position
 
@@ -131,10 +131,10 @@ No accounts. No servers. No cell service. No configuration. It just works.
 
 | Data | Collected | Stored | Transmitted |
 |------|:---------:|:------:|:-----------:|
-| GPS location | In use only | Local session DB | Field Link peers only (encrypted) |
-| Field Link positions | Active session | Ephemeral | AES-256-GCM encrypted, device-to-device |
-| Map tiles | Downloaded | Local MBTiles | Standard HTTPS to tile servers |
-| Waypoints & markers | User-created | Local only | Field Link peers only (encrypted) |
+| GPS location | In use / background (sessions) | Local session DB | Field Link peers only (PIN / QR: AES-256-GCM; Open: plaintext) |
+| Field Link positions | Active session | Local DB until you delete the session | AES-256-GCM in PIN/QR sessions, plaintext in Open sessions; always device-to-device |
+| Map tiles | Downloaded | Local MBTiles | Standard HTTPS to tile servers (OSM / OpenTopoMap) |
+| Waypoints & markers | User-created | Local DB | Field Link peers only (encrypted in PIN/QR sessions) |
 | After-Action Reports | User-generated | Local only | Never |
 | Device identifiers | Never | Never | Never |
 

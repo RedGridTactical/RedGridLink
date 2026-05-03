@@ -254,13 +254,42 @@ final demoModeProvider =
 class EntitlementNotifier extends StateNotifier<String> {
   final SettingsRepository _repo;
 
-  EntitlementNotifier(this._repo) : super(_repo.entitlement);
+  /// Whether the in-memory state has been deliberately overridden for
+  /// the current session (demo mode). When true, [setNonPersisting]
+  /// has installed a value that should NOT be written to storage.
+  bool _sessionOverride = false;
+
+  /// Construct with optional [initialOverride]. When non-null, the
+  /// notifier starts in that state without writing to storage. Used by
+  /// the entitlement provider to seed `proLink` for demo mode without
+  /// reaching into a protected `state` setter from outside the class.
+  ///
+  /// Audit 2026-05-03 P1: previously the entitlement provider mutated
+  /// `notifier.state = 'proLink'` from outside the StateNotifier, which
+  /// triggered analyzer warnings (`invalid_use_of_protected_member` and
+  /// `invalid_use_of_visible_for_testing_member`) and made it unclear
+  /// to readers whether the value would be persisted.
+  EntitlementNotifier(this._repo, {String? initialOverride})
+      : super(initialOverride ?? _repo.entitlement) {
+    _sessionOverride = initialOverride != null;
+  }
 
   /// Update the entitlement tier and persist to storage.
   Future<void> set(String value) async {
     state = value;
+    _sessionOverride = false;
     await _repo.setEntitlement(value);
   }
+
+  /// Set an in-memory override without persisting. Intended for
+  /// session-scoped overrides like demo mode.
+  void setNonPersisting(String value) {
+    state = value;
+    _sessionOverride = true;
+  }
+
+  /// Whether the current state is a non-persisting session override.
+  bool get isSessionOverride => _sessionOverride;
 }
 
 /// User entitlement tier: free, pro, proLink, or team.
@@ -270,11 +299,10 @@ class EntitlementNotifier extends StateNotifier<String> {
 final entitlementProvider =
     StateNotifierProvider<EntitlementNotifier, String>((ref) {
   final repo = ref.watch(settingsRepositoryProvider);
-  final notifier = EntitlementNotifier(repo);
   final isDemo = ref.watch(demoModeProvider);
-  if (isDemo && notifier.state == 'free') {
-    // Don't persist — just override in memory for the session.
-    notifier.state = 'proLink';
-  }
-  return notifier;
+  // Compute the seed up front so we don't need to mutate `state` from
+  // outside the notifier subclass.
+  final stored = repo.entitlement;
+  final initial = (isDemo && stored == 'free') ? 'proLink' : null;
+  return EntitlementNotifier(repo, initialOverride: initial);
 });

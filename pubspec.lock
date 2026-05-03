@@ -757,7 +757,7 @@ packages:
     source: hosted
     version: "0.13.0"
   mbtiles:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: mbtiles
       sha256: "316af1f8db8ce95888ca70f5dd3f6914906b4e17ceeca8501206d28e78612af8"
