@@ -966,11 +966,24 @@ class FieldLinkService {
             // deactivation throws — otherwise the unhandled error
             // inside the Timer callback would leave the joiner stuck
             // in their previous status.
+            //
+            // Codex review round 4 P2: also force-clear _activeSession
+            // and emit null on sessionStream in the failure path. If
+            // leaveSession throws BEFORE it reaches its own
+            // `_activeSession = null; _emitSession();` lines, the
+            // active-session-driven UI (driven by sessionStream) would
+            // stay on the joining-session screen even though the
+            // status went to error, and the user couldn't retry. This
+            // belt-and-braces clear guarantees the session state is
+            // consistent regardless of which step of teardown failed.
             try {
               await leaveSession();
             } catch (_) {
-              // Best-effort cleanup; the error status below is the
-              // real signal the UI cares about.
+              // Best-effort cleanup; force-clear what leaveSession
+              // didn't get to so the UI doesn't strand on a phantom
+              // active session.
+              _activeSession = null;
+              _emitSession();
             } finally {
               _setStatus(FieldLinkStatus.error);
             }
