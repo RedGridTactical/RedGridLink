@@ -539,40 +539,73 @@ class FieldLinkService {
     _joinAcceptTimer?.cancel();
     _joinAcceptTimer = null;
 
-    // Stop sub-services in order.
-    _stopRssiPolling();
+    // Stop sub-services in order. Each step is best-effort: if any one
+    // throws (transport failure mid-disconnect, DB lock contention,
+    // platform channel error during foreground service stop), we still
+    // run the rest so we don't strand the user in a partially-active
+    // session.
+    //
+    // Codex review round 5 P2: previously a single thrown step would
+    // bail out of leaveSession, leaving _isRunning, _activeSession,
+    // and the transport/sync stack half-set. The next createSession
+    // would skip its `if (_activeSession != null) await leaveSession()`
+    // guard (because _activeSession was force-cleared by the timeout
+    // catch) and then SyncEngine.start() would early-return because
+    // _isRunning was never cleared, leaving the retry attached to the
+    // stale session state.
+    Future<void> bestEffort(String label, Future<void> Function() op) async {
+      try {
+        await op();
+      } catch (e) {
+        RedLog.w('FieldLink', 'leaveSession step "$label" failed', e);
+      }
+    }
+
+    void bestEffortSync(String label, void Function() op) {
+      try {
+        op();
+      } catch (e) {
+        RedLog.w('FieldLink', 'leaveSession step "$label" failed', e);
+      }
+    }
+
+    bestEffortSync('stopRssiPolling', _stopRssiPolling);
     // Stop GPS track recording so position updates don't keep flowing
     // into a deactivated session row in the track table.
     // Audit 2026-05-03 P0: track lifecycle was previously not wired.
-    await _locationService?.stopTracking();
+    await bestEffort('stopTracking', () async {
+      await _locationService?.stopTracking();
+    });
     // Tear down the Android foreground service so the persistent
     // notification disappears and the OS can reclaim the wakelock.
     // No-op on iOS / desktop.
-    await ForegroundService.stop();
-    await _syncEngine.stop();
-    await _transport.disconnectAll();
-    await _transport.stopDiscovery();
+    await bestEffort('foregroundServiceStop', ForegroundService.stop);
+    await bestEffort('syncEngineStop', _syncEngine.stop);
+    await bestEffort('disconnectAll', _transport.disconnectAll);
+    await bestEffort('stopDiscovery', _transport.stopDiscovery);
     final stopBle = _resolveBleTransport();
     if (stopBle != null) {
-      await stopBle.stopAdvertising();
+      await bestEffort('stopAdvertising', stopBle.stopAdvertising);
     }
-    _stopBatteryPolling();
+    bestEffortSync('stopBatteryPolling', _stopBatteryPolling);
 
     // Mark all peers in this session as disconnected.
-    await _peerRepository.disconnectAllInSession(sessionId);
+    await bestEffort('peerDisconnectAll',
+        () => _peerRepository.disconnectAllInSession(sessionId));
 
     // Deactivate session.
-    await _sessionRepository.deactivateAll();
+    await bestEffort('sessionDeactivateAll',
+        () => _sessionRepository.deactivateAll());
 
-    _emergencyBeacon.dispose();
-    _messageService.reset();
-    _roleManager.reset();
-    _boundaryManager.clearBoundary();
-    _keyExchangeManager.reset();
+    bestEffortSync('emergencyBeaconDispose', _emergencyBeacon.dispose);
+    bestEffortSync('messageServiceReset', _messageService.reset);
+    bestEffortSync('roleManagerReset', _roleManager.reset);
+    bestEffortSync('clearBoundary', _boundaryManager.clearBoundary);
+    bestEffortSync('keyExchangeReset', _keyExchangeManager.reset);
     _activeSession = null;
     _emitSession();
     _setStatus(FieldLinkStatus.idle);
-    _ghostManager.removeAllGhosts();
+    bestEffortSync('removeAllGhosts', _ghostManager.removeAllGhosts);
   }
 
   // ---------------------------------------------------------------------------
