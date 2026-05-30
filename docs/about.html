@@ -87,7 +87,7 @@
     <div class="container" style="max-width: 800px;">
       <h2 class="section-title">Why Red Grid Exists</h2>
       <p class="mb-3">Red Grid Tactical was founded by an active duty Army officer who spent years watching the gap between military-grade navigation tools and what civilian teams actually have access to. Military units have ATAK, DAGR receivers, and encrypted radio networks. A volunteer SAR team trying to coordinate a search in the backcountry? They get group texts that don't work without cell service.</p>
-      <p class="mb-3">The idea was simple: take the concepts that work in military operations and make them accessible to everyone. Real MGRS coordinates, not approximations. Encrypted peer-to-peer sync, not cloud-dependent tracking. Tools that work when infrastructure doesn't. No accounts to create, no servers to maintain, no subscriptions required just to see where your teammate is.</p>
+      <p class="mb-3">The idea was simple: take the concepts that work in military operations and make them accessible to everyone. Real MGRS coordinates, not approximations. Encrypted peer-to-peer sync, not cloud-dependent tracking. Tools that work when infrastructure doesn't. No accounts to create, no Red Grid server needed for active sessions, no subscription required just to see where your teammate is.</p>
       <p>Red Grid started as a solo MGRS navigator (Red Grid MGRS) that could match the precision of a $2,500 military DAGR. Then came the question every team lead asks: how do I see where my people are? That became Red Grid Link, with its Field Link proximity sync engine. Two apps, one mission: give small teams the situational awareness tools that used to require military infrastructure.</p>
     </div>
   </section>
@@ -97,7 +97,7 @@
     <div class="container" style="max-width: 800px;">
       <h2 class="section-title">Transparent Security</h2>
       <p class="mb-3">We believe security tools should be verifiable. PIN and QR Field Link sessions wrap every payload in industry-standard AES-256-GCM derived from an ECDH P-256 session key — no proprietary black boxes, no security through obscurity. Open mode is intentionally unencrypted for training and demo use. We publish detailed documentation of our security architecture so you can verify our claims.</p>
-      <p>Your operational data stays on your device. No accounts, no analytics, no advertising networks. Field Link encryption keys are ephemeral and discarded on session end; the data they protected (sessions, markers, tracks) persists locally until you delete it. Optional release-only crash diagnostics use Sentry with PII off and GPS coordinates stripped. That's not a feature we advertise. It's a design principle.</p>
+      <p>Your operational data stays on your device unless you share it with nearby Field Link peers or export it yourself. No accounts, no analytics, no advertising networks. Field Link encryption keys are ephemeral and discarded on session end; the data they protected (sessions, markers, tracks) persists locally until you delete it. Optional release-only crash diagnostics use Sentry with PII off and GPS coordinates stripped. That's not a feature we advertise. It's a design principle.</p>
     </div>
   </section>
 
@@ -107,20 +107,20 @@
       <h2 class="section-title">What Powers Red Grid</h2>
       <div class="grid-2">
         <div class="card">
-          <h3>React Native + Expo</h3>
-          <p>Cross-platform framework delivering a single JavaScript codebase for iOS and Android. Native performance, consistent experience.</p>
+          <h3>Flutter + Native Channels</h3>
+          <p>Cross-platform Flutter app with native iOS and Android platform channels for Bluetooth, nearby peer transport, location, billing, and battery-aware field behavior.</p>
         </div>
         <div class="card">
           <h3>DMA MGRS Algorithm</h3>
           <p>Defense Mapping Agency TM 8358.1 compliant MGRS conversion with Vincenty formula for sub-millimeter geodetic accuracy on WGS84.</p>
         </div>
         <div class="card">
-          <h3>Meshtastic + BLE</h3>
-          <p>LoRa mesh networking via Bluetooth Low Energy for off-grid position sharing. No cell service, no internet, no infrastructure.</p>
+          <h3>Mesh / Radio Roadmap</h3>
+          <p>Longer-distance team awareness belongs on radio-backed workflows such as Meshtastic LoRa, with phone Bluetooth used for nearby peers and radio bridge control.</p>
         </div>
         <div class="card">
-          <h3>AsyncStorage + Zero Network</h3>
-          <p>Local-first data storage with no cloud dependency. Zero HTTP requests during normal operation. Your data lives on your device and nowhere else.</p>
+          <h3>Local Storage + No Cloud Sync</h3>
+          <p>Local-first storage with no Red Grid cloud dependency. Active Field Link sessions work without internet; map downloads, store purchase flows, and optional crash diagnostics are the expected network surfaces.</p>
         </div>
       </div>
     </div>

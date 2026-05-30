@@ -139,7 +139,7 @@
           <div class="timeline-version">V1.4 — Extended Range</div>
           <div class="timeline-date">March 2026</div>
           <ul class="timeline-features">
-            <li>BLE Long Range (Coded PHY) for 400m-1km range</li>
+            <li>BLE Long Range / Coded PHY support detection and LR connection status on capable hardware</li>
             <li>Connection quality indicator (RSSI signal bars)</li>
             <li>FixPhrase: 4-word location encoding (~11m accuracy)</li>
             <li>OpenStreetMap offline tile downloads</li>
@@ -151,13 +151,13 @@
           <div class="timeline-date">April 2026</div>
           <ul class="timeline-features">
             <li>ECDH P-256 key exchange (per-peer encryption)</li>
-            <li>Actual BLE Coded PHY negotiation for extended range</li>
+            <li>BLE Coded PHY negotiation on supported Android hardware</li>
             <li>Emergency beacon with one-tap SOS and team alerts</li>
             <li>Tactical messaging (8 pre-canned + free text)</li>
             <li>Connection quality warnings and signal bars</li>
             <li>V1.5.1 patch: repaired Emergency Beacon wiring and Field Link scan/join flow</li>
             <li>V1.5.2 patch: fixed BLE peer sync, MGRS grid accuracy, mode-specific callouts, PIN flow</li>
-            <li>V1.5.2 Android production submission to Google Play — full iOS feature parity, first production build since v1.3.1 closed beta</li>
+            <li>V1.5.2 Android production submission to Google Play — full iOS feature parity and renewed Android release-track momentum</li>
             <li>V1.5.3 patch: expanded in-app location disclosure to clearly explain what location data is accessed, how it is used, and that it stays on your device</li>
             <li>V1.5.4 patch: Field Link reliability — joining iOS-to-iOS sessions now works, position broadcasts are properly chunked so iOS no longer truncates them, joiners inherit the host's operational mode, lead promotion propagates correctly, display name changes update connected teammates live, and waypoints / search areas / boundaries persist across leave-and-rejoin. Multipeer Connectivity runs alongside BLE on iOS, GPS holds a fix when stationary, and emergency SOS no longer re-displays after acknowledgement</li>
             <li>V1.5.5 — Trust hardening: AES-256-GCM payload encryption is now actually wrapped around every Field Link sync packet in PIN and QR sessions; QR mode finally authenticates the joiner against a host-validated key; track recording is wired into session lifecycle so After-Action Reports include real GPS routes; annotation persistence survives restart; release-only Sentry crash diagnostics with PII off and GPS coordinates stripped (disclosed in privacy policy); offline tile downloads throttle and cap region size to respect public-tile-server policies; production print() calls replaced with a structured logger that suppresses in release. Plus 6 rounds of independent code review fixes on the encryption envelope, partial-cleanup robustness, wrong-PIN/QR rejection UX, iOS session startup, and engine state guarantees</li>
@@ -165,7 +165,7 @@
         </div>
 
         <div class="timeline-item current">
-          <div class="timeline-version">V1.6 — Field Reliability + Android + Meshtastic MVP</div>
+          <div class="timeline-version">V1.6 — Field Reliability + Meshtastic MVP</div>
           <div class="timeline-date">Q2 2026</div>
           <ul class="timeline-features">
             <li><strong>Field Readiness Preflight</strong>: one-tap pre-mission check that confirms downloaded AO map coverage, GPS permission, background location, Bluetooth, local network, notifications, battery mode, storage, encryption mode, team roster, and last successful peer test. Each teammate shows as Ready / Partial / Not Ready, and the readiness snapshot lands in the AAR</li>
@@ -173,7 +173,7 @@
             <li><strong>Map Health</strong>: per-teammate AO coverage, missing zooms, stale layers, storage impact, attribution, and a "will work offline" status. Lead can see whether teammates have the same AO downloaded</li>
             <li><strong>Licensed offline tile provider</strong>: provider abstraction supporting demo OSM, licensed offline providers, self-hosted PMTiles / vector tiles, and USGS where allowed. Replaces the public-tile fallback for paid users</li>
             <li><strong>Meshtastic BLE bridge MVP</strong>: position, status, and SOS over LoRa for multi-kilometer team awareness. Tight scope first; chat and richer assignment payloads later</li>
-            <li><strong>Android production release</strong> on Google Play with full physical-device QA. Field Link reliability on Android required before public ship</li>
+            <li><strong>Android post-launch reliability</strong>: continue Google Play physical-device QA across Pixel, Samsung, and OnePlus devices, with cross-platform Field Link reliability treated as a release gate for future claims</li>
             <li><strong>Team diagnostics export</strong>: one-tap radio / location / permission state snapshot for support, with sensitive fields redacted</li>
             <li><strong>Hard claims gate</strong>: every public claim mapped to implemented-and-tested, beta/limited, or removed-from-copy</li>
           </ul>
@@ -331,7 +331,7 @@
           <div class="timeline-version">V2.5 — Interoperability</div>
           <div class="timeline-date">March 2026</div>
           <ul class="timeline-features">
-            <li>FixPhrase integration (open-source What3Words alternative)</li>
+            <li>FixPhrase integration (privacy-friendly What3Words alternative)</li>
             <li>GPX/KML waypoint export via Share sheet</li>
             <li>Elevation and slope calculator tool (10th tactical tool)</li>
             <li>OLED true black themes</li>
@@ -340,12 +340,12 @@
         </div>
 
         <div class="timeline-item completed">
-          <div class="timeline-version">V2.6 — Open Source Library</div>
+          <div class="timeline-version">V2.6 — Coordinate Engine</div>
           <div class="timeline-date">March 2026</div>
           <ul class="timeline-features">
-            <li>@redgrid/mgrs npm package (DMA TM 8358.1 compliant)</li>
-            <li>Standalone MGRS/UTM/FixPhrase conversion library</li>
-            <li>Zero dependencies, ~15 KB</li>
+            <li>Hardened MGRS/UTM/FixPhrase conversion engine (DMA TM 8358.1 compliant)</li>
+            <li>1-meter precision across every coordinate format</li>
+            <li>Same engine across both apps and the web toolkit</li>
           </ul>
         </div>
 
