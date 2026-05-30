@@ -143,6 +143,16 @@ class IAPService {
   /// Checks store availability, loads products, and begins listening
   /// for purchase updates.
   Future<void> initialize() async {
+    // Initialization may be triggered from multiple purchase surfaces
+    // (Settings, feature paywalls, restore flow). Keep the purchase stream
+    // listener singular so each store update is processed exactly once.
+    if (_purchaseSubscription != null) {
+      if (_storeAvailable) {
+        await loadProducts();
+      }
+      return;
+    }
+
     _storeAvailable = await _iap.isAvailable();
 
     if (!_storeAvailable) {
@@ -215,6 +225,12 @@ class IAPService {
       return false;
     }
 
+    final loadedProduct = getProduct(product.id);
+    if (loadedProduct == null) {
+      _emitError('Product not found: ${product.id}');
+      return false;
+    }
+
     if (_currentState == PurchaseFlowState.purchasing) {
       _emitError('A purchase is already in progress.');
       return false;
@@ -223,7 +239,7 @@ class IAPService {
     _setState(PurchaseFlowState.purchasing);
 
     try {
-      final purchaseParam = PurchaseParam(productDetails: product);
+      final purchaseParam = PurchaseParam(productDetails: loadedProduct);
       // All Red Grid Link products are non-consumable (subscriptions + lifetime).
       final started = await _iap.buyNonConsumable(
         purchaseParam: purchaseParam,
@@ -248,7 +264,11 @@ class IAPService {
   /// Looks up the product in the loaded list. Returns false if the
   /// product ID is not found.
   Future<bool> buyProductById(String productId) async {
-    final product = getProduct(productId);
+    var product = getProduct(productId);
+    if (product == null) {
+      await initialize();
+      product = getProduct(productId);
+    }
     if (product == null) {
       _emitError('Product not found: $productId');
       return false;

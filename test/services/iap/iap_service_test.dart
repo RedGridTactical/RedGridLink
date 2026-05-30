@@ -22,14 +22,17 @@ class FakeInAppPurchase implements InAppPurchase {
   ProductDetailsResponse? productDetailsResponse;
   bool buyNonConsumableResult = true;
   bool restoreCalled = false;
+  int purchaseStreamAccessCount = 0;
   final List<PurchaseDetails> completedPurchases = [];
 
   final StreamController<List<PurchaseDetails>> _purchaseStreamController =
       StreamController<List<PurchaseDetails>>.broadcast();
 
   @override
-  Stream<List<PurchaseDetails>> get purchaseStream =>
-      _purchaseStreamController.stream;
+  Stream<List<PurchaseDetails>> get purchaseStream {
+    purchaseStreamAccessCount += 1;
+    return _purchaseStreamController.stream;
+  }
 
   @override
   Future<bool> isAvailable() async => isAvailableResult;
@@ -264,6 +267,15 @@ void main() {
       expect(service.products, isNotEmpty);
     });
 
+    test('initialize is idempotent and keeps one purchase listener', () async {
+      await service.initialize();
+      await service.initialize();
+
+      expect(service.storeAvailable, isTrue);
+      expect(service.products, hasLength(6));
+      expect(fakeIap.purchaseStreamAccessCount, 1);
+    });
+
     test('marks store unavailable when isAvailable returns false', () async {
       fakeIap.isAvailableResult = false;
 
@@ -402,8 +414,7 @@ void main() {
       final errors = <String>[];
       service.errorStream.listen(errors.add);
 
-      final result =
-          await service.buyProductById(IAPProducts.proMonthly);
+      final result = await service.buyProductById(IAPProducts.proMonthly);
       expect(result, isFalse);
     });
 
@@ -431,6 +442,33 @@ void main() {
       service.errorStream.listen(errors.add);
 
       final result = await service.buyProductById('nonexistent');
+      await Future.delayed(const Duration(milliseconds: 50));
+
+      expect(result, isFalse);
+      expect(errors.any((e) => e.contains('Product not found')), isTrue);
+    });
+
+    test('buyProductById initializes products before purchasing', () async {
+      final states = <PurchaseFlowState>[];
+      service.stateStream.listen(states.add);
+
+      final result = await service.buyProductById(IAPProducts.lifetime);
+
+      expect(result, isTrue);
+      expect(service.storeAvailable, isTrue);
+      expect(service.getProduct(IAPProducts.lifetime), isNotNull);
+      expect(states, contains(PurchaseFlowState.purchasing));
+    });
+
+    test('buyProduct rejects product objects that were not loaded', () async {
+      await service.initialize();
+
+      final errors = <String>[];
+      service.errorStream.listen(errors.add);
+
+      final result =
+          await service.buyProduct(_makeProductDetails('legacy_lifetime'));
+
       expect(result, isFalse);
       expect(errors.any((e) => e.contains('Product not found')), isTrue);
     });
@@ -470,16 +508,15 @@ void main() {
       // Wait for the purchase to be processed.
       final stateCompleter = Completer<PurchaseFlowState>();
       service.stateStream.listen((state) {
-        if (state == PurchaseFlowState.success &&
-            !stateCompleter.isCompleted) {
+        if (state == PurchaseFlowState.success && !stateCompleter.isCompleted) {
           stateCompleter.complete(state);
         }
       });
 
       fakeIap.emitPurchases([purchase]);
 
-      final finalState = await stateCompleter.future
-          .timeout(const Duration(seconds: 2));
+      final finalState =
+          await stateCompleter.future.timeout(const Duration(seconds: 2));
 
       expect(finalState, PurchaseFlowState.success);
       expect(lastEntitlement, 'pro');
@@ -496,16 +533,15 @@ void main() {
 
       final stateCompleter = Completer<PurchaseFlowState>();
       service.stateStream.listen((state) {
-        if (state == PurchaseFlowState.success &&
-            !stateCompleter.isCompleted) {
+        if (state == PurchaseFlowState.success && !stateCompleter.isCompleted) {
           stateCompleter.complete(state);
         }
       });
 
       fakeIap.emitPurchases([purchase]);
 
-      final finalState = await stateCompleter.future
-          .timeout(const Duration(seconds: 2));
+      final finalState =
+          await stateCompleter.future.timeout(const Duration(seconds: 2));
 
       expect(finalState, PurchaseFlowState.success);
       expect(lastEntitlement, 'proLink');
@@ -522,16 +558,15 @@ void main() {
 
       final stateCompleter = Completer<PurchaseFlowState>();
       service.stateStream.listen((state) {
-        if (state == PurchaseFlowState.success &&
-            !stateCompleter.isCompleted) {
+        if (state == PurchaseFlowState.success && !stateCompleter.isCompleted) {
           stateCompleter.complete(state);
         }
       });
 
       fakeIap.emitPurchases([purchase]);
 
-      final finalState = await stateCompleter.future
-          .timeout(const Duration(seconds: 2));
+      final finalState =
+          await stateCompleter.future.timeout(const Duration(seconds: 2));
 
       expect(finalState, PurchaseFlowState.success);
       expect(lastEntitlement, 'proLink');
@@ -548,16 +583,15 @@ void main() {
 
       final stateCompleter = Completer<PurchaseFlowState>();
       service.stateStream.listen((state) {
-        if (state == PurchaseFlowState.success &&
-            !stateCompleter.isCompleted) {
+        if (state == PurchaseFlowState.success && !stateCompleter.isCompleted) {
           stateCompleter.complete(state);
         }
       });
 
       fakeIap.emitPurchases([purchase]);
 
-      final finalState = await stateCompleter.future
-          .timeout(const Duration(seconds: 2));
+      final finalState =
+          await stateCompleter.future.timeout(const Duration(seconds: 2));
 
       expect(finalState, PurchaseFlowState.success);
       expect(lastEntitlement, 'team');
@@ -574,16 +608,15 @@ void main() {
 
       final stateCompleter = Completer<PurchaseFlowState>();
       service.stateStream.listen((state) {
-        if (state == PurchaseFlowState.success &&
-            !stateCompleter.isCompleted) {
+        if (state == PurchaseFlowState.success && !stateCompleter.isCompleted) {
           stateCompleter.complete(state);
         }
       });
 
       fakeIap.emitPurchases([purchase]);
 
-      final finalState = await stateCompleter.future
-          .timeout(const Duration(seconds: 2));
+      final finalState =
+          await stateCompleter.future.timeout(const Duration(seconds: 2));
 
       expect(finalState, PurchaseFlowState.success);
       expect(lastEntitlement, 'pro');
@@ -600,8 +633,7 @@ void main() {
 
       final stateCompleter = Completer<void>();
       service.stateStream.listen((state) {
-        if (state == PurchaseFlowState.success &&
-            !stateCompleter.isCompleted) {
+        if (state == PurchaseFlowState.success && !stateCompleter.isCompleted) {
           stateCompleter.complete();
         }
       });
