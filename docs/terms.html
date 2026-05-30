@@ -32,7 +32,7 @@
     <p>You may not use this App for any unlawful purpose or in any way that could damage, disable, or impair the App.</p>
 
     <h2>3. Privacy &amp; Data</h2>
-    <p>Red Grid Link is offline-first. No operational data (position, session, or configuration) is transmitted to or stored on any server controlled by us or any third party. Optional release-only crash diagnostics may transmit stack traces and device model info to Sentry; PII is disabled and GPS coordinates are stripped before transmission. See the <a href="privacy.html">Privacy Policy</a> for the full disclosure.</p>
+    <p>Red Grid Link is offline-first. Red Grid does not cloud-sync operational data (position, session, or configuration) or send it to Red Grid servers; active sessions share data only with nearby Field Link peers, and exports happen only when you initiate them. Optional release-only crash diagnostics may transmit stack traces and device model info to Sentry; PII is disabled and GPS coordinates are stripped before transmission. See the <a href="privacy.html">Privacy Policy</a> for the full disclosure.</p>
     <p>Field Link peer-to-peer communication occurs directly between devices via Bluetooth Low Energy on every platform, with Apple Multipeer Connectivity (AWDL) on iOS and Google Play Services Nearby Connections on Android as a parallel transport. PIN and QR sessions wrap every payload in AES-256-GCM derived from an ECDH P-256 session key; Open mode is intentionally unencrypted for training and demos. Operational data persists locally as part of session history until you delete it; the encryption keys themselves are ephemeral and discarded on session end.</p>
 
     <h2>4. Field Link Limitations</h2>

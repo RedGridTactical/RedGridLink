@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Red Grid Tactical — Offline Navigation & Team Coordination</title>
-<meta name="description" content="Military-grade offline navigation and encrypted team coordination apps. No cell towers, no servers, no accounts. Built for SAR, hunting, and backcountry teams.">
+<meta name="description" content="Offline navigation and nearby team coordination apps. No accounts, analytics, tracking, or cloud sync. Built for SAR, hunting, and backcountry teams.">
 <meta name="keywords" content="ATAK alternative, blue force tracking, team tracker, offline map, MGRS, tactical navigation, encrypted team sync, offline GPS, SAR app, hunting app, backcountry navigation, Bluetooth team tracking, goTenna alternative">
 <meta name="author" content="Red Grid Tactical">
 <link rel="canonical" href="https://redgridtactical.com/">
@@ -12,7 +12,7 @@
 
 <!-- Open Graph -->
 <meta property="og:title" content="Red Grid Tactical — Offline Navigation & Team Coordination">
-<meta property="og:description" content="Military-grade offline navigation and encrypted team coordination apps. No cell towers, no servers, no accounts. Built for SAR, hunting, and backcountry teams.">
+<meta property="og:description" content="Offline navigation and nearby team coordination apps. No accounts, analytics, tracking, or cloud sync. Built for SAR, hunting, and backcountry teams.">
 <meta property="og:image" content="https://redgridtactical.com/images/social-preview.png">
 <meta property="og:url" content="https://redgridtactical.com/">
 <meta property="og:type" content="website">
@@ -21,7 +21,7 @@
 <!-- Twitter Card -->
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Red Grid Tactical — Offline Navigation & Team Coordination">
-<meta name="twitter:description" content="Military-grade offline navigation and encrypted team coordination apps. No cell towers, no servers, no accounts.">
+<meta name="twitter:description" content="Offline navigation and nearby team coordination apps. No accounts, analytics, tracking, or cloud sync.">
 <meta name="twitter:image" content="https://redgridtactical.com/images/social-preview.png">
 
 <!-- Structured Data: Organization -->
@@ -60,7 +60,7 @@
       "name": "Does Red Grid Link work without cell service?",
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": "Yes. Red Grid Link uses GPS satellites for positioning and Bluetooth for team sync. No cell towers, no WiFi, no internet required. Download maps ahead of time for full offline operation."
+        "text": "Yes. Red Grid Link uses GPS satellites for positioning and Bluetooth for nearby team sync, so active sessions do not need cell service or a server. Download maps ahead of time for offline map coverage."
       }
     },
     {
@@ -68,7 +68,7 @@
       "name": "What data does Red Grid Link collect?",
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": "No accounts, no analytics, no advertising networks. Operational data (sessions, markers, tracks) stays on your device until you delete it. Field Link encryption keys are ephemeral and discarded on session end. Optional release-only crash diagnostics use Sentry with PII off and GPS coordinates stripped."
+        "text": "No accounts, no analytics, no advertising networks, and no cloud sync. Operational data (sessions, markers, tracks) stays on your device until you delete it, share it with nearby peers, or export it. Field Link encryption keys are ephemeral and discarded on session end. Optional release-only crash diagnostics use Sentry with PII off and GPS coordinates stripped."
       }
     },
     {
@@ -89,10 +89,10 @@
     },
     {
       "@type": "Question",
-      "name": "When is Android coming?",
+      "name": "Is Red Grid Link on Android?",
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": "Android parity with the current iOS release is on the roadmap for v1.6. Cross-platform sessions between iPhone and Android will ship with the Android public launch."
+        "text": "Yes. Red Grid Link is available on both the App Store and Google Play. Field Link is designed for nearby team awareness and coordination across iPhone and Android."
       }
     }
   ]
@@ -154,7 +154,7 @@
   <div class="proof-strip" aria-label="Social proof">
     <div class="container">
       <span><strong>iOS + Android</strong></span>
-      <span><strong>Zero</strong> Data Collection</span>
+      <span><strong>No</strong> Analytics</span>
       <span><strong>AES-256</strong> Encrypted</span>
       <span><strong>No</strong> Accounts Required</span>
     </div>
@@ -168,7 +168,7 @@
           <img src="images/icon.png" alt="Red Grid Link icon" class="ecosystem-icon" width="64" height="64">
           <h2>Red Grid Link</h2>
           <p class="ecosystem-subtitle">Team Coordinator</p>
-          <p>BLE-based team sync with real-time position sharing, waypoint coordination, and after-action reports. PIN and QR sessions encrypt every payload with AES-256-GCM. Apple Multipeer Connectivity (iOS) and Google Play Services Nearby Connections (Android) run alongside BLE for higher-bandwidth peer transport. No cell towers, no servers.</p>
+          <p>Nearby team awareness with real-time position sharing, waypoint coordination, and after-action reports. PIN and QR sessions encrypt every Field Link payload with AES-256-GCM. Apple Multipeer Connectivity (iOS) and Google Play Services Nearby Connections (Android) run alongside BLE for higher-bandwidth peer transport. No cell towers or Red Grid servers required for active sessions.</p>
           <a href="link.html" class="btn btn-primary">Learn More</a>
           <div class="app-badges">
             <a href="https://apps.apple.com/app/id6760084718" class="btn btn-secondary">Download on App Store</a>
@@ -274,13 +274,13 @@
   <!-- PRIVACY STRIP -->
   <section class="privacy-strip fade-in" aria-label="Privacy">
     <div class="container">
-      <h2>Zero Footprint Architecture</h2>
-      <p class="privacy-subtitle">Red Grid apps collect no data. Your position never touches a server.</p>
+      <h2>Operational Privacy</h2>
+      <p class="privacy-subtitle">Red Grid apps do not use accounts, analytics, ads, or cloud sync. Operational data stays local unless you share it with nearby peers or export it.</p>
       <div class="privacy-grid">
         <div class="privacy-item">
           <div class="privacy-icon">&#128274;</div>
           <strong>AES-256-GCM</strong>
-          <span>Military-grade encryption on every packet.</span>
+          <span>PIN and QR Field Link sessions encrypt peer payloads.</span>
         </div>
         <div class="privacy-item">
           <div class="privacy-icon">&#128100;</div>
@@ -289,13 +289,13 @@
         </div>
         <div class="privacy-item">
           <div class="privacy-icon">&#128225;</div>
-          <strong>No Cloud / No Servers</strong>
-          <span>Nothing leaves your device.</span>
+          <strong>No Red Grid Cloud</strong>
+          <span>Team sessions sync peer-to-peer, not through our servers.</span>
         </div>
         <div class="privacy-item">
           <div class="privacy-icon">&#9200;</div>
-          <strong>Ephemeral Sessions</strong>
-          <span>Field Link data disappears when you disconnect.</span>
+          <strong>Local Records</strong>
+          <span>Session history, tracks, and maps stay on device until you delete them.</span>
         </div>
       </div>
     </div>

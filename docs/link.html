@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Red Grid Link — Encrypted Team Coordination Over Bluetooth</title>
-<meta name="description" content="Encrypted Bluetooth team coordination with offline MGRS maps. Track 2-8 team members, share waypoints, set boundaries. No cell towers, no servers. Free on iOS.">
+<meta name="description" content="Encrypted nearby team coordination with offline MGRS maps. Track 2-8 team members, share waypoints, set boundaries. No Red Grid servers for active sessions. Available on iOS and Android.">
 <meta name="keywords" content="ATAK alternative, blue force tracking, team tracker, offline map, MGRS, tactical navigation, encrypted team sync, offline GPS, SAR app, hunting app, backcountry navigation, Bluetooth team tracking, goTenna alternative, Field Link, ghost markers">
 <meta name="author" content="Red Grid Tactical">
 <link rel="canonical" href="https://redgridtactical.com/link.html">
@@ -12,7 +12,7 @@
 
 <!-- Open Graph -->
 <meta property="og:title" content="Red Grid Link — Encrypted Team Coordination Over Bluetooth">
-<meta property="og:description" content="Encrypted Bluetooth team coordination with offline MGRS maps. Track 2-8 team members, share waypoints, set boundaries. No cell towers, no servers.">
+<meta property="og:description" content="Encrypted nearby team coordination with offline MGRS maps. Track 2-8 team members, share waypoints, set boundaries. Available on iOS and Android.">
 <meta property="og:image" content="https://redgridtactical.com/images/social-preview.png">
 <meta property="og:url" content="https://redgridtactical.com/link.html">
 <meta property="og:type" content="website">
@@ -21,7 +21,7 @@
 <!-- Twitter Card -->
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Red Grid Link — Encrypted Team Coordination Over Bluetooth">
-<meta name="twitter:description" content="Encrypted Bluetooth team coordination with offline MGRS maps. Track 2-8 team members, share waypoints, set boundaries. No cell towers, no servers.">
+<meta name="twitter:description" content="Encrypted nearby team coordination with offline MGRS maps. Track 2-8 team members, share waypoints, set boundaries. Available on iOS and Android.">
 <meta name="twitter:image" content="https://redgridtactical.com/images/social-preview.png">
 
 <!-- Structured Data: MobileApplication -->
@@ -38,7 +38,7 @@
     "priceCurrency": "USD"
   },
   "softwareVersion": "1.5.4",
-  "description": "Encrypted Bluetooth team coordination with offline MGRS maps. Track 2-8 team members, share waypoints, set boundaries. No cell towers, no servers, no accounts.",
+  "description": "Encrypted nearby team coordination with offline MGRS maps. Track 2-8 team members, share waypoints, set boundaries. Available on iOS and Android with no Red Grid servers for active sessions.",
   "screenshot": "https://redgridtactical.com/images/appstore_1_map_team.png",
   "url": "https://redgridtactical.com/link.html",
   "downloadUrl": [
@@ -72,7 +72,7 @@
       "name": "Does it work without cell service?",
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": "Yes. Red Grid Link uses GPS satellites for positioning and Bluetooth for team sync. No cell towers, no WiFi, no internet required. Download maps ahead of time for full offline operation."
+        "text": "Yes. Red Grid Link uses GPS satellites for positioning and Bluetooth for nearby team sync, so active sessions do not need cell service or a server. Download maps ahead of time for offline map coverage."
       }
     },
     {
@@ -80,7 +80,7 @@
       "name": "What data do you collect?",
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": "No accounts, no analytics, no advertising networks. Operational data (sessions, markers, tracks) stays on your device until you delete it. Field Link encryption keys are ephemeral and discarded on session end. Optional release-only crash diagnostics use Sentry with PII off and GPS coordinates stripped."
+        "text": "No accounts, no analytics, no advertising networks, and no cloud sync. Operational data (sessions, markers, tracks) stays on your device until you delete it, share it with nearby peers, or export it. Field Link encryption keys are ephemeral and discarded on session end. Optional release-only crash diagnostics use Sentry with PII off and GPS coordinates stripped."
       }
     },
     {
@@ -101,10 +101,10 @@
     },
     {
       "@type": "Question",
-      "name": "When is Android coming?",
+      "name": "Is Red Grid Link on Android?",
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": "Android parity with the current iOS release is on the roadmap for v1.6. Cross-platform sessions between iPhone and Android will ship with the Android public launch."
+        "text": "Yes. Red Grid Link is available on both the App Store and Google Play. Field Link is designed for nearby team awareness and coordination across iPhone and Android."
       }
     },
     {
@@ -112,7 +112,7 @@
       "name": "How far does Bluetooth reach?",
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": "Standard BLE range is 100-300 meters. With BLE Long Range (Coded PHY), supported devices reach 400m-1km in open terrain. The app negotiates Long Range automatically."
+        "text": "Bluetooth range depends on device hardware, terrain, body position, antenna orientation, and interference. BLE Long Range / Coded PHY can improve links on supported devices, but it is not a guaranteed distance. For longer-distance team awareness, use mesh or radio workflows such as Meshtastic when available."
       }
     },
     {
@@ -171,7 +171,7 @@
       <img src="images/icon.png" alt="Red Grid Link app icon" width="80" height="80" style="border-radius: 18px; margin-bottom: 24px;">
       <h1><span class="accent">Red Grid</span> Link</h1>
       <span class="badge badge-red" style="margin-bottom: 16px;">V1.5 — Secure Coordination</span>
-      <p class="pitch">Encrypted team coordination over Bluetooth. No cell towers. No servers. No accounts.</p>
+      <p class="pitch">Encrypted nearby team awareness and coordination over Bluetooth. No cell towers. No Red Grid servers. No accounts.</p>
       <div class="cta-row">
         <a href="https://apps.apple.com/app/id6760084718" class="btn btn-primary btn-lg">Download on App Store</a>
         <a href="https://play.google.com/store/apps/details?id=com.redgrid.red_grid_link" class="btn btn-primary btn-lg">Get it on Google Play</a>
@@ -204,7 +204,7 @@
       <div class="grid-3">
         <div class="card">
           <h3>Field Link — Encrypted Team Sync</h3>
-          <p>Auto-discover teammates via BLE on every platform with Apple Multipeer Connectivity (AWDL) on iOS and Google Play Services Nearby Connections on Android. PIN and QR sessions wrap every payload in AES-256-GCM with ECDH P-256 session keys; Open mode auto-joins for training and demos. No servers, no pairing, no configuration. Sync positions with 2-8 team members in real time.</p>
+          <p>Auto-discover teammates via BLE on every platform with Apple Multipeer Connectivity (AWDL) on iOS and Google Play Services Nearby Connections on Android. PIN and QR sessions wrap every payload in AES-256-GCM with ECDH P-256 session keys; Open mode auto-joins for training and demos. No Red Grid servers, no pairing, no configuration. Sync positions with 2-8 team members in real time.</p>
         </div>
         <div class="card">
           <h3>Offline MGRS Maps</h3>
@@ -249,7 +249,7 @@
         </div>
         <div class="card">
           <h3>Extended Range</h3>
-          <p>BLE Coded PHY now actually negotiated after connection. Signal quality bars for each teammate. Range warnings when signal weakens.</p>
+          <p>BLE Coded PHY / LR status is detected and shown when supported and confirmed. Signal quality bars for each teammate. Range warnings when signal weakens.</p>
         </div>
       </div>
     </div>
@@ -425,7 +425,7 @@
       </div>
       <div style="text-align: center; margin-top: 48px; padding: 32px; border: 1px solid var(--border); border-radius: var(--radius-md); background: var(--bg-tertiary);">
         <h3 style="margin-bottom: 8px;">Enterprise &amp; Teams</h3>
-        <p style="color: var(--text-secondary); margin-bottom: 16px;">Need multi-seat licensing, source access, or priority support for your organization?</p>
+        <p style="color: var(--text-secondary); margin-bottom: 16px;">Need multi-seat licensing, custom integrations, or priority support for your organization?</p>
         <a href="https://redgridtactical.com/#contact" class="btn btn-primary">Contact Us</a>
       </div>
     </div>
@@ -438,15 +438,15 @@
       <div style="max-width: 800px; margin: 0 auto;">
         <details class="faq-item">
           <summary>How does Field Link work?</summary>
-          <p>Field Link uses Bluetooth Low Energy on every platform with Apple Multipeer Connectivity (AWDL) on iOS and Google Play Services Nearby Connections on Android as a parallel higher-bandwidth transport. PIN and QR sessions wrap every payload in AES-256-GCM derived from an ECDH P-256 session key; Open mode auto-joins without encryption for training, demos, and trusted environments. Session keys are derived per session and discarded on session end. All data syncs peer-to-peer with no servers involved.</p>
+          <p>Field Link uses Bluetooth Low Energy on every platform with Apple Multipeer Connectivity (AWDL) on iOS and Google Play Services Nearby Connections on Android as a parallel higher-bandwidth transport. PIN and QR sessions wrap every payload in AES-256-GCM derived from an ECDH P-256 session key; Open mode auto-joins without encryption for training, demos, and trusted environments. Session keys are derived per session and discarded on session end. Active session data syncs peer-to-peer with no Red Grid server relay.</p>
         </details>
         <details class="faq-item">
           <summary>Does it work without cell service?</summary>
-          <p>Yes. Red Grid Link uses GPS satellites for positioning and Bluetooth for team sync. No cell towers, no WiFi, no internet connection required. Download your map regions over WiFi before heading out and you have full offline operation with MGRS grid overlay, all 11 tools, and team coordination.</p>
+          <p>Yes. Red Grid Link uses GPS satellites for positioning and Bluetooth for nearby team sync, so active sessions do not need cell service or a Red Grid server. Download your map regions over WiFi before heading out and you have offline map coverage with MGRS grid overlay, all 11 tools, and team coordination.</p>
         </details>
         <details class="faq-item">
           <summary>What data do you collect?</summary>
-          <p>No accounts, no analytics, no advertising networks. Operational data (sessions, markers, tracks) stays on your device until you delete it. Field Link encryption keys are ephemeral and discarded on session end; the data they protected persists locally. Optional release-only crash diagnostics use Sentry with PII off and GPS coordinates stripped — opt out by using a build compiled without a Sentry DSN. We have no servers to store operational data on.</p>
+          <p>No accounts, no analytics, no advertising networks. Operational data (sessions, markers, tracks) stays on your device until you delete it, share it with nearby Field Link peers, or export it yourself. Field Link encryption keys are ephemeral and discarded on session end; the data they protected persists locally. Optional release-only crash diagnostics use Sentry with PII off and GPS coordinates stripped. We have no Red Grid servers to store operational data on.</p>
         </details>
         <details class="faq-item">
           <summary>How is this different from ATAK?</summary>
@@ -457,12 +457,12 @@
           <p>Absolutely. Hunting mode adapts the UI with hunting-specific terminology, icons, and quick actions. Track every member of your hunting party on the map, share stand locations, mark game trails, and coordinate without radio chatter. All over encrypted Bluetooth.</p>
         </details>
         <details class="faq-item">
-          <summary>When is Android coming?</summary>
-          <p>Android parity with the current iOS release is on the roadmap for v1.6. Cross-platform sessions (iPhone talking to Android) are a core part of Field Link's design and will ship with the Android public launch.</p>
+          <summary>Is Red Grid Link on Android?</summary>
+          <p>Yes. Red Grid Link is available on both the App Store and Google Play. Field Link is designed for nearby team awareness and coordination across iPhone and Android.</p>
         </details>
         <details class="faq-item">
           <summary>How far does Bluetooth reach?</summary>
-          <p>Standard BLE range is 100-300 meters depending on terrain and device hardware. With BLE Long Range (Coded PHY), supported devices can reach 400 meters to 1 kilometer in open terrain. The app automatically negotiates Long Range when both devices support it and shows an "LR" badge on the connection.</p>
+          <p>Bluetooth range depends on device hardware, terrain, vegetation, body position, antenna orientation, and interference. BLE Long Range / Coded PHY can improve links on supported devices, and the app shows an "LR" badge when that connection state is confirmed, but it is not a guaranteed distance. For longer-distance team awareness, use mesh or radio workflows such as Meshtastic when available.</p>
         </details>
         <details class="faq-item">
           <summary>What are Ghost Markers?</summary>

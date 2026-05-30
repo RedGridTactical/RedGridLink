@@ -27,7 +27,7 @@
     <p class="updated">Last updated: May 2026</p>
 
     <h2>1. Overview</h2>
-    <p>Red Grid Link ("the App") is built with a privacy-first, offline-first architecture. We do not collect, transmit, or store any personal data on external servers. Your location data, session history, waypoints, and configuration remain entirely on your device.</p>
+    <p>Red Grid Link ("the App") is built with a privacy-first, offline-first architecture. We do not run accounts, analytics, advertising, or cloud sync for operational data. Your location data, session history, waypoints, and configuration remain on your device unless you intentionally share session data with nearby Field Link peers.</p>
 
     <h2>2. Data We Do Not Collect</h2>
     <p>We do not collect:</p>
@@ -41,12 +41,12 @@
     <p>The App has no user accounts, no login, and no cloud sync.</p>
 
     <h2>3. Field Link Peer-to-Peer Data</h2>
-    <p>When you use the Field Link feature, position, marker, and annotation data is shared directly between nearby devices via Bluetooth Low Energy. On iOS, Apple Multipeer Connectivity (AWDL) runs in parallel as a higher-bandwidth secondary transport so peers stay discoverable when the app is backgrounded. Android currently uses BLE only with Google Play Services Nearby Connections as a parallel transport when available; Wi-Fi Direct is a roadmap item.</p>
+    <p>When you use the Field Link feature, position, marker, and annotation data is shared directly between nearby devices via Bluetooth Low Energy. On iOS, Apple Multipeer Connectivity (AWDL) runs in parallel as a higher-bandwidth secondary transport so peers stay discoverable when the app is backgrounded. On Android, Google Play Services Nearby Connections runs in parallel where available; BLE remains the fallback transport.</p>
     <ul>
       <li>In <strong>PIN</strong> and <strong>QR</strong> sessions, payloads are encrypted with AES-256-GCM using session keys derived from an ECDH P-256 key exchange between paired peers</li>
       <li>In <strong>Open</strong> sessions (auto-join, no PIN/QR), payloads are not encrypted; this mode is intended for training, demos, and trusted environments</li>
       <li>Travels only between devices in the same session</li>
-      <li>Is never sent to any server</li>
+      <li>Is never sent to a Red Grid server</li>
       <li>Persists locally on your device as part of session history, saved markers, and tracks until you delete it; the encryption keys themselves are ephemeral and discarded on session end</li>
     </ul>
 
