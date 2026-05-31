@@ -1,7 +1,7 @@
 name: red_grid_link
 description: Offline-first MGRS-native proximity coordination platform
 publish_to: 'none'
-version: 1.6.0+321
+version: 1.6.0+322
 
 environment:
   sdk: '>=3.2.0 <4.0.0'
@@ -31,7 +31,7 @@ dependencies:
   printing: ^5.12.0
   in_app_purchase: ^3.1.13
   qr_flutter: ^4.1.0
-  mobile_scanner: ^5.0.0
+  mobile_scanner: ^7.0.0
   flutter_tts: ^4.2.0
   pointycastle: ^3.7.4
   uuid: ^4.3.3
