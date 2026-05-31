@@ -164,11 +164,22 @@
           </ul>
         </div>
 
-        <div class="timeline-item current">
-          <div class="timeline-version">V1.6 — Field Reliability + Meshtastic MVP</div>
+        <div class="timeline-item completed">
+          <div class="timeline-version">V1.6 — Field Readiness Preflight</div>
           <div class="timeline-date">Q2 2026</div>
           <ul class="timeline-features">
-            <li><strong>Field Readiness Preflight</strong>: one-tap pre-mission check that confirms downloaded AO map coverage, GPS permission, background location, Bluetooth, local network, notifications, battery mode, storage, encryption mode, team roster, and last successful peer test. Each teammate shows as Ready / Partial / Not Ready, and the readiness snapshot lands in the AAR</li>
+            <li><strong>Field Readiness Preflight</strong>: one-tap pre-mission check with a single READY / CAUTION / NOT READY verdict across GPS permission, GPS fix accuracy, Bluetooth, offline map coverage, encryption mode, team roster, last successful peer contact, and battery</li>
+            <li><strong>One-tap fixes</strong>: grant location or jump straight to the offline-map download for items that can be fixed in-app; OS-level items link out with clear guidance</li>
+            <li><strong>Whole-team readiness board</strong>: each teammate broadcasts their readiness over the Field Link control channel and shows as Ready / Caution / Not Ready, so the Lead sees who's good before stepping off (Pro+Link and Team)</li>
+            <li><strong>Step-off snapshot in the AAR</strong>: the team's readiness at session start is captured and rendered as a page in the After-Action Report PDF (Pro)</li>
+            <li>Review prompt now fires only after a session that actually linked a teammate</li>
+          </ul>
+        </div>
+
+        <div class="timeline-item current">
+          <div class="timeline-version">V1.7 — Field Reliability + Meshtastic MVP</div>
+          <div class="timeline-date">Summer 2026</div>
+          <ul class="timeline-features">
             <li><strong>Mission Packets</strong> (extending session templates): operational mode, roster roles, security mode, check-in cadence, rally point, boundaries/sectors, required map region, quick messages, and AAR schema in one shareable bundle. Templates for SAR Hasty Search, Training Lane, Hunting Party, Guide Trip, Event Safety, Family Hike. Share by QR, local file, AirDrop / Nearby Share, or Field Link</li>
             <li><strong>Map Health</strong>: per-teammate AO coverage, missing zooms, stale layers, storage impact, attribution, and a "will work offline" status. Lead can see whether teammates have the same AO downloaded</li>
             <li><strong>Licensed offline tile provider</strong>: provider abstraction supporting demo OSM, licensed offline providers, self-hosted PMTiles / vector tiles, and USGS where allowed. Replaces the public-tile fallback for paid users</li>

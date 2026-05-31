@@ -1,15 +1,15 @@
 # Red Grid Link — Product Roadmap
 
-> **Platform:** iOS on the App Store. Android in closed beta (Play Store).
+> **Platform:** iOS on the App Store and Android on Google Play.
 > **Mission:** The fastest way to get a team on a shared map without infrastructure.
 
 ## V1.4 — Extended Range (COMPLETE)
 
 **Status: Complete** — App v1.4.0+63
 
-BLE Long Range, signal quality, FixPhrase location encoding, OSM offline tiles.
+BLE Long Range / Coded PHY support detection, signal quality, FixPhrase location encoding, OSM offline tiles.
 
-- [x] BLE Long Range capability detection (Coded PHY)
+- [x] BLE Long Range / Coded PHY capability detection on supported hardware
 - [x] Connection quality indicator (RSSI-based, rolling 5-sample average)
 - [x] FixPhrase: 4-word location encoding (~11m accuracy, order-independent)
 - [x] OpenStreetMap offline tile downloads (source selector)
@@ -35,9 +35,24 @@ Real ECDH key exchange, actual Coded PHY negotiation, emergency beacon, tactical
 
 ---
 
-## V1.6 — Meshtastic Bridge + Android Launch
+## V1.6 — Field Readiness Preflight (COMPLETE)
 
-**Target: May-June 2026** — Range multiplier + Android production
+**Status: Complete** — App v1.6.0+321
+
+One-tap, pre-mission "is the team ready?" check that confirms every prerequisite before a team steps off coverage, plus a whole-team readiness board and a step-off snapshot in the After-Action Report.
+
+- [x] Field Readiness Preflight: single READY / CAUTION / NOT READY verdict across GPS permission, GPS fix accuracy, Bluetooth, offline maps, encryption mode, team roster, last peer contact, and battery
+- [x] One-tap in-app fixes where possible (grant location, jump to map download); OS-level items link out with guidance
+- [x] Whole-team readiness board — each teammate broadcasts their status over the Field Link control channel and shows as Ready / Caution / Not Ready (Pro+Link and Team)
+- [x] Step-off readiness snapshot captured at session start and rendered as a page in the AAR PDF (Pro)
+- [x] Review prompt now fires only after a session that actually linked a teammate
+- [x] 1,167 tests, 0 warnings
+
+---
+
+## V1.7 — Meshtastic Bridge + Field Reliability
+
+**Target: Summer 2026** — Range multiplier + post-launch cross-platform reliability
 
 ### Meshtastic Bridge
 - [ ] Meshtastic BLE bridge via `meshtastic_flutter` pub.dev package
@@ -47,11 +62,10 @@ Real ECDH key exchange, actual Coded PHY negotiation, emergency beacon, tactical
 - [ ] LoRa-relayed peers shown with mesh icon (distinct from BLE peers)
 - [ ] Fallback: BLE direct when no radio, LoRa when available
 
-### Android Launch + Distribution
+### Android + Distribution
 - [ ] Convert Apple ASC to organization account (Estus Holdings LLC, D-U-N-S pending)
-- [ ] Create Google Play organization account
-- [ ] Promote Android to production track on Play Store
-- [ ] Android QA on physical devices (Pixel, Samsung, OnePlus minimum)
+- [x] Publish Android on Google Play
+- [ ] Continue Android QA on physical devices (Pixel, Samsung, OnePlus minimum)
 - [ ] F-Droid submission (Firebase-free build flavor, FLOSS-compliant)
 - [ ] BetaList submission + Product Hunt launch
 - [ ] Session templates (SAR Hasty Search, Hunting Party, Family Hike, Training Exercise)
@@ -210,7 +224,7 @@ Real ECDH key exchange, actual Coded PHY negotiation, emergency beacon, tactical
 | Competitor | Their Strength | Our Advantage |
 |---|---|---|
 | ATAK | Feature depth, military standard | Zero setup, cross-platform, no server |
-| Meshtastic | Multi-km LoRa range | No hardware required (bridge for upgrade) |
+| Meshtastic | Multi-km LoRa range | Phone-only direct mode, optional radio bridge when longer range matters |
 | MeshCore SAR | Messaging + voice + tracking | Phone-only, no hardware purchase |
 | goTenna Pro X | Professional mesh comms | $0 vs $849/device |
 | Garmin inReach | Satellite coverage | Team tracking vs point-to-point |
