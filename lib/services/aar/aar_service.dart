@@ -8,6 +8,7 @@ import 'package:red_grid_link/data/repositories/marker_repository.dart';
 import 'package:red_grid_link/data/repositories/peer_repository.dart';
 import 'package:red_grid_link/data/repositories/session_repository.dart';
 import 'package:red_grid_link/data/repositories/track_repository.dart';
+import 'package:red_grid_link/services/field_link/preflight/preflight_report.dart';
 
 /// AAR (After-Action Report) compilation service.
 ///
@@ -38,7 +39,14 @@ class AarService {
   /// track points into a single [AarData] snapshot.
   ///
   /// Throws [ArgumentError] if the session is not found.
-  Future<AarData> compileAar(String sessionId) async {
+  ///
+  /// [preflightSnapshot] is the optional Field Readiness report captured at
+  /// step-off (session start); when provided it is embedded in the AAR and
+  /// rendered as the step-off readiness page.
+  Future<AarData> compileAar(
+    String sessionId, {
+    PreflightReport? preflightSnapshot,
+  }) async {
     final session = await _sessionRepo.getSessionById(sessionId);
     if (session == null) {
       throw ArgumentError('Session not found: $sessionId');
@@ -63,6 +71,7 @@ class AarService {
       markers: markers,
       trackPoints: trackPoints,
       annotations: annotations,
+      preflightSnapshot: preflightSnapshot,
     );
   }
 

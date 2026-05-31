@@ -1,7 +1,7 @@
 name: red_grid_link
 description: Offline-first MGRS-native proximity coordination platform
 publish_to: 'none'
-version: 1.5.6+320
+version: 1.6.0+321
 
 environment:
   sdk: '>=3.2.0 <4.0.0'

@@ -5,6 +5,7 @@ import 'package:red_grid_link/l10n/app_localizations.dart';
 
 import 'core/theme/app_theme.dart';
 import 'providers/field_link_provider.dart';
+import 'providers/preflight_provider.dart';
 import 'providers/settings_provider.dart';
 import 'providers/theme_provider.dart';
 import 'ui/screens/home/home_screen.dart';
@@ -30,6 +31,8 @@ class RedGridLinkApp extends ConsumerWidget {
     // This runs regardless of which tab is visible — critical for peer
     // visibility. Without it, positions only update on the MAP tab.
     ref.watch(positionSyncProvider);
+    // Wire Field Readiness preflight broadcast + inbound team board updates.
+    ref.watch(preflightWiringProvider);
 
     return MaterialApp(
       title: 'Red Grid Link',

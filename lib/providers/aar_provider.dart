@@ -6,6 +6,7 @@ import 'package:red_grid_link/data/repositories/marker_repository.dart';
 import 'package:red_grid_link/data/repositories/peer_repository.dart';
 import 'package:red_grid_link/data/repositories/session_repository.dart';
 import 'package:red_grid_link/providers/location_provider.dart';
+import 'package:red_grid_link/providers/preflight_provider.dart';
 import 'package:red_grid_link/services/aar/aar_service.dart';
 import 'package:red_grid_link/services/aar/export_service.dart';
 import 'package:red_grid_link/services/aar/pdf_generator.dart';
@@ -103,7 +104,9 @@ final exportServiceProvider = Provider<ExportService>((ref) {
 final sessionAarProvider =
     FutureProvider.family<AarData, String>((ref, sessionId) async {
   final aarService = ref.watch(aarServiceProvider);
-  return aarService.compileAar(sessionId);
+  final snapshot =
+      ref.watch(preflightSnapshotStoreProvider).forSession(sessionId);
+  return aarService.compileAar(sessionId, preflightSnapshot: snapshot);
 });
 
 // ---------------------------------------------------------------------------

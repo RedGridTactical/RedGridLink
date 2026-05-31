@@ -4,6 +4,7 @@ import 'package:red_grid_link/data/models/marker.dart';
 import 'package:red_grid_link/data/models/operational_mode.dart';
 import 'package:red_grid_link/data/models/peer.dart';
 import 'package:red_grid_link/data/models/track_point.dart';
+import 'package:red_grid_link/services/field_link/preflight/preflight_report.dart';
 
 /// After-Action Report data — captures a complete session snapshot
 /// for export and post-mission review.
@@ -21,6 +22,11 @@ class AarData {
   final Annotation? boundary;
   final List<BoundaryEvent> boundaryEvents;
 
+  /// The local device's Field Readiness preflight captured at step-off
+  /// (session start), or null if none was recorded. Rendered as the
+  /// "STEP-OFF READINESS" page in the exported PDF.
+  final PreflightReport? preflightSnapshot;
+
   const AarData({
     required this.sessionId,
     required this.sessionName,
@@ -34,6 +40,7 @@ class AarData {
     this.notes,
     this.boundary,
     this.boundaryEvents = const [],
+    this.preflightSnapshot,
   });
 
   /// Duration of the session
@@ -61,6 +68,7 @@ class AarData {
     'notes': notes,
     if (boundary != null) 'boundary': boundary!.toJson(),
     'boundaryEvents': boundaryEvents.map((e) => e.toJson()).toList(),
+    if (preflightSnapshot != null) 'preflight': preflightSnapshot!.toJson(),
   };
 
   factory AarData.fromJson(Map<String, dynamic> json) => AarData(
@@ -96,6 +104,9 @@ class AarData {
             ?.map((e) => BoundaryEvent.fromJson(e as Map<String, dynamic>))
             .toList() ??
         const [],
+    preflightSnapshot: json['preflight'] != null
+        ? PreflightReport.fromJson(json['preflight'] as Map<String, dynamic>)
+        : null,
   );
 
   AarData copyWith({
@@ -111,6 +122,7 @@ class AarData {
     String? notes,
     Annotation? boundary,
     List<BoundaryEvent>? boundaryEvents,
+    PreflightReport? preflightSnapshot,
   }) =>
       AarData(
         sessionId: sessionId ?? this.sessionId,
@@ -125,5 +137,6 @@ class AarData {
         notes: notes ?? this.notes,
         boundary: boundary ?? this.boundary,
         boundaryEvents: boundaryEvents ?? this.boundaryEvents,
+        preflightSnapshot: preflightSnapshot ?? this.preflightSnapshot,
       );
 }

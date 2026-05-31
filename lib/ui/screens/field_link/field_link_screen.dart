@@ -13,10 +13,22 @@ import '../../common/widgets/tactical_button.dart';
 import '../session/session_history_screen.dart';
 import 'widgets/ghost_list.dart';
 import 'widgets/peer_list.dart';
+import 'widgets/preflight_sheet.dart';
 import 'widgets/session_create_card.dart';
 import 'widgets/session_info_card.dart';
 import 'widgets/session_join_card.dart';
 import 'widgets/sync_status_bar.dart';
+
+/// Opens the Field Readiness Preflight bottom sheet.
+void _showPreflightSheet(BuildContext context) {
+  tapMedium();
+  showModalBottomSheet<void>(
+    context: context,
+    backgroundColor: Colors.transparent,
+    isScrollControlled: true,
+    builder: (_) => const PreflightSheet(),
+  );
+}
 
 /// Main Field Link tab screen.
 ///
@@ -131,6 +143,13 @@ class _NoSessionView extends ConsumerWidget {
           const SessionJoinCard(),
           const SizedBox(height: 16),
           TacticalButton(
+            label: 'Field Readiness',
+            icon: Icons.checklist,
+            colors: colors,
+            onPressed: () => _showPreflightSheet(context),
+          ),
+          const SizedBox(height: 12),
+          TacticalButton(
             label: 'Session History',
             icon: Icons.history,
             colors: colors,
@@ -182,6 +201,17 @@ class _ActiveSessionView extends ConsumerWidget {
           ),
         ),
 
+        // Field readiness preflight (pinned, secondary action)
+        Padding(
+          padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
+          child: TacticalButton(
+            label: 'Field Readiness',
+            icon: Icons.checklist,
+            colors: colors,
+            onPressed: () => _showPreflightSheet(context),
+          ),
+        ),
+
         // Leave session button (pinned at bottom)
         Padding(
           padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
@@ -215,11 +245,15 @@ class _ActiveSessionView extends ConsumerWidget {
 
     if (confirmed) {
       tapHeavy();
+      // Capture whether this was a real multi-device session before we
+      // disconnect — we only ask for a review after a session that actually
+      // linked up with at least one teammate.
+      final hadPeers = ref.read(connectedPeerCountProvider) > 0;
       final service = ref.read(fieldLinkServiceProvider);
       await service.leaveSession();
-      // Prompt for review after first completed session.
-      final reviewService = ref.read(reviewServiceProvider);
-      await reviewService.maybePromptReview();
+      if (hadPeers) {
+        await ref.read(reviewServiceProvider).maybePromptReview();
+      }
     }
   }
 }

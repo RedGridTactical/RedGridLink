@@ -9,6 +9,7 @@ import 'package:red_grid_link/data/models/aar_data.dart';
 import 'package:red_grid_link/data/models/operational_mode.dart';
 import 'package:red_grid_link/data/models/track_point.dart';
 import 'package:red_grid_link/services/aar/aar_service.dart';
+import 'package:red_grid_link/services/field_link/preflight/preflight_report.dart';
 
 /// Generates a tactical-styled PDF report from [AarData].
 ///
@@ -75,6 +76,11 @@ class PdfGenerator {
     // Boundary events (only if boundary was set)
     if (aar.boundary != null || aar.boundaryEvents.isNotEmpty) {
       pdf.addPage(_buildBoundaryEventsPage(aar, mono, monoBold));
+    }
+
+    // Step-off readiness snapshot (only if captured at session start)
+    if (aar.preflightSnapshot != null) {
+      pdf.addPage(_buildReadinessPage(aar, mono, monoBold));
     }
 
     return pdf.save();
@@ -934,6 +940,100 @@ class PdfGenerator {
         );
       },
     );
+  }
+
+  // ---------------------------------------------------------------------------
+  // Step-off readiness page
+  // ---------------------------------------------------------------------------
+
+  pw.Page _buildReadinessPage(AarData aar, pw.Font mono, pw.Font monoBold) {
+    final report = aar.preflightSnapshot!;
+
+    return pw.Page(
+      pageFormat: PdfPageFormat.letter,
+      margin: const pw.EdgeInsets.all(40),
+      build: (context) {
+        return pw.Container(
+          decoration: pw.BoxDecoration(
+            color: _bgColor,
+            border: pw.Border.all(color: _borderColor, width: 1),
+          ),
+          padding: const pw.EdgeInsets.all(30),
+          child: pw.Column(
+            crossAxisAlignment: pw.CrossAxisAlignment.start,
+            children: [
+              _pageHeader('STEP-OFF READINESS', mono, monoBold),
+              pw.SizedBox(height: 16),
+
+              _labelValue(
+                'OVERALL',
+                _readinessStatusText(report.overall),
+                mono,
+                monoBold,
+              ),
+              pw.SizedBox(height: 4),
+              _labelValue(
+                'CAPTURED',
+                AarService.formatTacticalTimestamp(aar.startTime),
+                mono,
+                monoBold,
+              ),
+
+              pw.SizedBox(height: 16),
+              pw.Divider(color: _borderColor, thickness: 1),
+              pw.SizedBox(height: 12),
+
+              pw.TableHelper.fromTextArray(
+                border: pw.TableBorder.all(color: _borderColor, width: 0.5),
+                headerStyle: pw.TextStyle(
+                  font: monoBold,
+                  fontSize: 9,
+                  color: _accentColor,
+                ),
+                headerDecoration: const pw.BoxDecoration(color: _headerBg),
+                cellStyle:
+                    pw.TextStyle(font: mono, fontSize: 9, color: _textColor),
+                cellDecoration: (index, data, rowNum) =>
+                    pw.BoxDecoration(color: rowNum.isOdd ? _headerBg : _bgColor),
+                cellPadding:
+                    const pw.EdgeInsets.symmetric(horizontal: 6, vertical: 4),
+                columnWidths: {
+                  0: const pw.FlexColumnWidth(2),
+                  1: const pw.FlexColumnWidth(1.4),
+                  2: const pw.FlexColumnWidth(3),
+                },
+                headers: ['CHECK', 'STATUS', 'DETAIL'],
+                data: report.checks
+                    .map((c) => [
+                          c.label.toUpperCase(),
+                          _readinessStatusText(c.status),
+                          c.detail.isEmpty ? '-' : c.detail,
+                        ])
+                    .toList(),
+              ),
+
+              pw.SizedBox(height: 12),
+              pw.Text(
+                'Readiness captured at session start; reflects the recording '
+                'device only.',
+                style: pw.TextStyle(font: mono, fontSize: 8, color: _dimColor),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  String _readinessStatusText(PreflightStatus s) {
+    switch (s) {
+      case PreflightStatus.ready:
+        return 'READY';
+      case PreflightStatus.caution:
+        return 'CAUTION';
+      case PreflightStatus.notReady:
+        return 'NOT READY';
+    }
   }
 
   // ---------------------------------------------------------------------------

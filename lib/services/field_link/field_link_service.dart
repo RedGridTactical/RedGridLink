@@ -22,6 +22,7 @@ import 'package:red_grid_link/services/field_link/emergency_beacon_service.dart'
 import 'package:red_grid_link/services/field_link/ghost/ghost_manager.dart';
 import 'package:red_grid_link/services/field_link/message_service.dart';
 import 'package:red_grid_link/services/field_link/platform/foreground_service.dart';
+import 'package:red_grid_link/services/field_link/preflight/preflight_report.dart';
 import 'package:red_grid_link/services/field_link/role_manager.dart';
 import 'package:red_grid_link/services/field_link/security/key_exchange_manager.dart';
 import 'package:red_grid_link/services/field_link/sync/crdt/crdt_state.dart';
@@ -125,6 +126,11 @@ class FieldLinkService {
   /// received or cancelled). Set by the provider layer to feed
   /// [emergencyActiveProvider].
   void Function(bool active)? onEmergencyStateChanged;
+
+  /// Callback invoked when a teammate broadcasts their Field Readiness
+  /// preflight status. Set by the provider layer to populate the team
+  /// readiness board (Pro/Team tiers).
+  void Function(PreflightReport report)? onTeammatePreflight;
 
   FieldLinkService({
     required TransportService transport,
@@ -841,8 +847,16 @@ class FieldLinkService {
   /// Human-readable battery projection string.
   String get batteryProjection => _batteryManager.projectedRemainingTime;
 
+  /// Current battery level (0-100), or null if unknown. Surfaced for the
+  /// Field Readiness Preflight check.
+  int? get batteryLevel => _batteryManager.currentBatteryLevel;
+
   /// Stream of battery mode changes.
   Stream<BatteryMode> get batteryModeStream => _batteryManager.modeStream;
+
+  /// Live transport (BLE) state, surfaced read-only for the Field Readiness
+  /// Preflight Bluetooth check.
+  TransportState get transportState => _transport.currentState;
 
   // ---------------------------------------------------------------------------
   // Status
@@ -1098,12 +1112,29 @@ class FieldLinkService {
     });
   }
 
+  /// Broadcast the local device's Field Readiness preflight status to all
+  /// connected peers so they can populate their team readiness board.
+  ///
+  /// No-op when there is no active session. Only the compact status vector
+  /// (check id + status) and the local callsign travel over the wire —
+  /// labels and detail strings are reconstructed by each receiver.
+  void broadcastPreflight(PreflightReport report) {
+    if (_activeSession == null) return;
+    final cs = _roleManager.callsign;
+    _syncEngine.broadcastControl({
+      'evt': 'preflight_status',
+      ...report.toWire(),
+      if (cs.isNotEmpty) 'cs': cs,
+    });
+  }
+
   /// Handle an incoming control message from the sync engine.
   ///
   /// Dispatches to the appropriate handler based on the `evt` field:
   /// - `key_exchange`: ECDH public key from a peer
   /// - `role_assign`, `callsign_update`: forwarded to [RoleManager]
   /// - `boundary_exit`: boundary crossing notification
+  /// - `preflight_status`: teammate Field Readiness report
   void _onControlMessage(ControlMessage event) {
     final evt = event.data['evt'] as String?;
 
@@ -1159,6 +1190,13 @@ class FieldLinkService {
         break;
       case 'join_response':
         _handleJoinResponse(event.data);
+        break;
+      case 'preflight_status':
+        // A teammate reported their Field Readiness. Reconstruct and hand
+        // to the provider layer for the team readiness board.
+        onTeammatePreflight?.call(
+          PreflightReport.fromWire(event.senderId, event.data),
+        );
         break;
       default:
         // Other control events (boundary_exit, join, leave, etc.) are
