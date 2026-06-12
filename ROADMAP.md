@@ -185,9 +185,9 @@ One-tap, pre-mission "is the team ready?" check that confirms every prerequisite
 | Tier | Price | Includes |
 |------|-------|----------|
 | Free | $0 | All modes, 2 devices, 1 map region, Red Light theme |
-| Pro Monthly | $3.99/mo | All themes, 8 devices, unlimited maps, AAR, messaging |
+| Pro Monthly | $3.99/mo | All themes, unlimited maps, AAR, messaging |
 | Pro Annual | $29.99/yr | Same as monthly, 37% savings |
-| Lifetime | $149.99 | All Pro features forever |
+| Lifetime | $149.99 | All Pro features + 8-device Field Link, forever |
 
 ### Enterprise (contact for pricing)
 | Tier | Price | Includes |
