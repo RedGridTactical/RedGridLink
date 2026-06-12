@@ -8,7 +8,6 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:red_grid_link/data/models/marker.dart' as model;
 import 'package:red_grid_link/data/models/operational_mode.dart';
 import 'package:red_grid_link/data/models/session.dart';
-import 'package:red_grid_link/data/models/waypoint.dart';
 import 'package:red_grid_link/data/repositories/settings_repository.dart';
 import 'package:red_grid_link/data/repositories/waypoint_repository.dart';
 import 'package:red_grid_link/providers/field_link_provider.dart';

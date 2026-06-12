@@ -37,6 +37,7 @@ class SessionInfoCard extends ConsumerWidget {
         return _SessionInfoContent(
           session: session,
           peerCount: peerCount,
+          maxDevices: service.sessionMaxDevices,
           transportType: service.activeTransport,
           batteryProjection: batteryProjection,
           batteryLevel: service.batteryMode == batteryMode
@@ -55,6 +56,7 @@ class _SessionInfoContent extends StatelessWidget {
   const _SessionInfoContent({
     required this.session,
     required this.peerCount,
+    required this.maxDevices,
     required this.transportType,
     required this.batteryProjection,
     this.batteryLevel,
@@ -63,6 +65,9 @@ class _SessionInfoContent extends StatelessWidget {
 
   final Session session;
   final int peerCount;
+
+  /// Session device cap (host entitlement bound), counting the host.
+  final int maxDevices;
   final TransportType transportType;
   final String batteryProjection;
   final int? batteryLevel;
@@ -125,7 +130,7 @@ class _SessionInfoContent extends StatelessWidget {
           _InfoRow(
             icon: Icons.people,
             label: 'Peers',
-            value: '$peerCount/${AppConstants.maxDevices} connected',
+            value: '$peerCount/$maxDevices connected',
             colors: colors,
           ),
           const SizedBox(height: 6),

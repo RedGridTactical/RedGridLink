@@ -33,6 +33,8 @@ class RedGridLinkApp extends ConsumerWidget {
     ref.watch(positionSyncProvider);
     // Wire Field Readiness preflight broadcast + inbound team board updates.
     ref.watch(preflightWiringProvider);
+    // Wire the host-side device-cap rejection → Pro+Link upsell signal.
+    ref.watch(capUpsellWiringProvider);
 
     return MaterialApp(
       title: 'Red Grid Link',

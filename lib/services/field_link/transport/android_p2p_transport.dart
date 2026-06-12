@@ -11,9 +11,10 @@ import 'package:red_grid_link/services/field_link/transport/transport_service.da
 /// for high-throughput, Wi-Fi-Direct-backed peer-to-peer communication.
 ///
 /// This Dart side defines the full interface and forwards calls over a
-/// [MethodChannel].  The native Kotlin implementation lives in
-/// `android/app/src/main/kotlin/.../NearbyConnectionsPlugin.kt` and will
-/// be built in Phase 7.
+/// [MethodChannel]. The native Kotlin implementation lives in
+/// `android/app/src/main/kotlin/.../NearbyConnectionsChannel.kt`. The
+/// production Android stack is currently BLE-only (see main.dart) — this
+/// transport is wired up by TransportManager but not the shipping path.
 ///
 /// All method-channel calls are guarded: if the native side is not yet
 /// implemented, calls will throw a [MissingPluginException] which is

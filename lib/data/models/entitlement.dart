@@ -48,4 +48,11 @@ enum Entitlement {
     required this.allThemes,
     required this.fullFieldLink,
   });
+
+  /// Resolve a persisted entitlement name, defaulting to [free] for
+  /// unknown or legacy values.
+  static Entitlement fromName(String name) => Entitlement.values.firstWhere(
+        (e) => e.name == name,
+        orElse: () => Entitlement.free,
+      );
 }

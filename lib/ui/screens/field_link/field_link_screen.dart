@@ -4,11 +4,14 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/theme/tactical_colors.dart';
 import '../../../core/theme/tactical_text_styles.dart';
 import '../../../core/utils/haptics.dart';
+import '../../../data/models/entitlement.dart';
 import '../../../providers/field_link_provider.dart';
+import '../../../providers/settings_provider.dart';
 import '../../../services/review/review_service.dart';
 import '../../../providers/mode_provider.dart';
 import '../../../providers/theme_provider.dart';
 import '../../common/dialogs/confirm_dialog.dart';
+import '../../common/widgets/paywall_sheet.dart';
 import '../../common/widgets/tactical_button.dart';
 import '../session/session_history_screen.dart';
 import 'widgets/ghost_list.dart';
@@ -43,6 +46,36 @@ class FieldLinkScreen extends ConsumerWidget {
     final colors = ref.watch(currentThemeProvider);
     final isActive = ref.watch(isSessionActiveProvider);
     final mode = ref.watch(currentModeProvider);
+
+    // Host-side upsell: a device tried to join past the entitlement cap.
+    ref.listen<int>(joinBlockedByCapProvider, (prev, next) {
+      if (prev == next) return;
+      final entitlement = Entitlement.fromName(ref.read(entitlementProvider));
+      if (entitlement.fullFieldLink) return; // already on an 8-device tier
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            'SESSION FULL — YOUR TIER LINKS ${entitlement.maxDevices} DEVICES',
+            style: const TextStyle(
+              fontFamily: 'monospace',
+              fontSize: 12,
+              color: Colors.white,
+            ),
+          ),
+          backgroundColor: colors.accent,
+          behavior: SnackBarBehavior.floating,
+          duration: const Duration(seconds: 5),
+          action: SnackBarAction(
+            label: 'UPGRADE',
+            textColor: Colors.white,
+            onPressed: () => showPaywallSheet(
+              context,
+              featureName: '8-Device Field Link',
+            ),
+          ),
+        ),
+      );
+    });
 
     return Scaffold(
       backgroundColor: colors.bg,

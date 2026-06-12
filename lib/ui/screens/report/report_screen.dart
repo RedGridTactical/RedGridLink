@@ -4,8 +4,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:red_grid_link/core/theme/tactical_text_styles.dart';
 import 'package:red_grid_link/core/utils/haptics.dart';
 import 'package:red_grid_link/data/models/aar_data.dart';
+import 'package:red_grid_link/data/models/entitlement.dart';
 import 'package:red_grid_link/providers/aar_provider.dart';
+import 'package:red_grid_link/providers/settings_provider.dart';
 import 'package:red_grid_link/providers/theme_provider.dart';
+import 'package:red_grid_link/ui/common/widgets/paywall_sheet.dart';
 import 'package:red_grid_link/ui/common/widgets/tactical_button.dart';
 import 'widgets/aar_summary_card.dart';
 import 'widgets/marker_log_card.dart';
@@ -30,6 +33,8 @@ class ReportScreen extends ConsumerWidget {
     final colors = ref.watch(currentThemeProvider);
     final aarAsync = ref.watch(sessionAarProvider(sessionId));
     final exportState = ref.watch(exportNotifierProvider);
+    final canExport =
+        Entitlement.fromName(ref.watch(entitlementProvider)).aarExport;
 
     return Scaffold(
       backgroundColor: colors.bg,
@@ -140,9 +145,20 @@ class ReportScreen extends ConsumerWidget {
                   ),
                   data: (path) => TacticalButton(
                     label: path != null ? 'Export Again' : 'Export PDF',
-                    icon: Icons.share,
+                    icon: canExport ? Icons.share : Icons.lock_outline,
                     colors: colors,
                     onPressed: () {
+                      // PDF export is a Pro feature (sold as such on the
+                      // paywall feature table) — free tier gets the
+                      // upgrade sheet instead of the share flow.
+                      if (!canExport) {
+                        tapLight();
+                        showPaywallSheet(
+                          context,
+                          featureName: 'After-Action Reports',
+                        );
+                        return;
+                      }
                       tapMedium();
                       _export(ref, aarAsync.value!);
                     },

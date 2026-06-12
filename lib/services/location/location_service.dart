@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'dart:io' show Platform;
 
-import 'package:flutter/foundation.dart';
 import 'package:geolocator/geolocator.dart' as geo;
 import 'package:red_grid_link/core/logging/red_log.dart';
 import 'package:red_grid_link/core/utils/mgrs.dart';

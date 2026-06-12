@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -8,14 +10,24 @@ import '../../../core/utils/haptics.dart';
 import '../../../providers/iap_provider.dart';
 import '../../../providers/theme_provider.dart';
 import '../../../services/iap/iap_service.dart';
+import '../../../services/stats/funnel_stats.dart';
 import '../../screens/settings/widgets/privacy_screen.dart';
 import '../../screens/settings/widgets/terms_screen.dart';
+import 'tactical_button.dart';
 
 /// Shows the paywall bottom sheet when a user taps a pro-gated feature.
 ///
 /// [featureName] is displayed at the top so the user knows what they
 /// tried to access.
 void showPaywallSheet(BuildContext context, {String? featureName}) {
+  // Local-only funnel counters — never leave the device.
+  unawaited(FunnelStats.instance.increment('paywall_views'));
+  if (featureName != null) {
+    unawaited(
+      FunnelStats.instance
+          .increment('gate.${FunnelStats.keyFor(featureName)}'),
+    );
+  }
   showModalBottomSheet<void>(
     context: context,
     isScrollControlled: true,
@@ -24,15 +36,25 @@ void showPaywallSheet(BuildContext context, {String? featureName}) {
   );
 }
 
-class _PaywallSheet extends ConsumerWidget {
+class _PaywallSheet extends ConsumerStatefulWidget {
   const _PaywallSheet({this.featureName});
 
   final String? featureName;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<_PaywallSheet> createState() => _PaywallSheetState();
+}
+
+class _PaywallSheetState extends ConsumerState<_PaywallSheet> {
+  /// Pro Annual is the default selection — recurring annual is the tier
+  /// the pricing model is built around.
+  String _selected = IAPProducts.proAnnual;
+
+  @override
+  Widget build(BuildContext context) {
     final colors = ref.watch(currentThemeProvider);
     final purchaseState = ref.watch(purchaseStateProvider);
+    final iap = ref.read(iapServiceProvider);
     final isProcessing = purchaseState == PurchaseFlowState.purchasing ||
         purchaseState == PurchaseFlowState.restoring;
 
@@ -84,10 +106,10 @@ class _PaywallSheet extends ConsumerWidget {
                         'PRO FEATURE',
                         style: TacticalTextStyles.heading(colors),
                       ),
-                      if (featureName != null) ...[
+                      if (widget.featureName != null) ...[
                         const SizedBox(height: 4),
                         Text(
-                          featureName!.toUpperCase(),
+                          widget.featureName!.toUpperCase(),
                           style: TacticalTextStyles.caption(colors),
                           textAlign: TextAlign.center,
                         ),
@@ -134,24 +156,27 @@ class _PaywallSheet extends ConsumerWidget {
                         ),
                       ],
 
-                      // --- Solo Plans ---
+                      // --- Solo Plans (annual featured + default) ---
                       _SectionLabel(label: 'SOLO PLANS', colors: colors),
                       const SizedBox(height: 8),
-                      _PricingCard(
-                        title: 'PRO MONTHLY',
-                        productId: IAPProducts.proMonthly,
-                        colors: colors,
-                        ref: ref,
+                      _PlanCard(
+                        title: 'PRO ANNUAL',
+                        subtitle: 'Save 37% vs monthly',
+                        price: iap.getPrice(IAPProducts.proAnnual),
+                        isBestValue: true,
+                        selected: _selected == IAPProducts.proAnnual,
                         enabled: !isProcessing,
+                        colors: colors,
+                        onSelect: () => _select(IAPProducts.proAnnual),
                       ),
                       const SizedBox(height: 8),
-                      _PricingCard(
-                        title: 'PRO ANNUAL',
-                        productId: IAPProducts.proAnnual,
-                        isBestValue: true,
-                        colors: colors,
-                        ref: ref,
+                      _PlanCard(
+                        title: 'PRO MONTHLY',
+                        price: iap.getPrice(IAPProducts.proMonthly),
+                        selected: _selected == IAPProducts.proMonthly,
                         enabled: !isProcessing,
+                        colors: colors,
+                        onSelect: () => _select(IAPProducts.proMonthly),
                       ),
 
                       const SizedBox(height: 16),
@@ -159,32 +184,24 @@ class _PaywallSheet extends ConsumerWidget {
                       // --- Link Plans ---
                       _SectionLabel(label: 'LINK PLANS', colors: colors),
                       const SizedBox(height: 8),
-                      _PricingCard(
-                        title: 'PRO+LINK MONTHLY',
-                        productId: IAPProducts.proLinkMonthly,
-                        subtitle: '8 devices Field Link',
-                        colors: colors,
-                        ref: ref,
-                        enabled: !isProcessing,
-                      ),
-                      const SizedBox(height: 8),
-                      _PricingCard(
+                      _PlanCard(
                         title: 'PRO+LINK ANNUAL',
-                        productId: IAPProducts.proLinkAnnual,
                         subtitle: '8 devices Field Link',
-                        isBestValue: true,
-                        colors: colors,
-                        ref: ref,
+                        price: iap.getPrice(IAPProducts.proLinkAnnual),
+                        selected: _selected == IAPProducts.proLinkAnnual,
                         enabled: !isProcessing,
+                        colors: colors,
+                        onSelect: () => _select(IAPProducts.proLinkAnnual),
                       ),
                       const SizedBox(height: 8),
-                      _PricingCard(
-                        title: 'LIFETIME',
-                        productId: IAPProducts.lifetime,
-                        subtitle: 'Pro+Link forever, one-time purchase',
-                        colors: colors,
-                        ref: ref,
+                      _PlanCard(
+                        title: 'PRO+LINK MONTHLY',
+                        subtitle: '8 devices Field Link',
+                        price: iap.getPrice(IAPProducts.proLinkMonthly),
+                        selected: _selected == IAPProducts.proLinkMonthly,
                         enabled: !isProcessing,
+                        colors: colors,
+                        onSelect: () => _select(IAPProducts.proLinkMonthly),
                       ),
 
                       const SizedBox(height: 16),
@@ -192,16 +209,34 @@ class _PaywallSheet extends ConsumerWidget {
                       // --- Team ---
                       _SectionLabel(label: 'TEAM', colors: colors),
                       const SizedBox(height: 8),
-                      _PricingCard(
+                      _PlanCard(
                         title: 'TEAM ANNUAL',
-                        productId: IAPProducts.teamAnnual,
                         subtitle: '8 seats included',
-                        colors: colors,
-                        ref: ref,
+                        price: iap.getPrice(IAPProducts.teamAnnual),
+                        selected: _selected == IAPProducts.teamAnnual,
                         enabled: !isProcessing,
+                        colors: colors,
+                        onSelect: () => _select(IAPProducts.teamAnnual),
                       ),
 
-                      const SizedBox(height: 20),
+                      const SizedBox(height: 12),
+
+                      // Lifetime stays available but unpromoted — a quiet
+                      // one-time-purchase row, never a featured card.
+                      _LifetimeRow(
+                        price: iap.getPrice(IAPProducts.lifetime),
+                        selected: _selected == IAPProducts.lifetime,
+                        enabled: !isProcessing,
+                        colors: colors,
+                        onSelect: () => _select(IAPProducts.lifetime),
+                      ),
+
+                      const SizedBox(height: 16),
+
+                      // Purchase CTA for the selected plan.
+                      _buildCta(iap, colors, isProcessing),
+
+                      const SizedBox(height: 16),
 
                       // Subscription auto-renewal disclosure.
                       Padding(
@@ -334,6 +369,65 @@ class _PaywallSheet extends ConsumerWidget {
           ),
         );
       },
+    );
+  }
+
+  void _select(String productId) {
+    if (_selected == productId) return;
+    tapLight();
+    setState(() => _selected = productId);
+  }
+
+  /// CTA button + terms caption for the currently selected plan.
+  ///
+  /// Shows trial copy when the store (Android) or the declared ASC
+  /// configuration (iOS / StoreKit 2) reports an introductory free trial.
+  Widget _buildCta(
+    IAPService iap,
+    TacticalColorScheme colors,
+    bool isProcessing,
+  ) {
+    final trial = iap.trialInfo(_selected);
+    final price = iap.getPrice(_selected);
+    final isLifetime = _selected == IAPProducts.lifetime;
+
+    final label = trial != null
+        ? 'START ${trial.days}-DAY FREE TRIAL'
+        : (isLifetime ? 'BUY LIFETIME' : 'SUBSCRIBE');
+    final caption = trial != null
+        ? 'then $price · cancel anytime · trial for new subscribers'
+        : (isLifetime ? '$price · one-time purchase' : '$price · cancel anytime');
+
+    return Column(
+      children: [
+        SizedBox(
+          width: double.infinity,
+          child: TacticalButton(
+            label: label,
+            icon: isLifetime ? Icons.workspace_premium : Icons.lock_open,
+            colors: colors,
+            onPressed: isProcessing
+                ? null
+                : () {
+                    tapMedium();
+                    unawaited(
+                      FunnelStats.instance.increment(
+                        trial != null
+                            ? 'trial_cta.$_selected'
+                            : 'buy_cta.$_selected',
+                      ),
+                    );
+                    ref.read(buyProductProvider(_selected));
+                  },
+          ),
+        ),
+        const SizedBox(height: 6),
+        Text(
+          caption,
+          style: TacticalTextStyles.dim(colors).copyWith(fontSize: 11),
+          textAlign: TextAlign.center,
+        ),
+      ],
     );
   }
 }
@@ -550,40 +644,34 @@ class _TableRow extends StatelessWidget {
 }
 
 // ---------------------------------------------------------------------------
-// Pricing card
+// Plan card (selectable)
 // ---------------------------------------------------------------------------
 
-class _PricingCard extends StatelessWidget {
-  const _PricingCard({
+class _PlanCard extends StatelessWidget {
+  const _PlanCard({
     required this.title,
-    required this.productId,
+    required this.price,
     this.subtitle,
     this.isBestValue = false,
+    required this.selected,
+    required this.enabled,
     required this.colors,
-    required this.ref,
-    this.enabled = true,
+    required this.onSelect,
   });
 
   final String title;
-  final String productId;
+  final String price;
   final String? subtitle;
   final bool isBestValue;
-  final TacticalColorScheme colors;
-  final WidgetRef ref;
+  final bool selected;
   final bool enabled;
+  final TacticalColorScheme colors;
+  final VoidCallback onSelect;
 
   @override
   Widget build(BuildContext context) {
-    final service = ref.read(iapServiceProvider);
-    final price = service.getPrice(productId);
-
     return GestureDetector(
-      onTap: enabled
-          ? () {
-              tapMedium();
-              ref.read(buyProductProvider(productId));
-            }
-          : null,
+      onTap: enabled ? onSelect : null,
       child: Opacity(
         opacity: enabled ? 1.0 : 0.5,
         child: Container(
@@ -593,12 +681,20 @@ class _PricingCard extends StatelessWidget {
             color: colors.card,
             borderRadius: BorderRadius.circular(8),
             border: Border.all(
-              color: isBestValue ? colors.accent : colors.border,
-              width: isBestValue ? 2 : 1,
+              color: selected ? colors.accent : colors.border,
+              width: selected ? 2 : 1,
             ),
           ),
           child: Row(
             children: [
+              Icon(
+                selected
+                    ? Icons.radio_button_checked
+                    : Icons.radio_button_off,
+                size: 18,
+                color: selected ? colors.accent : colors.text3,
+              ),
+              const SizedBox(width: 10),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -650,8 +746,70 @@ class _PricingCard extends StatelessWidget {
                   fontWeight: FontWeight.bold,
                 ),
               ),
-              const SizedBox(width: 8),
-              Icon(Icons.chevron_right, color: colors.text3, size: 20),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Lifetime row (available, unpromoted)
+// ---------------------------------------------------------------------------
+
+class _LifetimeRow extends StatelessWidget {
+  const _LifetimeRow({
+    required this.price,
+    required this.selected,
+    required this.enabled,
+    required this.colors,
+    required this.onSelect,
+  });
+
+  final String price;
+  final bool selected;
+  final bool enabled;
+  final TacticalColorScheme colors;
+  final VoidCallback onSelect;
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: enabled ? onSelect : null,
+      child: Opacity(
+        opacity: enabled ? 1.0 : 0.5,
+        child: Container(
+          width: double.infinity,
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(8),
+            border: Border.all(
+              color: selected ? colors.accent : colors.border2,
+            ),
+          ),
+          child: Row(
+            children: [
+              Icon(
+                selected
+                    ? Icons.radio_button_checked
+                    : Icons.radio_button_off,
+                size: 16,
+                color: selected ? colors.accent : colors.text4,
+              ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: Text(
+                  'LIFETIME — Pro+Link, one-time purchase',
+                  style: TacticalTextStyles.dim(colors),
+                ),
+              ),
+              Text(
+                price,
+                style: TacticalTextStyles.caption(colors).copyWith(
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
             ],
           ),
         ),

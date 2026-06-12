@@ -141,11 +141,47 @@ void main() {
       await tester.pumpWidget(buildTestableOnboarding());
       await tester.pumpAndSettle();
 
-      // There should be 4 dot indicators (one per page)
       // The dots are Containers with decoration. The active one is 24px wide,
       // inactive ones are 8px wide.
       // We can verify by finding the overall structure.
       expect(find.text('NEXT'), findsOneWidget);
+    });
+
+    testWidgets('quick setup leads to the Pro offer page, not straight out',
+        (WidgetTester tester) async {
+      await tester.pumpWidget(buildTestableOnboarding());
+      await tester.pumpAndSettle();
+
+      // Page 0 -> 1
+      await tester.tap(find.text('NEXT'));
+      await tester.pumpAndSettle();
+
+      // Accept the disclaimer, then 1 -> 2 -> 3.
+      final acceptRow = find.textContaining('I understand the limitations');
+      await tester.ensureVisible(acceptRow);
+      await tester.pumpAndSettle();
+      await tester.tap(acceptRow);
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('NEXT'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('NEXT'));
+      await tester.pumpAndSettle();
+
+      // Page 3: Quick Setup — finish.
+      final finishButton = find.text('START USING RED GRID LINK');
+      await tester.ensureVisible(finishButton);
+      await tester.pumpAndSettle();
+      await tester.tap(finishButton);
+      await tester.pumpAndSettle();
+
+      // Page 4: Pro offer — optional, with an explicit free path.
+      expect(find.text('GO PRO'), findsOneWidget);
+      expect(find.text('SEE PLANS'), findsOneWidget);
+      expect(find.text('CONTINUE WITH FREE'), findsOneWidget);
+      expect(
+        find.text('Optional — the free tier stays fully functional.'),
+        findsOneWidget,
+      );
     });
   });
 }

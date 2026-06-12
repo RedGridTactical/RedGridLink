@@ -11,6 +11,7 @@ import '../../../../core/theme/tactical_colors.dart';
 import '../../../../core/theme/tactical_text_styles.dart';
 import '../../../../core/utils/crypto_utils.dart';
 import '../../../../core/utils/haptics.dart';
+import '../../../../data/models/entitlement.dart';
 import '../../../../data/models/operational_mode.dart';
 import '../../../../data/models/session.dart';
 import '../../../../providers/field_link_provider.dart';
@@ -104,6 +105,9 @@ class _SessionCreateCardState extends ConsumerState<SessionCreateCard> {
         securityMode: _securityMode,
         pin: _securityMode == SecurityMode.pin ? _generatedPin : null,
         mode: _operationalMode,
+        // Host entitlement bounds the session size (free/pro = 2 devices).
+        maxDevices:
+            Entitlement.fromName(ref.read(entitlementProvider)).maxDevices,
       );
 
       // Set callsign from display name so peers see a human-readable

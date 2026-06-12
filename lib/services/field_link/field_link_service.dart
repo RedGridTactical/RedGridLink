@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 
+import 'package:red_grid_link/core/constants/app_constants.dart';
 import 'package:red_grid_link/core/logging/red_log.dart';
 import 'package:red_grid_link/core/utils/crypto_utils.dart';
 import 'package:red_grid_link/data/models/annotation.dart';
@@ -132,6 +133,23 @@ class FieldLinkService {
   /// readiness board (Pro/Team tiers).
   void Function(PreflightReport report)? onTeammatePreflight;
 
+  /// Maximum devices for the active session. Hosts set this from their
+  /// entitlement at create time (free/pro = 2, Pro+Link/Team = 8);
+  /// joiners mirror the host's value from the `join_response`.
+  int _sessionMaxDevices = AppConstants.maxDevices;
+
+  /// Device cap of the active session (host entitlement bound).
+  int get sessionMaxDevices => _sessionMaxDevices;
+
+  /// Host-side callback fired when a join is rejected because the session
+  /// reached its entitlement device cap. Set by the provider layer to
+  /// surface the Pro+Link upsell.
+  void Function(int cap)? onJoinBlockedByCap;
+
+  /// Why the host rejected our last join attempt ('session_full',
+  /// 'rejected'), for joiner-side error copy.
+  String? lastJoinRejectReason;
+
   FieldLinkService({
     required TransportService transport,
     required SyncEngine syncEngine,
@@ -176,11 +194,16 @@ class FieldLinkService {
     required SecurityMode securityMode,
     String? pin,
     required OperationalMode mode,
+    int maxDevices = AppConstants.maxDevices,
   }) async {
     // End any existing session first.
     if (_activeSession != null) {
       await leaveSession();
     }
+
+    // Host entitlement bounds the session size (free/pro = 2 devices,
+    // Pro+Link/Team = 8). Enforced in _handleJoinRequest.
+    _sessionMaxDevices = maxDevices.clamp(2, AppConstants.maxDevices);
 
     // Short 16-hex tag so it fits in the BLE advertisement LocalName
     // field (iOS CoreBluetooth only permits ServiceUUID + LocalName
@@ -304,6 +327,10 @@ class FieldLinkService {
     if (_activeSession != null) {
       await leaveSession();
     }
+
+    // Default until the host's join_response mirrors its entitlement cap.
+    _sessionMaxDevices = AppConstants.maxDevices;
+    lastJoinRejectReason = null;
 
     // Parse QR data when supplied. Audit 2026-05-03 P0: qrData was
     // previously accepted by the API but ignored — the security mode
@@ -1246,10 +1273,31 @@ class FieldLinkService {
       }
     }
 
+    // Entitlement device cap — the host's tier bounds the session size
+    // (free/pro = 2 devices, Pro+Link/Team = 8). The requester is already
+    // transport-connected to deliver this join_request, so the count is
+    // host + requester + every other connected peer.
+    String? rejectReason;
+    if (accepted) {
+      final others = _transport.connectedDeviceIds
+          .where((id) => id != senderId)
+          .length;
+      if (others + 2 > _sessionMaxDevices) {
+        accepted = false;
+        rejectReason = 'session_full';
+        RedLog.w('FieldLink',
+            'Join rejected: session at $_sessionMaxDevices-device cap');
+        onJoinBlockedByCap?.call(_sessionMaxDevices);
+      }
+    }
+
     _syncEngine.broadcastControl({
       'evt': 'join_response',
       'accepted': accepted,
       'targetDeviceId': senderId,
+      // Session capacity, mirrored by the joiner for its UI.
+      if (accepted) 'maxDev': _sessionMaxDevices,
+      if (rejectReason != null) 'reason': rejectReason,
       // Include the host's session metadata so the joiner can mirror it
       // locally — without these the joiner's UI shows hardcoded defaults
       // ("Joined Session" name, SAR mode) that don't match the host.
@@ -1288,12 +1336,16 @@ class FieldLinkService {
     _joinAcceptTimer = null;
 
     if (!accepted) {
-      // PIN was wrong — leave the session.
+      // Rejected — wrong PIN/QR key, or the session is at its device cap.
+      lastJoinRejectReason = data['reason'] as String? ?? 'rejected';
       leaveSession();
       // Notify listeners of the rejection via an error status.
       _setStatus(FieldLinkStatus.error);
       return;
     }
+
+    // Mirror the host's entitlement device cap for joiner-side UI.
+    _sessionMaxDevices = data['maxDev'] as int? ?? _sessionMaxDevices;
 
     // Mirror the host's session metadata locally so this device's UI
     // (mode-aware labels, session name, lead-only controls) matches the

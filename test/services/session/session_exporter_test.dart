@@ -161,9 +161,6 @@ void main() {
     });
 
     test('JSON omits boundary when null', () {
-      final noBoundary = sampleAar.copyWith(
-        boundary: null,
-      );
       // copyWith preserves non-null boundary; create fresh
       final aar = AarData(
         sessionId: 'sess-002',

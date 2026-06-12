@@ -13,7 +13,6 @@
 //     --target=integration_test/screenshots_test.dart \
 //     -d <simulator>
 
-import 'dart:convert';
 import 'dart:io';
 
 import 'package:integration_test/integration_test_driver_extended.dart';

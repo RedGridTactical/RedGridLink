@@ -47,8 +47,7 @@ void main() {
             body: Builder(
               builder: (context) => TextButton(
                 onPressed: () async {
-                  final result =
-                      await Navigator.of(context).push<Map<String, dynamic>>(
+                  await Navigator.of(context).push<Map<String, dynamic>>(
                     MaterialPageRoute(
                       builder: (_) => const QrScannerScreen(),
                     ),

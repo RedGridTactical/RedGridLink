@@ -42,6 +42,15 @@ class FieldLinkForegroundService : Service() {
 
     override fun onBind(intent: Intent?): IBinder? = null
 
+    override fun onDestroy() {
+        // Drop the persistent notification when the service is torn down
+        // outside the normal ACTION_STOP path (app crash / system kill),
+        // so a stale "Field Link Active" notification never lingers.
+        val manager = getSystemService(NotificationManager::class.java)
+        manager.cancel(NOTIFICATION_ID)
+        super.onDestroy()
+    }
+
     private fun createNotificationChannel() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val channel = NotificationChannel(
@@ -82,7 +91,7 @@ class FieldLinkForegroundService : Service() {
         return NotificationCompat.Builder(this, CHANNEL_ID)
             .setContentTitle("Red Grid Link")
             .setContentText(contentText)
-            .setSmallIcon(android.R.drawable.ic_menu_mylocation)
+            .setSmallIcon(R.mipmap.ic_launcher)
             .setOngoing(true)
             .setContentIntent(launchPendingIntent)
             .addAction(

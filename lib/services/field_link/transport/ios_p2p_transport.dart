@@ -13,12 +13,13 @@ import 'package:red_grid_link/services/field_link/transport/transport_service.da
 /// peer-to-peer communication on iOS devices.
 ///
 /// This Dart side defines the full interface and forwards calls over a
-/// [MethodChannel].  The native Swift implementation lives in
-/// `ios/Runner/MultipeerPlugin.swift` and will be built in Phase 7.
+/// [MethodChannel]. The native Swift implementation lives in
+/// `ios/Runner/MultipeerChannel.swift` and runs in production as the
+/// secondary transport beside BLE (see main.dart's MultiTransport setup).
 ///
-/// All method-channel calls are guarded: if the native side is not yet
-/// implemented, calls will throw a [MissingPluginException] which is
-/// caught and wrapped in a [TransportException].
+/// All method-channel calls are guarded: if the native side is missing
+/// (e.g. tests), calls throw a [MissingPluginException] which is caught
+/// and wrapped in a [TransportException].
 class IosP2pTransport implements TransportService {
   // ---------------------------------------------------------------------------
   // Platform channel

@@ -1,10 +1,15 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../core/theme/tactical_colors.dart';
 import '../../../core/theme/tactical_text_styles.dart';
 import '../../../core/utils/haptics.dart';
 import '../../../providers/settings_provider.dart';
 import '../../../providers/theme_provider.dart';
+import '../../../services/stats/funnel_stats.dart';
+import '../../common/widgets/paywall_sheet.dart';
 import '../../common/widgets/tactical_button.dart';
 import '../home/home_screen.dart';
 import 'widgets/disclaimer_page.dart';
@@ -13,11 +18,12 @@ import 'widgets/quick_setup_page.dart';
 
 /// First-launch onboarding flow.
 ///
-/// 4 pages:
+/// 5 pages:
 ///   0 — Welcome / branding
 ///   1 — Safety disclaimer (must accept to proceed)
 ///   2 — Permission requests (location + Bluetooth)
 ///   3 — Quick setup (name, theme, mode)
+///   4 — Pro offer (optional upgrade moment; free continues unchanged)
 ///
 /// Marks onboarding complete on finish and navigates to [HomeScreen].
 class OnboardingScreen extends ConsumerStatefulWidget {
@@ -36,7 +42,11 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
   int _currentPage = 0;
   bool _disclaimerAccepted = false;
 
-  static const int _pageCount = 4;
+  static const int _pageCount = 5;
+
+  /// Pages after this index host their own primary buttons, so the shared
+  /// bottom "Next" bar is hidden (Quick Setup and the Pro offer page).
+  static const int _lastNextBarPage = 2;
 
   @override
   void dispose() {
@@ -73,6 +83,21 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
         curve: Curves.easeInOut,
       );
     }
+  }
+
+  /// Quick Setup finished — show the Pro offer page (skipped in
+  /// read-only help replay, which is about features, not plans).
+  void _onSetupDone() {
+    if (widget.readOnly) {
+      _finish();
+      return;
+    }
+    tapLight();
+    unawaited(FunnelStats.instance.increment('onboarding_offer_views'));
+    _pageController.nextPage(
+      duration: const Duration(milliseconds: 300),
+      curve: Curves.easeInOut,
+    );
   }
 
   Future<void> _finish() async {
@@ -124,13 +149,23 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                   PermissionsPage(colors: colors),
 
                   // Page 3: Quick Setup
-                  QuickSetupPage(onFinish: _finish),
+                  QuickSetupPage(onFinish: _onSetupDone),
+
+                  // Page 4: Pro offer (skippable)
+                  _ProOfferPage(
+                    colors: colors,
+                    onSeePlans: () {
+                      tapMedium();
+                      showPaywallSheet(context);
+                    },
+                    onContinueFree: _finish,
+                  ),
                 ],
               ),
             ),
 
             // Bottom bar: dots + next button
-            if (_currentPage < _pageCount - 1)
+            if (_currentPage <= _lastNextBarPage)
               Padding(
                 padding: const EdgeInsets.fromLTRB(24, 8, 24, 24),
                 child: Row(
@@ -276,6 +311,100 @@ class _WelcomePage extends StatelessWidget {
             ),
 
             const SizedBox(height: 48),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Pro offer page (page 4)
+// ---------------------------------------------------------------------------
+
+class _ProOfferPage extends StatelessWidget {
+  const _ProOfferPage({
+    required this.colors,
+    required this.onSeePlans,
+    required this.onContinueFree,
+  });
+
+  final TacticalColorScheme colors;
+  final VoidCallback onSeePlans;
+  final VoidCallback onContinueFree;
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: SingleChildScrollView(
+        padding: const EdgeInsets.symmetric(horizontal: 32),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(Icons.workspace_premium, size: 48, color: colors.accent),
+            const SizedBox(height: 16),
+            Text(
+              'GO PRO',
+              style: TextStyle(
+                fontFamily: 'monospace',
+                fontWeight: FontWeight.bold,
+                fontSize: 24,
+                color: colors.accent,
+                letterSpacing: 4,
+              ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              'Optional — the free tier stays fully functional.',
+              style: TacticalTextStyles.caption(colors),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 24),
+            _FeatureBullet(
+              icon: Icons.map,
+              text: 'Unlimited offline map regions',
+              colors: colors,
+            ),
+            _FeatureBullet(
+              icon: Icons.description,
+              text: 'After-Action Report PDF export',
+              colors: colors,
+            ),
+            _FeatureBullet(
+              icon: Icons.palette,
+              text: 'All four tactical themes',
+              colors: colors,
+            ),
+            _FeatureBullet(
+              icon: Icons.groups,
+              text: 'Pro+Link: 8-device Field Link sessions',
+              colors: colors,
+            ),
+            const SizedBox(height: 32),
+            SizedBox(
+              width: double.infinity,
+              child: TacticalButton(
+                label: 'See Plans',
+                icon: Icons.lock_open,
+                colors: colors,
+                onPressed: onSeePlans,
+              ),
+            ),
+            const SizedBox(height: 8),
+            GestureDetector(
+              onTap: onContinueFree,
+              child: Container(
+                constraints: const BoxConstraints(minHeight: 44),
+                alignment: Alignment.center,
+                child: Text(
+                  'CONTINUE WITH FREE',
+                  style: TacticalTextStyles.caption(colors).copyWith(
+                    color: colors.accent,
+                  ),
+                ),
+              ),
+            ),
+            const SizedBox(height: 24),
           ],
         ),
       ),

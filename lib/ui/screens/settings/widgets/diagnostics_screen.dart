@@ -9,6 +9,7 @@ import '../../../../core/theme/tactical_text_styles.dart';
 import '../../../../providers/field_link_provider.dart';
 import '../../../../providers/location_provider.dart';
 import '../../../../providers/theme_provider.dart';
+import '../../../../services/stats/funnel_stats.dart';
 
 /// In-app diagnostics screen for support requests.
 ///
@@ -27,6 +28,7 @@ class DiagnosticsScreen extends ConsumerStatefulWidget {
 class _DiagnosticsScreenState extends ConsumerState<DiagnosticsScreen> {
   Timer? _refresh;
   String? _systemLocationStatus;
+  Map<String, int> _funnel = const {};
 
   @override
   void initState() {
@@ -38,6 +40,9 @@ class _DiagnosticsScreenState extends ConsumerState<DiagnosticsScreen> {
       },
     );
     _readSystemLocationStatus();
+    FunnelStats.instance.snapshot().then((s) {
+      if (mounted) setState(() => _funnel = s);
+    });
   }
 
   @override
@@ -209,6 +214,17 @@ class _DiagnosticsScreenState extends ConsumerState<DiagnosticsScreen> {
       _DiagLine.kv('Messages emitted',
           '${ble?.diagMessagesEmitted ?? 0}'),
       _DiagLine.kv('Last error', ble?.diagLastError ?? '—'),
+
+      // ── CONVERSION (LOCAL ONLY) ──────────────────────────────
+      // Funnel counters recorded on-device only (see FunnelStats) —
+      // paywall views, gate hits, purchases. Never transmitted.
+      _DiagLine.section('CONVERSION (LOCAL ONLY)'),
+      if (_funnel.isEmpty)
+        _DiagLine.kv('Counters', 'none recorded')
+      else
+        ...(_funnel.entries.toList()
+              ..sort((a, b) => a.key.compareTo(b.key)))
+            .map((e) => _DiagLine.kv(e.key, '${e.value}')),
     ];
 
     return Scaffold(

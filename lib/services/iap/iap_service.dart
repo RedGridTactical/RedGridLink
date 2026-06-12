@@ -1,8 +1,13 @@
 import 'dart:async';
 
+import 'package:flutter/foundation.dart' show visibleForTesting;
 import 'package:in_app_purchase/in_app_purchase.dart';
+import 'package:in_app_purchase_android/in_app_purchase_android.dart';
+import 'package:in_app_purchase_storekit/in_app_purchase_storekit.dart';
+import 'package:in_app_purchase_storekit/store_kit_wrappers.dart';
 import 'package:red_grid_link/data/models/entitlement.dart';
 import 'package:red_grid_link/services/iap/purchase_handler.dart';
+import 'package:red_grid_link/services/stats/funnel_stats.dart';
 
 /// Product identifiers for Red Grid Link subscriptions.
 class IAPProducts {
@@ -42,6 +47,17 @@ class IAPProducts {
     }
   }
 
+  /// Introductory free-trial lengths configured in App Store Connect.
+  ///
+  /// StoreKit 2 (the default iOS path) does not expose introductory-offer
+  /// details in product data, so iOS paywall copy is driven by this
+  /// declaration. The App Store payment sheet always shows the real terms
+  /// for the signed-in account. Android trials are detected live from
+  /// Play product data and ignore this map.
+  static const Map<String, int> declaredIosTrialDays = {
+    proAnnual: 7,
+  };
+
   /// Human-readable tier label for a product.
   static String tierLabel(String productId) {
     switch (productId) {
@@ -70,6 +86,19 @@ enum PurchaseFlowState {
   restoring,
   success,
   error,
+}
+
+/// Introductory free-trial information for a subscription product.
+class TrialInfo {
+  const TrialInfo({required this.days, required this.fromStoreData});
+
+  /// Trial length in days.
+  final int days;
+
+  /// True when detected from live store data (Android offers / StoreKit 1).
+  /// False when supplied by [IAPProducts.declaredIosTrialDays] because
+  /// StoreKit 2 product data carries no introductory-offer details.
+  final bool fromStoreData;
 }
 
 /// In-App Purchase service for Red Grid Link.
@@ -308,21 +337,121 @@ class IAPService {
   // Product queries
   // ---------------------------------------------------------------------------
 
+  /// All loaded instances for a product ID.
+  ///
+  /// Android returns one [ProductDetails] per Play subscription offer, so
+  /// a product configured with a free-trial offer arrives as multiple
+  /// instances sharing the same ID.
+  List<ProductDetails> _instancesOf(String productId) =>
+      _products.where((p) => p.id == productId).toList();
+
   /// Get a product by its ID.
+  ///
+  /// Prefers the instance carrying an introductory free trial so Android
+  /// purchases go through that offer's token; eligible users get the
+  /// trial, ineligible users never receive the offer from Play.
   ProductDetails? getProduct(String productId) {
-    try {
-      return _products.firstWhere((p) => p.id == productId);
-    } catch (_) {
-      return null;
+    final instances = _instancesOf(productId);
+    if (instances.isEmpty) return null;
+    for (final p in instances) {
+      if (_storeTrialOf(p) != null) return p;
     }
+    return instances.first;
+  }
+
+  /// Introductory free-trial info for a product, or null when none.
+  TrialInfo? trialInfo(String productId) {
+    for (final p in _instancesOf(productId)) {
+      final t = _storeTrialOf(p);
+      if (t != null) return t;
+    }
+    // StoreKit 2 product data carries no introductory-offer details;
+    // fall back to the declared App Store Connect configuration.
+    final declared = IAPProducts.declaredIosTrialDays[productId];
+    if (declared != null &&
+        _instancesOf(productId).any((p) => p is AppStoreProduct2Details)) {
+      return TrialInfo(days: declared, fromStoreData: false);
+    }
+    return null;
+  }
+
+  /// Trial detected from live store product data, or null.
+  TrialInfo? _storeTrialOf(ProductDetails p) {
+    if (p is AppStoreProductDetails) {
+      final intro = p.skProduct.introductoryPrice;
+      if (intro == null ||
+          intro.paymentMode != SKProductDiscountPaymentMode.freeTrail) {
+        return null;
+      }
+      final period = intro.subscriptionPeriod;
+      final unitDays = switch (period.unit) {
+        SKSubscriptionPeriodUnit.day => 1,
+        SKSubscriptionPeriodUnit.week => 7,
+        SKSubscriptionPeriodUnit.month => 30,
+        SKSubscriptionPeriodUnit.year => 365,
+      };
+      return TrialInfo(
+        days: unitDays * period.numberOfUnits * intro.numberOfPeriods,
+        fromStoreData: true,
+      );
+    }
+    if (p is GooglePlayProductDetails) {
+      final idx = p.subscriptionIndex;
+      final offers = p.productDetails.subscriptionOfferDetails;
+      if (idx == null || offers == null || idx >= offers.length) return null;
+      for (final phase in offers[idx].pricingPhases) {
+        if (phase.priceAmountMicros == 0) {
+          return TrialInfo(
+            days: daysFromIsoPeriod(phase.billingPeriod),
+            fromStoreData: true,
+          );
+        }
+      }
+    }
+    return null;
+  }
+
+  /// The recurring base price of an instance, never a $0 trial phase.
+  String? _basePriceOf(ProductDetails p) {
+    if (p is GooglePlayProductDetails) {
+      final idx = p.subscriptionIndex;
+      final offers = p.productDetails.subscriptionOfferDetails;
+      if (idx != null && offers != null && idx < offers.length) {
+        // The last non-zero pricing phase is the recurring base price; a
+        // trial offer's leading phase is 0 and must not be displayed.
+        final phases = offers[idx].pricingPhases;
+        for (final phase in phases.reversed) {
+          if (phase.priceAmountMicros > 0) return phase.formattedPrice;
+        }
+        return null;
+      }
+    }
+    return p.price;
+  }
+
+  /// Days in an ISO-8601 billing period like `P1W`, `P3D`, `P1M`, `P1Y`.
+  @visibleForTesting
+  static int daysFromIsoPeriod(String iso) {
+    final match = RegExp(r'^P(\d+)([DWMY])$').firstMatch(iso.toUpperCase());
+    if (match == null) return 0;
+    final n = int.parse(match.group(1)!);
+    return switch (match.group(2)!) {
+      'D' => n,
+      'W' => n * 7,
+      'M' => n * 30,
+      'Y' => n * 365,
+      _ => 0,
+    };
   }
 
   /// Get a formatted price string for a product.
   ///
-  /// Returns the store-formatted price (e.g., "\$3.99") or a fallback.
+  /// Returns the store-formatted base price (e.g., "\$29.99") or a fallback.
   String getPrice(String productId) {
-    final product = getProduct(productId);
-    if (product != null) return product.price;
+    for (final p in _instancesOf(productId)) {
+      final base = _basePriceOf(p);
+      if (base != null && base.isNotEmpty) return base;
+    }
 
     // Fallback prices when products haven't loaded.
     switch (productId) {
@@ -376,6 +505,13 @@ class IAPService {
             purchase.productID,
           );
           _setState(PurchaseFlowState.success);
+          if (purchase.status == PurchaseStatus.purchased) {
+            // Local-only conversion counter (no network, no identifiers).
+            unawaited(
+              FunnelStats.instance
+                  .increment('purchase_success.${purchase.productID}'),
+            );
+          }
         } else {
           _setState(PurchaseFlowState.error);
           _emitError('Purchase verification failed.');

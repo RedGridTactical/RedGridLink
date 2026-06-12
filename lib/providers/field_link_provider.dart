@@ -347,3 +347,29 @@ final isSessionActiveProvider = Provider<bool>((ref) {
   final sessionAsync = ref.watch(activeSessionProvider);
   return sessionAsync.valueOrNull != null;
 });
+
+// ---------------------------------------------------------------------------
+// Device-cap upsell
+// ---------------------------------------------------------------------------
+
+/// Bumps every time the host rejects a join because the session reached
+/// its entitlement device cap (free/pro = 2 devices). The Field Link
+/// screen listens to surface the Pro+Link upsell.
+final joinBlockedByCapProvider = StateProvider<int>((ref) => 0);
+
+/// Wires [FieldLinkService.onJoinBlockedByCap] into
+/// [joinBlockedByCapProvider]. Watched from the app shell (app.dart) so
+/// the callback is registered before any session starts. Safe to watch
+/// when [fieldLinkServiceProvider] is not overridden (widget tests).
+final capUpsellWiringProvider = Provider<void>((ref) {
+  final FieldLinkService service;
+  try {
+    service = ref.watch(fieldLinkServiceProvider);
+  } on UnimplementedError {
+    return;
+  }
+  service.onJoinBlockedByCap = (_) {
+    ref.read(joinBlockedByCapProvider.notifier).state++;
+  };
+  ref.onDispose(() => service.onJoinBlockedByCap = null);
+});

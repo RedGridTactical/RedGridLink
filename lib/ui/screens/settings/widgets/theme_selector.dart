@@ -2,9 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/theme/tactical_colors.dart';
+import '../../../../core/utils/haptics.dart';
 import '../../../../data/models/entitlement.dart';
 import '../../../../providers/settings_provider.dart';
 import '../../../../providers/theme_provider.dart';
+import '../../../common/widgets/paywall_sheet.dart';
 import '../../../common/widgets/section_header.dart';
 import '../../../common/widgets/theme_preview.dart';
 
@@ -57,7 +59,8 @@ class ThemeSelector extends ConsumerWidget {
                   appColors: colors,
                   onTap: () {
                     if (isLocked) {
-                      _showProRequired(context, colors);
+                      tapLight();
+                      showPaywallSheet(context, featureName: 'All Themes');
                       return;
                     }
                     ref.read(themeIdProvider.notifier).set(theme.id);
@@ -81,21 +84,4 @@ class ThemeSelector extends ConsumerWidget {
     );
   }
 
-  void _showProRequired(BuildContext context, TacticalColorScheme colors) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: const Text(
-          'PRO THEME - Upgrade to unlock',
-          style: TextStyle(
-            fontFamily: 'monospace',
-            color: Colors.white,
-            fontSize: 12,
-          ),
-        ),
-        backgroundColor: colors.accent,
-        duration: const Duration(seconds: 2),
-        behavior: SnackBarBehavior.floating,
-      ),
-    );
-  }
 }

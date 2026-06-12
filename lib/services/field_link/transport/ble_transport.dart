@@ -1078,12 +1078,21 @@ class BleTransport implements TransportService {
     Duration interval = const Duration(seconds: 5),
   }) {
     stopRssiPolling();
+    var pollInFlight = false;
     _rssiPollTimer = Timer.periodic(interval, (_) async {
-      for (final deviceId in _connectedDevices.keys.toList()) {
-        final rssi = await readRssi(deviceId);
-        if (rssi != null) {
-          onRssi(deviceId, rssi);
+      // Reentrancy guard: on slow hardware a full readRssi sweep can
+      // outlast the interval — skip the tick instead of stacking sweeps.
+      if (pollInFlight) return;
+      pollInFlight = true;
+      try {
+        for (final deviceId in _connectedDevices.keys.toList()) {
+          final rssi = await readRssi(deviceId);
+          if (rssi != null) {
+            onRssi(deviceId, rssi);
+          }
         }
+      } finally {
+        pollInFlight = false;
       }
     });
   }
@@ -1095,14 +1104,12 @@ class BleTransport implements TransportService {
   }
 
   // ---------------------------------------------------------------------------
-  // Peripheral advertising stub
+  // Peripheral advertising
   // ---------------------------------------------------------------------------
 
-  // NOTE: GATT server / peripheral advertising requires native platform
-  // channels. flutter_blue_plus does not support the peripheral role.
-  // For MVP, discovery works when at least one device acts as a scanner
-  // and the other already has the service advertised at the OS level
-  // (e.g., via a companion native module).
+  // flutter_blue_plus does not support the peripheral role, so advertising
+  // goes through the custom BleAdvertiserChannel platform channel
+  // (CBPeripheralManager on iOS, BluetoothLeAdvertiser on Android).
 
   /// Start advertising the Field Link service.
   /// Start advertising the Field Link GATT service via the custom

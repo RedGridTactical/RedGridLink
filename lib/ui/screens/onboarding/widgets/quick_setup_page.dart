@@ -49,7 +49,9 @@ class _QuickSetupPageState extends ConsumerState<QuickSetupPage> {
     final colors = ref.watch(currentThemeProvider);
     final currentThemeId = ref.watch(themeIdProvider);
     final entitlement = ref.watch(entitlementProvider);
-    final bool isPro = entitlement == 'pro' || entitlement == 'team';
+    final bool isPro = entitlement == 'pro' ||
+        entitlement == 'proLink' ||
+        entitlement == 'team';
     final themes = tacticalThemes.values.toList();
 
     return SingleChildScrollView(
