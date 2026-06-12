@@ -35,9 +35,9 @@ Real ECDH key exchange, actual Coded PHY negotiation, emergency beacon, tactical
 
 ---
 
-## V1.6 — Field Readiness Preflight (IN PROGRESS)
+## V1.6 — Field Readiness Preflight (COMPLETE)
 
-**Status: In progress** — code complete and tested, pending store release (targeting App v1.6.0+321)
+**Status: Complete** — App v1.6.0 live on the App Store and Google Play
 
 One-tap, pre-mission "is the team ready?" check that confirms every prerequisite before a team steps off coverage, plus a whole-team readiness board and a step-off snapshot in the After-Action Report.
 
