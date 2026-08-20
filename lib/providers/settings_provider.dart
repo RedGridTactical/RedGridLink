@@ -294,15 +294,18 @@ class EntitlementNotifier extends StateNotifier<String> {
 
 /// User entitlement tier: free, pro, proLink, or team.
 ///
-/// When demo mode is active, forces `proLink` so all features (themes,
-/// maps, AAR, Field Link) are unlocked for screenshots and demos.
+/// SUNSET (v1.7.0, final release): Red Grid Link is now part of Red Grid
+/// MGRS and no longer sells anything. Every free user is elevated to
+/// `proLink` so all features (themes, maps, AAR export, full Field Link)
+/// are unlocked at no charge for as long as the app stays installed.
+/// Stored paid entitlements are left untouched. This supersedes the old
+/// demo-mode override, which forced the same tier for screenshots.
 final entitlementProvider =
     StateNotifierProvider<EntitlementNotifier, String>((ref) {
   final repo = ref.watch(settingsRepositoryProvider);
-  final isDemo = ref.watch(demoModeProvider);
   // Compute the seed up front so we don't need to mutate `state` from
   // outside the notifier subclass.
   final stored = repo.entitlement;
-  final initial = (isDemo && stored == 'free') ? 'proLink' : null;
+  final initial = (stored == 'free') ? 'proLink' : null;
   return EntitlementNotifier(repo, initialOverride: initial);
 });

@@ -341,10 +341,10 @@ class _ProOfferPage extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(Icons.workspace_premium, size: 48, color: colors.accent),
+            Icon(Icons.merge_type, size: 48, color: colors.accent),
             const SizedBox(height: 16),
             Text(
-              'GO PRO',
+              'EVERYTHING UNLOCKED',
               style: TextStyle(
                 fontFamily: 'monospace',
                 fontWeight: FontWeight.bold,
@@ -355,7 +355,8 @@ class _ProOfferPage extends StatelessWidget {
             ),
             const SizedBox(height: 8),
             Text(
-              'Optional — the free tier stays fully functional.',
+              'Red Grid Link is now part of Red Grid MGRS. '
+              'All Pro features below are included, free.',
               style: TacticalTextStyles.caption(colors),
               textAlign: TextAlign.center,
             ),
@@ -384,8 +385,8 @@ class _ProOfferPage extends StatelessWidget {
             SizedBox(
               width: double.infinity,
               child: TacticalButton(
-                label: 'See Plans',
-                icon: Icons.lock_open,
+                label: 'ABOUT THE MERGE',
+                icon: Icons.merge_type,
                 colors: colors,
                 onPressed: onSeePlans,
               ),
@@ -397,7 +398,7 @@ class _ProOfferPage extends StatelessWidget {
                 constraints: const BoxConstraints(minHeight: 44),
                 alignment: Alignment.center,
                 child: Text(
-                  'CONTINUE WITH FREE',
+                  'CONTINUE',
                   style: TacticalTextStyles.caption(colors).copyWith(
                     color: colors.accent,
                   ),

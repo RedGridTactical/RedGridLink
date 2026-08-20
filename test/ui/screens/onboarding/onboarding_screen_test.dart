@@ -174,12 +174,13 @@ void main() {
       await tester.tap(finishButton);
       await tester.pumpAndSettle();
 
-      // Page 4: Pro offer — optional, with an explicit free path.
-      expect(find.text('GO PRO'), findsOneWidget);
-      expect(find.text('SEE PLANS'), findsOneWidget);
-      expect(find.text('CONTINUE WITH FREE'), findsOneWidget);
+      // Page 4 (SUNSET v1.7.0): the old Pro offer page now announces
+      // the merge and gives everything away, with an explicit exit.
+      expect(find.text('EVERYTHING UNLOCKED'), findsOneWidget);
+      expect(find.text('ABOUT THE MERGE'), findsOneWidget);
+      expect(find.text('CONTINUE'), findsOneWidget);
       expect(
-        find.text('Optional — the free tier stays fully functional.'),
+        find.textContaining('now part of Red Grid MGRS'),
         findsOneWidget,
       );
     });

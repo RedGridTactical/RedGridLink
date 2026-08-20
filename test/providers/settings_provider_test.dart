@@ -204,8 +204,21 @@ void main() {
   // ---------------------------------------------------------------------------
 
   group('EntitlementNotifier', () {
-    test('initial state comes from repository default', () {
-      expect(container.read(entitlementProvider), 'free');
+    // SUNSET (v1.7.0): a stored 'free' entitlement is elevated to proLink
+    // so the retired app gives every install full access. A regression to
+    // 'free' would resurrect the paywall gates in a build that no longer
+    // sells anything.
+    test('sunset: fresh install (stored free) is elevated to proLink', () {
+      expect(container.read(entitlementProvider), 'proLink');
+    });
+
+    test('sunset: stored paid entitlements are untouched', () async {
+      await repo.setEntitlement('pro');
+      final c2 = ProviderContainer(overrides: [
+        settingsRepositoryProvider.overrideWithValue(repo),
+      ]);
+      addTearDown(c2.dispose);
+      expect(c2.read(entitlementProvider), 'pro');
     });
 
     test('set updates state', () async {

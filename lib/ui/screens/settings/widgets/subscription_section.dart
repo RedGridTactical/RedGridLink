@@ -12,6 +12,7 @@ import '../../../../services/iap/iap_service.dart';
 import '../../../common/widgets/section_header.dart';
 import '../../../common/widgets/tactical_button.dart';
 import '../../../common/widgets/tactical_card.dart';
+import '../../../common/widgets/paywall_sheet.dart';
 
 /// Settings subscription management section.
 ///
@@ -31,6 +32,38 @@ class SubscriptionSection extends ConsumerWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         SectionHeader(title: 'Subscription', colors: colors),
+        const SizedBox(height: 12),
+
+        // SUNSET (v1.7.0): explain why the tier below reads PRO LINK on a
+        // fresh install and where the product went. Tap opens the merge
+        // notice (paywall_sheet.dart now shows the sunset sheet).
+        TacticalCard(
+          colors: colors,
+          padding: const EdgeInsets.all(12),
+          child: InkWell(
+            onTap: () => showPaywallSheet(context),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Icon(Icons.merge_type, size: 16, color: colors.accent),
+                    const SizedBox(width: 8),
+                    Text('NOW PART OF RED GRID MGRS',
+                        style: TacticalTextStyles.label(colors)),
+                  ],
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  'Red Grid Link no longer sells subscriptions. Every Pro '
+                  'feature is unlocked at no charge. New development '
+                  'continues in Red Grid MGRS. Tap for details.',
+                  style: TacticalTextStyles.caption(colors),
+                ),
+              ],
+            ),
+          ),
+        ),
         const SizedBox(height: 12),
 
         // Current tier display.

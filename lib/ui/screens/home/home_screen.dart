@@ -7,6 +7,7 @@ import '../../../core/utils/haptics.dart';
 import '../../../providers/location_provider.dart';
 import '../../../providers/mode_provider.dart';
 import '../../../providers/theme_provider.dart';
+import '../../common/widgets/paywall_sheet.dart';
 import '../field_link/field_link_screen.dart';
 import '../grid/grid_screen.dart';
 import '../map/map_screen.dart';
@@ -36,6 +37,11 @@ class HomeScreen extends ConsumerStatefulWidget {
 
 class _HomeScreenState extends ConsumerState<HomeScreen>
     with WidgetsBindingObserver {
+  /// SUNSET: merge notice above the tab stack. Dismissible for the
+  /// session only, on purpose — the app is retired and every launch
+  /// should restate where the product went.
+  bool _sunsetBannerVisible = true;
+
   @override
   void initState() {
     super.initState();
@@ -87,9 +93,60 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
     ];
 
     return Scaffold(
-      body: IndexedStack(
-        index: activeTab,
-        children: screens,
+      body: Column(
+        children: [
+          if (_sunsetBannerVisible)
+            Material(
+              color: colors.card,
+              child: SafeArea(
+                bottom: false,
+                child: InkWell(
+                  onTap: () {
+                    tapLight();
+                    showPaywallSheet(context);
+                  },
+                  child: Container(
+                    width: double.infinity,
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                    decoration: BoxDecoration(
+                      border: Border(
+                        bottom: BorderSide(color: colors.accent, width: 1),
+                      ),
+                    ),
+                    child: Row(
+                      children: [
+                        Icon(Icons.merge_type, size: 16, color: colors.accent),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: Text(
+                            'RED GRID LINK IS NOW PART OF RED GRID MGRS. '
+                            'TAP FOR DETAILS',
+                            style: TacticalTextStyles.caption(colors),
+                          ),
+                        ),
+                        IconButton(
+                          icon: Icon(Icons.close,
+                              size: 16, color: colors.text3),
+                          padding: EdgeInsets.zero,
+                          constraints: const BoxConstraints(
+                              minWidth: 32, minHeight: 32),
+                          onPressed: () =>
+                              setState(() => _sunsetBannerVisible = false),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          Expanded(
+            child: IndexedStack(
+              index: activeTab,
+              children: screens,
+            ),
+          ),
+        ],
       ),
       bottomNavigationBar: Column(
         mainAxisSize: MainAxisSize.min,
