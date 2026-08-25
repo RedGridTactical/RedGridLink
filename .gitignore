@@ -55,3 +55,9 @@ tools/certs/
 *.mobileprovision
 *.cer
 node_modules/
+
+# AI session context + business strategy — local-only, never commit
+# (public repo stays AI-trace-free; CONTEXT.md holds MRR/revenue strategy)
+CLAUDE.md
+CONTEXT.md
+context.md

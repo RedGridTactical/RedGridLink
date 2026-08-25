@@ -1,4 +1,4 @@
-# Red Grid Link - App Store Listing
+# Red Grid Link - Store Listing Copy
 
 ## App Name
 Red Grid Link
@@ -14,13 +14,13 @@ All iOS and Android sizes auto-generated in `ios/Runner/Assets.xcassets/AppIcon.
 Navigation (primary), Utilities (secondary)
 
 ## Short Description (Play Store, max 80 chars)
-Track your team offline over Bluetooth. Encrypted GPS sharing, no cell needed.
+Coordinate nearby teams over Bluetooth. Encrypted GPS sharing, no cell needed.
 
 ## Full Description
 
-Track your team anywhere -- no cell service, no internet, no accounts.
+Coordinate nearby teams off-grid -- no cell service, no internet, no accounts.
 
-Red Grid Link turns nearby phones into a private team GPS network using Bluetooth (with Apple Multipeer Connectivity on iOS for higher-bandwidth peer transport). See everyone's position on a shared map, drop waypoints, set boundaries, and coordinate -- all without cell towers or internet. Your operational data stays on your devices.
+Red Grid Link turns nearby phones into a private team awareness network using Bluetooth, with Apple Multipeer Connectivity on iOS and Google Play Services Nearby Connections on Android as higher-bandwidth peer transports when available. See everyone's position on a shared map, drop waypoints, set boundaries, and coordinate -- all without cell towers or internet during active sessions. Your operational data stays on your devices unless you share it with peers or export it.
 
 Built by an active duty Army officer for the people who actually need it: search & rescue volunteers, hunting parties, backcountry hiking groups, and field training teams.
 
@@ -33,7 +33,7 @@ WHO IT'S FOR:
 HOW IT WORKS:
 Open the app, start a session, and every teammate within Bluetooth range appears on your map. No pairing, no configuration, no internet required.
 
-- Devices discover each other automatically over Bluetooth (iOS adds Multipeer Connectivity for backgrounded peers)
+- Devices discover each other automatically over Bluetooth (iOS adds Multipeer Connectivity and Android adds Google Play Services Nearby Connections where available)
 - PIN and QR sessions wrap every position and marker delta in AES-256-GCM with ECDH P-256 session keys; Open mode skips encryption for trusted training and demo use
 - Works on both iPhone and Android in the same session
 - Battery-saver modes last all day (<2% per hour in Expedition mode)
@@ -60,11 +60,11 @@ Red Light (night vision safe), NVG Green, Day White, and Blue Force. All designe
 
 PRIVACY BY DESIGN:
 - No accounts, no sign-up, no login
-- No cloud, no servers, no tracking, no ads
-- Operational data (sessions, markers, tracks) stays on your device until you delete it
+- No cloud sync, no Red Grid servers for active sessions, no tracking, no ads
+- Operational data (sessions, markers, tracks) stays on your device until you delete it, share it with nearby peers, or export it
 - AES-256-GCM encryption on PIN and QR sessions (Open sessions are unencrypted by design for training / demo use)
 - Optional release-only crash diagnostics (Sentry) with PII off and GPS coordinates stripped — see Privacy Policy
-- In-app purchases handled by Apple/Google only
+- In-app purchases handled by Apple or Google Play only
 
 PRICING:
 - Free: All 4 modes, 2-device team sync, 1 offline map region, Red Light theme
@@ -72,13 +72,13 @@ PRICING:
 - Pro+Link ($5.99/mo or $44.99/yr): Everything in Pro + 8-device team sync
 - Lifetime ($149.99): Full Pro+Link features, one-time purchase
 
-Subscriptions auto-renew unless cancelled at least 24 hours before the end of the current period. Payment will be charged to your Apple ID account at confirmation of purchase. Manage or cancel subscriptions in your device's Settings > Apple ID > Subscriptions.
+Subscriptions auto-renew unless cancelled at least 24 hours before the end of the current period. Payment will be charged to your Apple ID or Google Play account at confirmation of purchase. Manage or cancel subscriptions in your device's subscription settings.
 
 Terms of Use: https://redgridtactical.com/terms.html
 Privacy Policy: https://redgridtactical.com/privacy.html
 
 ## Promotional Text (iOS, max 170 chars)
-Track your team offline over Bluetooth -- no cell service needed. Encrypted GPS sharing with offline topo maps for SAR, hunting, and backcountry teams.
+Coordinate nearby teams over Bluetooth -- no cell service needed. Encrypted GPS sharing with offline topo maps for SAR, hunting, and backcountry teams.
 
 ## Keywords (iOS, max 100 chars)
 offline tracker,team gps,blue force,walkie talkie,hunting gps,sar,mgrs,topo map,hiking,group track
@@ -98,12 +98,12 @@ Security and communication update:
 - ECDH P-256 key exchange (per-peer encryption with forward secrecy)
 - Emergency beacon with one-tap SOS and team alerts
 - Tactical messaging: 8 pre-canned messages + free text
-- Actual BLE Coded PHY negotiation for extended range
+- BLE Coded PHY negotiation on supported Android hardware
 - Hardened stream cleanup and connection quality warnings
 
 ## What's New (v1.4.0)
 Extended range and navigation update:
-- BLE Long Range: up to 1km range on supported devices (BLE 5.0 Coded PHY)
+- BLE Long Range / Coded PHY support detection on capable devices; actual Bluetooth range depends on hardware, terrain, and interference
 - Signal strength indicator for each connected teammate
 - FixPhrase: share your location as 4 easy-to-remember words (~11m accuracy)
 - Download OpenStreetMap or OpenTopoMap tiles for offline use
@@ -138,7 +138,6 @@ Red Grid Link v1.2.1 -- reliability and navigation update:
 - New app icon: updated network-star design with corner brackets
 - BLE transport debug logging for connection troubleshooting
 - Demo mode for screenshots (Washington DC coordinates)
-- 783 tests passing, 0 warnings
 
 ## What's New (v1.2)
 Red Grid Link v1.2 -- field hardening release:
@@ -155,12 +154,11 @@ Red Grid Link v1.2 -- field hardening release:
 - Crash reporting (Sentry, privacy-safe -- no location data sent)
 - Localization framework (English + Spanish)
 - Bug fixes and stability improvements from QA testing
-- 783 tests passing, 0 warnings
 
 ## What's New (v1.0)
 Red Grid Link v1.0 -- initial release:
 - Live MGRS navigation with 1-meter precision
-- Field Link proximity sync (BLE + peer-to-peer Wi-Fi)
+- Field Link proximity sync (BLE plus platform peer transports where available)
 - AES-256-GCM encrypted sync with ECDH key exchange
 - Offline map downloads (USGS Topo + OpenTopoMap)
 - Ghost markers with time-decay visualization
@@ -172,12 +170,12 @@ Red Grid Link v1.0 -- initial release:
 
 ## Privacy Highlights
 - No accounts, no analytics, no advertising networks
-- Operational data (sessions, markers, tracks) stays on your device until you delete it
+- Operational data (sessions, markers, tracks) stays on your device until you delete it, share it with nearby peers, or export it
 - Location used only when the app is in foreground (and during active Field Link sessions when background mode is enabled)
 - Field Link shares position only with nearby peers; PIN and QR sessions are AES-256-GCM encrypted, Open sessions are plaintext
 - Optional release-only crash diagnostics via Sentry, with PII off and GPS coordinates stripped
 - Map tile downloads are standard HTTPS requests to public OSM / OpenTopoMap servers (URL path only, no cookies, no identifiers)
-- No operational data is ever sent to any server controlled by Red Grid Link or any third party
+- Red Grid does not send operational data to its servers; Field Link shares only with nearby peers, and exports happen only when you initiate them
 
 ## Privacy URL
 https://redgridtactical.com/privacy.html

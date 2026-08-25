@@ -9,9 +9,9 @@ Red Grid Link is built on a simple principle: your operational data stays on you
 
 ## Data Collection Summary
 
-Red Grid Link does not collect personal data, does not run analytics, has no advertising networks, requires no account, and never transmits your operational data (positions, markers, sessions, tracks) to any server.
+Red Grid Link does not collect personal data, does not run analytics, has no advertising networks, requires no account, and does not cloud-sync operational data (positions, markers, sessions, tracks) or send it to Red Grid servers. Field Link shares operational data only with nearby peers in your active session, and exports happen only when you initiate them.
 
-The only optional outbound data is opt-in crash diagnostics, described below under **Crash Diagnostics**, which can be disabled by your IT/admin or omitted entirely from a build by your provider.
+Other outbound activity is limited to map tile downloads you request, native store purchase flows, and optional crash diagnostics described below under **Crash Diagnostics**, which can be disabled by your IT/admin or omitted entirely from a build by your provider.
 
 ---
 
@@ -71,7 +71,7 @@ The following data is saved locally on your device:
 - After-Action Report data (tracks, timestamps, team roster, markers)
 - Display theme and operational mode preferences
 
-All stored data lives **on your device only**. None of it is ever transmitted to any server.
+Stored operational data lives **on your device only** unless you share it with nearby Field Link peers or export it yourself. Red Grid does not transmit stored operational data to its servers.
 
 ---
 
@@ -154,7 +154,7 @@ This app does not knowingly collect any data from anyone, including children. No
 - **Preferences:** Stored locally until the app is uninstalled
 - **Crash diagnostics (when enabled):** Subject to [Sentry's data retention policy](https://docs.sentry.io/security-legal-pii/security/) — typically 30 to 90 days depending on plan
 
-No operational data is retained on any server because no operational data is ever sent to any server.
+No operational data is retained on Red Grid servers because the app does not send operational data to Red Grid servers.
 
 ---
 
