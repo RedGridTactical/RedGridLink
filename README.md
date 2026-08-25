@@ -23,7 +23,8 @@
 >
 > - **Already have it installed?** It keeps working. v1.7.0 unlocks every feature for everyone at no charge.
 > - **Paying for it?** You are not. Every subscription and the lifetime unlock have been removed from sale on both the App Store and Google Play. Nothing renews.
-> - **Want the team features?** They are in [Red Grid MGRS](https://github.com/RedGridTactical/RedGridMGRS) ([App Store](https://apps.apple.com/app/id6759629554) · [Google Play](https://play.google.com/store/apps/details?id=com.redgrid.redgridtactical)).
+> - **Want the team features?** They are in [Red Grid MGRS](https://github.com/RedGridTactical/RedGridMGRS) ([App Store](https://apps.apple.com/app/id6759629554) · [Google Play](https://play.google.com/store/apps/details?id=com.redgrid.redgridtactical)), **over Meshtastic LoRa radios**.
+> - **Relying on phone-to-phone Field Link?** That transport is **not** part of Red Grid MGRS. Link's team layer worked over Bluetooth and Multipeer with no extra hardware; Red Grid MGRS needs a Meshtastic radio. Keep using v1.7.0 if that matters to you, it is fully unlocked and will not stop working.
 >
 > This repository stays public and open source as an archive of the work. It is **feature-frozen**: no new releases are planned, and issues and pull requests are not being actively worked. All ongoing development happens in [RedGridMGRS](https://github.com/RedGridTactical/RedGridMGRS).
 
