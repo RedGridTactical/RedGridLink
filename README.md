@@ -4,7 +4,7 @@
 
 <h1 align="center">Red Grid Link</h1>
 
-[![Status](https://img.shields.io/badge/Status-Sunset%20%C2%B7%20merged%20into%20Red%20Grid%20MGRS-8B0000)](https://github.com/RedGridTactical/RedGridMGRS)
+[![Status](https://img.shields.io/badge/Status-Retired%20September%2027%2C%202026-8B0000)](https://github.com/RedGridTactical/RedGridMGRS)
 [![Final Release](https://img.shields.io/badge/Final%20Release-v1.7.0-CC0000)]()
 [![License](https://img.shields.io/badge/License-MIT%20%2B%20Commons%20Clause-8B0000)](LICENSE)
 [![No Tracking](https://img.shields.io/badge/Tracking-None-CC0000)](PRIVACY.md)
@@ -17,16 +17,17 @@
 [![Feature Frozen](https://img.shields.io/badge/Development-Feature%20Frozen-8B0000)]()
 [![Buy Me a Coffee](https://img.shields.io/badge/Buy%20Me%20a%20Coffee-Support-FFDD00?logo=buymeacoffee&logoColor=black)](https://buymeacoffee.com/redgridtac0)
 
-> ## ⚠️ Red Grid Link has merged into Red Grid MGRS
+> ## Red Grid Link is retired
 >
-> **v1.7.0 was the final release.** Red Grid Link is no longer distributed or sold. Team awareness now ships inside **[Red Grid MGRS](https://github.com/RedGridTactical/RedGridMGRS)** as an encrypted layer over Meshtastic, on the same offline map you already navigate with. One app, one purchase.
+> **Retired September 27, 2026. v1.7.0 is the final release.** Link has been removed from sale on the App Store and unpublished on Google Play. New subscriptions and lifetime purchases are no longer offered.
 >
-> - **Already have it installed?** It keeps working. v1.7.0 unlocks every feature for everyone at no charge.
-> - **Paying for it?** You are not. Every subscription and the lifetime unlock have been removed from sale on both the App Store and Google Play. Nothing renews.
-> - **Want the team features?** They are in [Red Grid MGRS](https://github.com/RedGridTactical/RedGridMGRS) ([App Store](https://apps.apple.com/app/id6759629554) · [Google Play](https://play.google.com/store/apps/details?id=com.redgrid.redgridtactical)), **over Meshtastic LoRa radios**.
-> - **Relying on phone-to-phone Field Link?** That transport is **not** part of Red Grid MGRS. Link's team layer worked over Bluetooth and Multipeer with no extra hardware; Red Grid MGRS needs a Meshtastic radio. Keep using v1.7.0 if that matters to you, it is fully unlocked and will not stop working.
+> - **Existing installations:** Retirement does not erase local maps, sessions or exports. Keep the installed app and back up important data using its export tools before changing devices or uninstalling. Future compatibility and reinstallation are not guaranteed.
+> - **Final release access:** v1.7.0 gives previously free users Pro+Link access, including themes, maps, AAR export and full Field Link. It preserves stored paid entitlements. No new purchase is required for that access.
+> - **Past purchases:** Check Apple or Google's subscription settings and purchase history for your account. For billing questions, contact support@redgridtactical.com.
+> - **Maintained product:** Development continues in [Red Grid MGRS](https://github.com/RedGridTactical/RedGridMGRS), available on [iOS](https://apps.apple.com/app/id6759629554) and [Android](https://play.google.com/store/apps/details?id=com.redgrid.redgridtactical).
+> - **Transport matters:** MGRS does **not** replace Link's phone-to-phone Bluetooth/Multipeer/Nearby transport. MGRS team radio features require compatible Meshtastic hardware. There is no automatic transfer of Link data or purchases to MGRS.
 >
-> This repository stays public and open source as an archive of the work. It is **feature-frozen**: no new releases are planned, and issues and pull requests are not being actively worked. All ongoing development happens in [RedGridMGRS](https://github.com/RedGridTactical/RedGridMGRS).
+> This public source repository is retained for reference under [MIT + Commons Clause](LICENSE). The license restricts selling the software; it is not an unrestricted open-source license. No further Link releases are planned, and issues and pull requests are not actively maintained.
 
 ---
 
@@ -34,7 +35,7 @@
 
 Built on the MGRS engine from [Red Grid MGRS](https://github.com/RedGridTactical/RedGridMGRS). Field Link adds zero-config proximity sync over Bluetooth, with Apple Multipeer Connectivity (iOS) and Google Play Services Nearby Connections (Android) running alongside as a parallel higher-bandwidth transport -- your team appears on the map the moment they're in range.
 
-> **Looking for the maintained app?** [Red Grid MGRS](https://github.com/RedGridTactical/RedGridMGRS) is a DAGR-class MGRS navigator with 12 tactical tools, 6 radio-ready report templates, and the encrypted team awareness that used to live here. Part of the [Red Grid Tactical](https://redgridtactical.com) ecosystem.
+> The feature descriptions below document the retired app. They are not an offer of current store availability or a roadmap commitment.
 
 ---
 
@@ -50,10 +51,10 @@ Built on the MGRS engine from [Red Grid MGRS](https://github.com/RedGridTactical
 
 ---
 
-## Features
+## Historical features
 
 ### MGRS-Native Navigation
-Live Military Grid Reference System coordinates with 1-meter precision. GPS Kalman filter for smooth, accurate position tracking. MGRS grid overlay on offline maps from GZD down to 100m resolution. Bearing, distance, dead reckoning, resection, pace count (with accelerometer step detection), declination, and coordinate conversion tools. NATO phonetic voice readout for hands-free grid calls.
+Military Grid Reference System coordinates with 1-meter grid resolution. Actual accuracy depends on the location receiver and conditions; coordinate resolution is not an accuracy guarantee. GPS Kalman filtering smooths position estimates. MGRS grid overlay on offline maps from GZD down to 100m resolution. Bearing, distance, dead reckoning, resection, pace count (with accelerometer step detection), declination, and coordinate conversion tools. NATO phonetic voice readout for hands-free grid calls.
 
 ### Field Link -- Team Sync Without Infrastructure
 Zero-config proximity sync over BLE on all platforms, with Apple Multipeer Connectivity (AWDL) on iOS and Google Play Services Nearby Connections on Android as parallel higher-bandwidth peer transports. Devices within range automatically discover each other and share position, marker, and annotation data. No cell service, pairing codes, or Red Grid servers required for active sessions.
@@ -64,12 +65,13 @@ Zero-config proximity sync over BLE on all platforms, with Apple Multipeer Conne
 - Delta payloads under 200 bytes per position update
 - Ghost markers with time-decay visualization when teammates disconnect
 - Velocity vectors project last-known movement direction
-- Expedition Mode: <3% battery/hr (BLE-only, 30s updates)
-- Ultra Expedition Mode: <2% battery/hr (BLE-only, 60s updates)
+- Expedition Mode: BLE-only, 30-second updates
+- Ultra Expedition Mode: BLE-only, 60-second updates
+- Battery use varies by device, conditions and settings; no fixed hourly rate is guaranteed.
 - Auto-reconnect with exponential backoff on disconnect
 
 ### Offline Maps
-Download map packs from OpenStreetMap or OpenTopoMap to MBTiles for offline operation, with MGRS grid lines rendered as a dynamic overlay. Region downloads are throttled to respect public-tile-server usage policies; for sustained heavy offline usage we recommend a licensed provider. (Native USGS / Mapbox / MapTiler integrations are on the roadmap.)
+Download map packs from OpenStreetMap or OpenTopoMap to MBTiles for offline operation, with MGRS grid lines rendered as a dynamic overlay. Region downloads are throttled to respect public-tile-server usage policies; for sustained heavy offline usage we recommend a licensed provider. No additional provider integrations are planned for the retired app.
 
 ### 4 Operational Modes
 One engine, four presentation layers. Terminology, icons, and quick actions adapt to your mission:
@@ -94,7 +96,7 @@ Real ECDH P-256 key exchange with per-peer derived encryption keys. BLE Coded PH
 One-tap PDF export: map snapshot, mission timeline, track data, timestamps, team roster with roles, per-member tracks, boundary events, markers, and session log. Share via AirDrop, file share, or any local transfer.
 
 ### 4 Tactical Themes
-Red Light (night vision, free), NVG Green (Pro), Day White (Pro), Blue Force (Pro).
+Red Light, NVG Green, Day White and Blue Force. Theme names do not imply night-vision equipment certification.
 
 ---
 
@@ -115,26 +117,11 @@ No accounts. No Red Grid servers. No cell service for active sessions. No config
 
 ---
 
-## Free vs Pro
+## Final release access and billing
 
-| Feature | Free | Pro | Pro+Link | Team |
-|---------|:----:|:---:|:--------:|:----:|
-| MGRS Navigation | Yes | Yes | Yes | Yes |
-| All Operational Modes | Yes | Yes | Yes | Yes |
-| 11 Tactical Tools | Yes | Yes | Yes | Yes |
-| Field Link (2 devices) | Yes | Yes | Yes | Yes |
-| All Themes | -- | Yes | Yes | Yes |
-| Unlimited Map Downloads | -- | Yes | Yes | Yes |
-| AAR Export | -- | Yes | Yes | Yes |
-| Full Field Link (8 devices) | -- | -- | Yes | Yes |
-| Team Management | -- | -- | -- | Yes |
+The former Free, Pro, Pro+Link, Team and Lifetime offers are retired. The final v1.7.0 release elevates previously free users to Pro+Link locally and preserves existing paid entitlement values. Historical pricing is no longer an offer to buy or subscribe.
 
-**Pricing:**
-- **Free** -- All modes, 2-device Field Link, 1 map region, Red Light theme
-- **Pro** -- $3.99/mo or $29.99/yr
-- **Pro+Link** -- $5.99/mo or $44.99/yr (Pro + full 8-device Field Link)
-- **Team** -- $199.99/yr (8 seats, includes Pro+Link for all members)
-- **Lifetime** -- $149.99 one-time (Pro+Link forever)
+Existing installations retain their local data. Back up important sessions and exports before uninstalling or changing devices. Store removal does not transfer purchases, subscriptions or data to MGRS.
 
 ---
 
@@ -165,55 +152,28 @@ flutter pub run build_runner build --delete-conflicting-outputs
 flutter run
 ```
 
-Requires Flutter SDK. Targets iOS and Android. All free features work from source. Pro features require a valid purchase through Apple or Google Play. Field Link requires Bluetooth and location permissions on physical devices.
+Requires Flutter SDK and the platform native toolchains. This is the retired v1.7.0 source, including its local Pro+Link access for previously free users. New store purchases are unavailable. Field Link requires Bluetooth and location permissions on physical devices. Source builds are for reference and use permitted by the license; they do not carry a future support guarantee.
 
 ---
 
-## Roadmap
+## Development status
 
-Full roadmap with feature checklists: [ROADMAP.md](ROADMAP.md)
-
-| Version | Target | Theme | Highlights |
-|---------|--------|-------|------------|
-| **V1.0** | **Complete** | Foundation | MGRS nav, Field Link (BLE+peer-to-peer Wi-Fi), 11 tools, AAR PDF, offline maps, 4 themes, IAP |
-| **V1.1** | **Complete** | Field Hardening | Kalman filter, step detector, Peer HUD, Ultra Expedition, auto-reconnect, map downloads, Sentry, l10n, Help/About |
-| **V1.2.1** | **Complete** | Reliability | Field Link session fix, waypoint persistence, relative bearing arrow, demo mode |
-| **V1.3** | **Complete** | Team Features | Team roles (Lead/Scout/Medic/Comms), waypoint sharing, shared annotations, boundary alerts, NATO voice callouts, session export/import |
-| **V1.4** | **Complete** | Range Awareness + Map Downloads | BLE Coded PHY / LR support detection, FixPhrase (4-word locations), OSM/OpenTopoMap tile downloads |
-| **V2.0** | Q4 2026 | Intelligence + Interop | ATAK/CoT interop, Meshtastic BLE bridge, elevation profiles, terrain analysis, weather overlay |
-| **V2.1** | Q1 2027 | Advanced Nav | Route planning, freehand annotations, track recording, GPX import/export, timeline replay |
-| **V3.0** | Q2 2027 | Connected Ops | Cloud relay, web dashboard, mesh networking, session scheduling, API |
-| **V3.1** | Q3 2027 | Sensors | Garmin inReach, external GPS, drone overlay, heart rate monitoring |
-| **V4.0** | Q4 2027 | Training | Scenario builder, instructor mode, scoring, AR compass, certification tracking |
-
-### Ongoing
-
-- Security audits and cryptographic library updates
-- Battery performance optimization
-- Map tile source expansion
-- Test coverage expansion (target 90%+)
-- Store listing optimization and A/B testing
+Development ended with v1.7.0. [ROADMAP.md](ROADMAP.md) is a historical record: unfinished items and old target dates are cancelled plans, not promised releases. Ongoing product development is in [Red Grid MGRS](https://github.com/RedGridTactical/RedGridMGRS).
 
 ---
 
-## Contributing
+## Support and contributions
 
-Red Grid Link is built in the open. We welcome bug reports, feature requests, and pull requests.
-
-- **Report a bug:** [Open an issue](https://github.com/RedGridTactical/RedGridLink/issues/new)
-- **Request a feature:** [Start a discussion](https://github.com/RedGridTactical/RedGridLink/discussions)
-- **Submit a PR:** Fork, branch, and open a pull request
-
-See the [Roadmap](ROADMAP.md) for planned features and where help is needed.
+Link issues and pull requests are not actively maintained, and new feature requests are not being scheduled. For questions about an existing installation or past billing, contact support@redgridtactical.com. MGRS issues belong in the [MGRS repository](https://github.com/RedGridTactical/RedGridMGRS/issues).
 
 ---
 
-## Red Grid Tactical Ecosystem
+## Red Grid Tactical projects
 
-| App | Purpose | Platform | Link |
-|-----|---------|----------|------|
-| **Red Grid MGRS** | Solo MGRS navigator (DAGR-class) | iOS | [GitHub](https://github.com/RedGridTactical/RedGridMGRS) · [App Store](https://apps.apple.com/app/id6759629554) |
-| **Red Grid Link** | Team awareness + encrypted coordination | iOS + Android | [GitHub](https://github.com/RedGridTactical/RedGridLink) · [App Store](https://apps.apple.com/app/red-grid-link/id6760084718) · [Google Play](https://play.google.com/store/apps/details?id=com.redgrid.red_grid_link) |
+| Project | Status | Links |
+|---------|--------|-------|
+| **Red Grid MGRS** | Maintained iOS and Android navigation app; optional Meshtastic radios | [GitHub](https://github.com/RedGridTactical/RedGridMGRS) · [Website](https://redgridtactical.com/mgrs) |
+| **Red Grid Link** | Retired; final v1.7.0 source retained for reference | [Retirement information](https://redgridtactical.com/link) |
 
 Website: [redgridtactical.com](https://redgridtactical.com)
 
@@ -221,12 +181,10 @@ Website: [redgridtactical.com](https://redgridtactical.com)
 
 ## License
 
-[MIT + Commons Clause](LICENSE) -- free for personal non-commercial use. Commercial and organizational deployment requires written permission.
+[MIT + Commons Clause](LICENSE). See the license for the restrictions on selling the software. Retirement does not change the license.
 
 Contact: support@redgridtactical.com
 
 ---
 
-*Your team. Your grid. No cell towers required.*
-
-If Red Grid Link helps you stay coordinated in the field, give it a star and share it with your team.
+*Historical source for Red Grid Link. Maintained product: [Red Grid MGRS](https://github.com/RedGridTactical/RedGridMGRS).*

@@ -1,7 +1,8 @@
-# Red Grid Link — Product Roadmap
+# Red Grid Link — Historical Roadmap
 
-> **Platform:** iOS on the App Store and Android on Google Play.
-> **Mission:** The fastest way to get a team on a shared map without infrastructure.
+> **Retired September 27, 2026.** v1.7.0 was the final release. Link is no longer offered to new users on the App Store or Google Play. This document preserves historical planning only: all unfinished items and future dates below are cancelled, not release commitments.
+>
+> The final v1.7.0 was a retirement release, not completion of the bridge proposal below. Development continues in [Red Grid MGRS](https://github.com/RedGridTactical/RedGridMGRS), whose radio features require Meshtastic hardware and do not replace Link phone-to-phone transport.
 
 ## V1.4 — Extended Range (COMPLETE)
 
@@ -37,7 +38,7 @@ Real ECDH key exchange, actual Coded PHY negotiation, emergency beacon, tactical
 
 ## V1.6 — Field Readiness Preflight (COMPLETE)
 
-**Status: Complete** — App v1.6.0 live on the App Store and Google Play
+**Historical status: Complete** — v1.6.0 was released on the App Store and Google Play before retirement.
 
 One-tap, pre-mission "is the team ready?" check that confirms every prerequisite before a team steps off coverage, plus a whole-team readiness board and a step-off snapshot in the After-Action Report.
 
